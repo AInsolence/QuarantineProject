@@ -1,0 +1,296 @@
+// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
+
+#include "QuarantineProjectCharacter.h"
+#include "HeadMountedDisplayFunctionLibrary.h"
+#include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Components/InputComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/Controller.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Animation/AnimInstance.h"
+#include "Kismet/GameplayStatics.h"
+#include "RifleProjectile_01.h"
+#include "Math/UnrealMathUtility.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "GameFramework/PlayerController.h"
+#include "QP_HUD.h"
+
+//////////////////////////////////////////////////////////////////////////
+// AQuarantineProjectCharacter
+
+AQuarantineProjectCharacter::AQuarantineProjectCharacter()
+{
+	// Set size for collision capsule
+	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
+
+	// set our turn rates for input
+	BaseTurnRate = 45.f;
+	BaseLookUpRate = 45.f;
+
+	// Configure character movement
+	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
+	GetCharacterMovement()->JumpZVelocity = 600.f;
+	GetCharacterMovement()->AirControl = 0.2f;
+	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
+
+	// Create a camera boom (pulls in towards the player if there is a collision)
+	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	CameraBoom->SetupAttachment(RootComponent);
+	CameraBoom->TargetArmLength = 150.0f; // The camera follows at this distance behind the character	
+	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
+
+	// Create a follow camera
+	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
+	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
+	FollowCamera->SetRelativeLocation(FVector(0, 50.f, 90.f));
+	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+	FollowCamera->SetFieldOfView(110.f);
+
+	// Create a follow camera
+	AimingCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("AimingCamera"));
+	AimingCamera->SetupAttachment(GetCapsuleComponent()); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
+	AimingCamera->SetRelativeLocation(FVector(-50.f, 50.f, 90.f));
+	AimingCamera->bUsePawnControlRotation = true; // Camera does not rotate relative to arm
+	AimingCamera->SetFieldOfView(80.f);
+
+	// Create a sniper camera
+	SniperAimingCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("SniperAimingCamera"));
+	SniperAimingCamera->SetupAttachment(GetCapsuleComponent()); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
+	SniperAimingCamera->SetRelativeLocation(FVector(0.f, 0.f, 90.f));
+	SniperAimingCamera->bUsePawnControlRotation = true; // Camera does not rotate relative to arm
+	SniperAimingCamera->SetFieldOfView(25.f);
+
+	// Create weapon in character hands
+	WeaponInHands = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponInHands"));
+	FVector InHandLocation = GetMesh()->GetSocketLocation(FName("RightHandWeaponSocket"));
+	WeaponInHands->AttachToComponent(GetMesh(),
+									FAttachmentTransformRules::SnapToTargetNotIncludingScale,
+									FName("RightHandWeaponSocket"));
+	// Set init crosshair visibility
+	//GetPlayerHUD()->SetCrosshairVisibility(bIsAiming);
+	
+	// Init base speed sprint variables
+	BaseWalkingSpeed = GetCharacterMovement()->MaxWalkSpeed;
+
+	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
+	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+void AQuarantineProjectCharacter::AimToTarget()
+{// Switch aiming status
+	bIsAiming = !bIsAiming;
+	// Switch camera
+	// SniperAimingCamera->SetActive(bIsAiming);
+	AimingCamera->SetActive(bIsAiming); //TODO change to real swith depends on the weapon type
+	FollowCamera->SetActive(!bIsAiming);
+	// Show crosshair in aiming mode
+	GetPlayerHUD()->SetCrosshairVisibility(bIsAiming);
+}
+
+
+void AQuarantineProjectCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// Don't rotate when the controller rotates. Let that just affect the camera.
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = true; // allow to move camera up'n'down TRUE
+	bUseControllerRotationRoll = false;
+}
+
+void AQuarantineProjectCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	
+	/**  Sprint logic */
+	float RampThisFrame = (DeltaTime / TimeToMaxSprintSpeed) * MaxSprintMultiplier;
+	if (bIsSprinting)
+	{
+		BaseSprintMultiplier += RampThisFrame;
+	}
+	else
+	{
+		BaseSprintMultiplier -= RampThisFrame;
+	}
+	BaseSprintMultiplier = FMath::Clamp(BaseSprintMultiplier, 1.0f, MaxSprintMultiplier);
+	GetCharacterMovement()->MaxWalkSpeed = BaseWalkingSpeed * BaseSprintMultiplier;
+	/**  Sprint logic end */
+}
+
+void AQuarantineProjectCharacter::OnResetVR()
+{
+	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
+}
+
+void AQuarantineProjectCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
+{
+		Jump();
+}
+
+void AQuarantineProjectCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
+{
+		StopJumping();
+}
+
+AQP_HUD* AQuarantineProjectCharacter::GetPlayerHUD() const
+{// helper to get player HUD from controller
+	return Cast<AQP_HUD>(Cast<APlayerController>(GetController())->GetHUD());
+}
+
+void AQuarantineProjectCharacter::TurnAtRate(float Rate)
+{
+	// calculate delta for this frame from the rate information
+	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
+}
+
+void AQuarantineProjectCharacter::LookUpAtRate(float Rate)
+{
+	// calculate delta for this frame from the rate information
+	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+}
+
+void AQuarantineProjectCharacter::MoveForward(float Value)
+{
+	if ((Controller != NULL) && (Value != 0.0f))
+	{
+		// find out which way is forward
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+		// get forward vector
+		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		AddMovementInput(Direction, Value);
+	}
+}
+
+void AQuarantineProjectCharacter::MoveRight(float Value)
+{
+	if ( (Controller != NULL) && (Value != 0.0f) )
+	{
+		// find out which way is right
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+	
+		// get right vector 
+		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		// add movement in that direction
+		AddMovementInput(Direction, Value);
+	}
+}
+
+void AQuarantineProjectCharacter::Jump()
+{
+	Super::Jump();
+}
+
+void AQuarantineProjectCharacter::StopJumping()
+{
+	Super::StopJumping();
+}
+
+void AQuarantineProjectCharacter::AddControllerYawInput(float Value)
+{
+	Super::AddControllerYawInput(Value);
+}
+
+void AQuarantineProjectCharacter::AddControllerPitchInput(float Value)
+{
+	Super::AddControllerPitchInput(Value);
+}
+
+void AQuarantineProjectCharacter::Crouch()
+{
+	Super::Crouch();
+}
+
+void AQuarantineProjectCharacter::UnCrouch()
+{
+	Super::UnCrouch();
+}
+
+void AQuarantineProjectCharacter::SprintStart()
+{
+	bIsSprinting = true;
+	UE_LOG(LogTemp, Warning, TEXT("Sprint start"))
+}
+
+void AQuarantineProjectCharacter::SprintEnd()
+{
+	bIsSprinting = false;
+}
+
+void AQuarantineProjectCharacter::OnFire()
+{
+	// try and fire a projectile
+	if (ProjectileClass != NULL)
+	{
+		UWorld* const World = GetWorld();
+		if (World != NULL)
+		{
+			if (WeaponInHands)
+			{
+				FRotator MuzzleRotation;
+				FVector MuzzleLocation = WeaponInHands->GetSocketLocation("Muzzle");
+				if (bIsAiming && !bIsSprinting)
+				{
+					MuzzleRotation = AimingCamera->GetComponentRotation();
+				}
+				else
+				{
+					MuzzleRotation = WeaponInHands->GetSocketRotation("Muzzle");
+				}
+				//Set Spawn Collision Handling Override
+				FActorSpawnParameters ActorSpawnParams;
+				ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+				// spawn the projectile at the place
+				World->SpawnActor<ARifleProjectile_01>(ProjectileClass, 
+														MuzzleLocation, 
+														MuzzleRotation, 
+														ActorSpawnParams);
+				// spawn the projectiles shell
+				World->SpawnActor<ARifleProjectile_01>(ShellClass,
+														WeaponInHands->GetSocketLocation("ShellSocket"),
+														WeaponInHands->GetSocketRotation("ShellSocket"),
+														ActorSpawnParams);
+				if (MuzzleFireEffect)
+				{
+					// spawn muzzle fire effect
+					auto Explosion = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),
+																				MuzzleFireEffect,
+																				MuzzleLocation);
+					Explosion->SetRelativeScale3D(FVector(0.03f));
+				}
+				
+			}
+		}
+	}
+
+	// try and play the sound if specified
+	if (FireSound != NULL)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+	}
+
+	// try and play a firing animation if specified
+	if (FireAnimationHip && FireAnimationAiming)
+	{
+		// Get the animation object for the mesh
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance != NULL)
+		{
+			if (bIsAiming)
+			{
+				AnimInstance->Montage_Play(FireAnimationAiming, 1.f);
+			}
+			else
+			{
+				AnimInstance->Montage_Play(FireAnimationHip, 1.f);
+			}	
+		}
+	}
+}
