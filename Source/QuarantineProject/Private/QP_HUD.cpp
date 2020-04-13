@@ -53,3 +53,8 @@ void AQP_HUD::SetCrosshairVisibility(bool bIsCrosshairVisible)
 		AimingWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
+
+void AQP_HUD::UpdateHealthState(float CurrentHealth)
+{
+	PlayerStateInfoWidget->UpdateHealthState(CurrentHealth);
+}

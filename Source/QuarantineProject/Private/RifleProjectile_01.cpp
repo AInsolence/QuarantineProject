@@ -7,6 +7,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Components/SphereComponent.h"
 #include "QuarantineProject/QuarantineProjectCharacter.h"
+#include "GameFramework/DamageType.h"
 
 // Sets default values
 ARifleProjectile_01::ARifleProjectile_01()
@@ -45,21 +46,22 @@ void ARifleProjectile_01::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor
 		// create explosion particle effect
 		auto Explosion = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticles, GetActorLocation());
 		Explosion->SetRelativeScale3D(FVector(0.3f));
-		if (KillActorsWithThatClass)
+		if (InflictDamageToThisClass)
 		{
-			if (OtherActor->GetClass() == KillActorsWithThatClass)
+			if (OtherActor->GetClass() == InflictDamageToThisClass)
 			{
-				OtherActor->Destroy();
+				// Create a damage event  
+				TSubclassOf<UDamageType> const ValidDamageTypeClass = TSubclassOf<UDamageType>(UDamageType::StaticClass());
+				FDamageEvent DamageEvent(ValidDamageTypeClass);
+
+				const float DamageAmount = 30.0f;
+				OtherActor->TakeDamage(DamageAmount, 
+											DamageEvent, 
+											GetWorld()->GetFirstPlayerController(),
+											this);
 			}
 		}
 		// destroy projectile
-		Destroy();
-	}
-	// Only add impulse and destroy projectile if we hit a physics
-	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
-	{
-		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
-
 		Destroy();
 	}
 }

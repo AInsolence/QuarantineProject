@@ -29,7 +29,7 @@ public:
 
 	/** Explosion effect */
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
-	TSubclassOf<class AQuarantineProjectCharacter> KillActorsWithThatClass;
+	TSubclassOf<class AQuarantineProjectCharacter> InflictDamageToThisClass;
 
 	/** called when projectile hits something */
 	UFUNCTION()

@@ -26,3 +26,8 @@ void UQP_PlayerStateInfoWidget::NativeConstruct()
         }
     }
 }
+
+void UQP_PlayerStateInfoWidget::UpdateHealthState(float CurrentHealth)
+{
+    HealthBar->SetPercent(CurrentHealth);
+}

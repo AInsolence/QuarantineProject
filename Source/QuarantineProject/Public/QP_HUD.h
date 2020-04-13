@@ -35,4 +35,6 @@ public:
 
     UFUNCTION()
     void SetCrosshairVisibility(bool bIsCrosshairVisible);
+    UFUNCTION()
+    void UpdateHealthState(float CurrentHealth);
 };

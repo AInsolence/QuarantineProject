@@ -16,6 +16,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "QP_HUD.h"
+#include "QP_HealthComponent.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AQuarantineProjectCharacter
@@ -56,12 +57,8 @@ AQuarantineProjectCharacter::AQuarantineProjectCharacter()
 	AimingCamera->bUsePawnControlRotation = true; // Camera does not rotate relative to arm
 	AimingCamera->SetFieldOfView(80.f);
 
-	// Create a sniper camera
-	SniperAimingCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("SniperAimingCamera"));
-	SniperAimingCamera->SetupAttachment(GetCapsuleComponent()); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
-	SniperAimingCamera->SetRelativeLocation(FVector(0.f, 0.f, 90.f));
-	SniperAimingCamera->bUsePawnControlRotation = true; // Camera does not rotate relative to arm
-	SniperAimingCamera->SetFieldOfView(25.f);
+	// Create health component
+	HealthComponent = CreateDefaultSubobject<UQP_HealthComponent>(TEXT("HealthComponent"));
 
 	// Create weapon in character hands
 	WeaponInHands = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponInHands"));
@@ -74,7 +71,7 @@ AQuarantineProjectCharacter::AQuarantineProjectCharacter()
 	
 	// Init base speed sprint variables
 	BaseWalkingSpeed = GetCharacterMovement()->MaxWalkSpeed;
-
+	
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
@@ -85,7 +82,6 @@ void AQuarantineProjectCharacter::AimToTarget()
 {// Switch aiming status
 	bIsAiming = !bIsAiming;
 	// Switch camera
-	// SniperAimingCamera->SetActive(bIsAiming);
 	AimingCamera->SetActive(bIsAiming); //TODO change to real swith depends on the weapon type
 	FollowCamera->SetActive(!bIsAiming);
 	// Show crosshair in aiming mode

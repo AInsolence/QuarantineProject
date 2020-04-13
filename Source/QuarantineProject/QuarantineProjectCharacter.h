@@ -32,9 +32,9 @@ protected:
 	/** Aiming camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* AimingCamera;
-	/** Sniper aiming camera */
+	/** Health component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* SniperAimingCamera;
+	class UQP_HealthComponent* HealthComponent;
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
@@ -120,7 +120,6 @@ public:
 	/** Handler for when a touch input stops. */
 	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
 
-private:
 	class AQP_HUD* GetPlayerHUD() const;
 };
 
