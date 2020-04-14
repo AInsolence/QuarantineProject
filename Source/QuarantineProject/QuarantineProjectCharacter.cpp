@@ -97,6 +97,9 @@ void AQuarantineProjectCharacter::BeginPlay()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = true; // allow to move camera up'n'down TRUE
 	bUseControllerRotationRoll = false;
+
+	//
+	OnTakeAnyDamage.AddDynamic(this, &AQuarantineProjectCharacter::OnTakeDamage);
 }
 
 void AQuarantineProjectCharacter::Tick(float DeltaTime)
@@ -287,6 +290,36 @@ void AQuarantineProjectCharacter::OnFire()
 			{
 				AnimInstance->Montage_Play(FireAnimationHip, 1.f);
 			}	
+		}
+	}
+}
+
+void AQuarantineProjectCharacter::OnTakeDamage(AActor* DamagedActor, 
+												float Damage, 
+												const UDamageType* DamageType,
+												AController* InstigatedBy,
+												AActor* DamageCauser)
+{
+	
+	// Disable collision capsule
+	if (HealthComponent) 
+	{// check if causer not a player itself and update HUD health status
+		if (InstigatedBy != GetWorld()->GetFirstPlayerController())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Try to change HUD with %f"), HealthComponent->GetCurrentHealth())
+			if (GetPlayerHUD())
+			{
+				GetPlayerHUD()->UpdateHealthState(HealthComponent->GetCurrentHealth()/100);
+			}
+		}
+		// check if the character is dead
+		if (HealthComponent->GetCurrentHealth() <= 0)
+		{
+			auto Capsule = DamagedActor->FindComponentByClass<UCapsuleComponent>();
+			if (Capsule)
+			{
+				Capsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			}
 		}
 	}
 }

@@ -19,7 +19,6 @@ UQP_HealthComponent::UQP_HealthComponent()
 	CurrentHealth = DefaultHealth;
 }
 
-
 // Called when the game starts
 void UQP_HealthComponent::BeginPlay()
 {
@@ -42,32 +41,7 @@ void UQP_HealthComponent::TakeDamage(AActor* DamagedActor,
 	{
 		return;
 	}
-
 	CurrentHealth = FMath::Clamp(CurrentHealth - Damage, 0.0f, DefaultHealth);
-
-	// check if causer not a player itself and update HUD health status
-	if (InstigatedBy != GetWorld()->GetFirstPlayerController())
-	{
-		auto PlayerController = GetWorld()->GetFirstPlayerController();
-			if (PlayerController)
-			{
-				auto HUD = Cast<AQP_HUD>(PlayerController->GetHUD());
-				if (HUD)
-				{
-					HUD->UpdateHealthState(CurrentHealth/DefaultHealth);
-				}
-			}
-	}
-	
-	// Death
-	if (CurrentHealth <= 0.0f)
-	{// disable capsule collison after characters death
-		auto Capsule = DamagedActor->FindComponentByClass<UCapsuleComponent>();
-		if (Capsule)
-		{
-			Capsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		}
-	}
 	UE_LOG(LogTemp, Warning, TEXT("Current Health: %f"), CurrentHealth)
 }
 

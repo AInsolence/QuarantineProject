@@ -15,20 +15,21 @@ class QUARANTINEPROJECT_API UQP_HealthComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UQP_HealthComponent();
+	FORCEINLINE float GetCurrentHealth() const { return CurrentHealth; };
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
-	float DefaultHealth = 100.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
-	float CurrentHealth;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
-	float DefaultStamina = 100.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
-	float CurrentStamina;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+		float DefaultHealth = 100.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+		float CurrentHealth;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+		float DefaultStamina = 100.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+		float CurrentStamina;
+	
 	UFUNCTION()
 	void TakeDamage(AActor* DamagedActor,
 						float Damage,

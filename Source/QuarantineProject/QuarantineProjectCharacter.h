@@ -104,6 +104,13 @@ public:
 	void AimToTarget();
 	/** Firing */
 	void OnFire();
+	/** OnTakeAnyDamage event function */
+	UFUNCTION()
+	void OnTakeDamage(AActor* DamagedActor,
+						float Damage,
+						const class UDamageType* DamageType,
+						class AController* InstigatedBy,
+						AActor* DamageCauser);
 
 	/** 
 	 * Called via input to turn at a given rate. 

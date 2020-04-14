@@ -14,6 +14,7 @@ AQP_HUD::AQP_HUD(const FObjectInitializer& ObjectInitializer)
 void AQP_HUD::BeginPlay()
 {
 	Super::BeginPlay();
+	// add aiming widget
 	if (AimingWidgetClass)
 	{
 		AimingWidget = CreateWidget<UAimingWidget>(GetWorld(), AimingWidgetClass);
@@ -22,6 +23,7 @@ void AQP_HUD::BeginPlay()
 			AimingWidget->AddToViewport();
 		}
 	}
+	// add player state  widget
 	if (PlayerStateInfoWidgetClass)
 	{
 		PlayerStateInfoWidget = CreateWidget<UQP_PlayerStateInfoWidget>(GetWorld(), PlayerStateInfoWidgetClass);
@@ -56,5 +58,6 @@ void AQP_HUD::SetCrosshairVisibility(bool bIsCrosshairVisible)
 
 void AQP_HUD::UpdateHealthState(float CurrentHealth)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Try to change HUD with %f"), CurrentHealth)
 	PlayerStateInfoWidget->UpdateHealthState(CurrentHealth);
 }
