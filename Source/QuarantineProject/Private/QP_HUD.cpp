@@ -59,5 +59,16 @@ void AQP_HUD::SetCrosshairVisibility(bool bIsCrosshairVisible)
 void AQP_HUD::UpdateHealthState(float CurrentHealth)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Try to change HUD with %f"), CurrentHealth)
-	PlayerStateInfoWidget->UpdateHealthState(CurrentHealth);
+	if (PlayerStateInfoWidget)
+	{
+		PlayerStateInfoWidget->UpdateHealthState(CurrentHealth);
+	}
+}
+
+void AQP_HUD::UpdateStaminaState(float CurrentStamina)
+{
+	if (PlayerStateInfoWidget)
+	{
+		PlayerStateInfoWidget->UpdateStaminaState(CurrentStamina);
+	}
 }

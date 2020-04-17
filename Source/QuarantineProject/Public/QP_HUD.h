@@ -37,4 +37,6 @@ public:
     void SetCrosshairVisibility(bool bIsCrosshairVisible);
     UFUNCTION()
     void UpdateHealthState(float CurrentHealth);
+    UFUNCTION()
+    void UpdateStaminaState(float CurrentStamina);
 };

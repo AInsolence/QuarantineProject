@@ -26,4 +26,16 @@ public:
 	class UProgressBar* StaminaBar;
 	UFUNCTION()
 	void UpdateHealthState(float CurrentHealth);
+	UFUNCTION()
+	void UpdateStaminaState(float CurrentStamina);
+
+private:
+	void StoreWidgetAnimations();
+	UWidgetAnimation* const GetAnimationByName(FName AnimationName) const;
+	TMap<FName, UWidgetAnimation*> AnimationsMap;
+
+	UPROPERTY(meta = (BindWidgetAnim))
+	UWidgetAnimation* HealthBarAnimation = nullptr;
+	UPROPERTY(meta = (BindWidgetAnim))
+	UWidgetAnimation* StaminaBarAnimation = nullptr;
 };

@@ -64,30 +64,19 @@ AQuarantineProjectCharacter::AQuarantineProjectCharacter()
 	WeaponInHands = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponInHands"));
 	FVector InHandLocation = GetMesh()->GetSocketLocation(FName("RightHandWeaponSocket"));
 	WeaponInHands->AttachToComponent(GetMesh(),
-									FAttachmentTransformRules::SnapToTargetNotIncludingScale,
-									FName("RightHandWeaponSocket"));
+		FAttachmentTransformRules::SnapToTargetNotIncludingScale,
+		FName("RightHandWeaponSocket"));
 	// Set init crosshair visibility
 	//GetPlayerHUD()->SetCrosshairVisibility(bIsAiming);
-	
+
 	// Init base speed sprint variables
 	BaseWalkingSpeed = GetCharacterMovement()->MaxWalkSpeed;
-	
+
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
 
 //////////////////////////////////////////////////////////////////////////
-
-void AQuarantineProjectCharacter::AimToTarget()
-{// Switch aiming status
-	bIsAiming = !bIsAiming;
-	// Switch camera
-	AimingCamera->SetActive(bIsAiming); //TODO change to real swith depends on the weapon type
-	FollowCamera->SetActive(!bIsAiming);
-	// Show crosshair in aiming mode
-	GetPlayerHUD()->SetCrosshairVisibility(bIsAiming);
-}
-
 
 void AQuarantineProjectCharacter::BeginPlay()
 {
@@ -105,21 +94,41 @@ void AQuarantineProjectCharacter::BeginPlay()
 void AQuarantineProjectCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+
 	/**  Sprint logic */
 	float RampThisFrame = (DeltaTime / TimeToMaxSprintSpeed) * MaxSprintMultiplier;
-	if (bIsSprinting)
+	if (bIsSprinting && HealthComponent->GetCurrentStamina() > 0.5f)
 	{
 		BaseSprintMultiplier += RampThisFrame;
+		if (HealthComponent)
+		{
+			HealthComponent->ChangeCurrentStaminaTo(-0.5f);
+			if (GetPlayerHUD() != nullptr)
+			{
+				GetPlayerHUD()->UpdateStaminaState(HealthComponent->GetCurrentStamina() / 100);
+				UE_LOG(LogTemp, Warning, TEXT("Stamina is : %f"), HealthComponent->GetCurrentStamina())
+			}
+		}
+
 	}
 	else
 	{
 		BaseSprintMultiplier -= RampThisFrame;
+		if (HealthComponent)
+		{
+			HealthComponent->ChangeCurrentStaminaTo(0.1f);
+			if (GetPlayerHUD() != nullptr)
+			{
+				GetPlayerHUD()->UpdateStaminaState(HealthComponent->GetCurrentStamina() / 100);
+			}
+		}
 	}
 	BaseSprintMultiplier = FMath::Clamp(BaseSprintMultiplier, 1.0f, MaxSprintMultiplier);
 	GetCharacterMovement()->MaxWalkSpeed = BaseWalkingSpeed * BaseSprintMultiplier;
 	/**  Sprint logic end */
 }
+
+//*****            INPUT LOGIC                *****//
 
 void AQuarantineProjectCharacter::OnResetVR()
 {
@@ -128,17 +137,30 @@ void AQuarantineProjectCharacter::OnResetVR()
 
 void AQuarantineProjectCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
 {
-		Jump();
+	Jump();
 }
 
 void AQuarantineProjectCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
 {
-		StopJumping();
+	StopJumping();
 }
 
 AQP_HUD* AQuarantineProjectCharacter::GetPlayerHUD() const
 {// helper to get player HUD from controller
-	return Cast<AQP_HUD>(Cast<APlayerController>(GetController())->GetHUD());
+	if (GetWorld()->GetFirstPlayerController())
+	{
+		if (Cast<APlayerController>(GetController()))
+		{
+			auto HUDPtr = Cast<AQP_HUD>(Cast<APlayerController>(GetController())->GetHUD());
+			if (HUDPtr)
+			{
+				return HUDPtr;
+			}
+			return nullptr;
+		}
+		return nullptr;
+	}
+	return nullptr;
 }
 
 void AQuarantineProjectCharacter::TurnAtRate(float Rate)
@@ -215,7 +237,6 @@ void AQuarantineProjectCharacter::UnCrouch()
 void AQuarantineProjectCharacter::SprintStart()
 {
 	bIsSprinting = true;
-	UE_LOG(LogTemp, Warning, TEXT("Sprint start"))
 }
 
 void AQuarantineProjectCharacter::SprintEnd()
@@ -223,8 +244,19 @@ void AQuarantineProjectCharacter::SprintEnd()
 	bIsSprinting = false;
 }
 
+void AQuarantineProjectCharacter::AimToTarget()
+{// Switch aiming status
+	bIsAiming = !bIsAiming;
+	// Switch camera
+	AimingCamera->SetActive(bIsAiming); //TODO change to real swith depends on the weapon type
+	FollowCamera->SetActive(!bIsAiming);
+	// Show crosshair in aiming mode
+	GetPlayerHUD()->SetCrosshairVisibility(bIsAiming);
+}
+
 void AQuarantineProjectCharacter::OnFire()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Try to fire"))
 	// try and fire a projectile
 	if (ProjectileClass != NULL)
 	{
@@ -294,25 +326,17 @@ void AQuarantineProjectCharacter::OnFire()
 	}
 }
 
+//*****                                        *****//
+
 void AQuarantineProjectCharacter::OnTakeDamage(AActor* DamagedActor, 
 												float Damage, 
 												const UDamageType* DamageType,
 												AController* InstigatedBy,
 												AActor* DamageCauser)
 {
-	
-	// Disable collision capsule
 	if (HealthComponent) 
-	{// check if causer not a player itself and update HUD health status
-		if (InstigatedBy != GetWorld()->GetFirstPlayerController())
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Try to change HUD with %f"), HealthComponent->GetCurrentHealth())
-			if (GetPlayerHUD())
-			{
-				GetPlayerHUD()->UpdateHealthState(HealthComponent->GetCurrentHealth()/100);
-			}
-		}
-		// check if the character is dead
+	{
+		// Disable collision capsule if the character is dead
 		if (HealthComponent->GetCurrentHealth() <= 0)
 		{
 			auto Capsule = DamagedActor->FindComponentByClass<UCapsuleComponent>();
@@ -320,6 +344,22 @@ void AQuarantineProjectCharacter::OnTakeDamage(AActor* DamagedActor,
 			{
 				Capsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			}
+		}
+		//update HUD health status
+		if (GetPlayerHUD())
+		{
+			GetPlayerHUD()->UpdateHealthState(HealthComponent->GetCurrentHealth() / 100);
+		}
+	}
+
+	// try and play injured animation if specified
+	if (InjuredAnimation)
+	{
+		// Get the animation object for the mesh
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance != NULL)
+		{
+			AnimInstance->Montage_Play(InjuredAnimation, 0.5f);
 		}
 	}
 }

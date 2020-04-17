@@ -17,6 +17,12 @@ UQP_HealthComponent::UQP_HealthComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 
 	CurrentHealth = DefaultHealth;
+	CurrentStamina = DefaultStamina;
+}
+
+void UQP_HealthComponent::ChangeCurrentStaminaTo(float StaminaCost)
+{
+	CurrentStamina = FMath::Clamp(CurrentStamina + StaminaCost, 0.0f, DefaultStamina);
 }
 
 // Called when the game starts

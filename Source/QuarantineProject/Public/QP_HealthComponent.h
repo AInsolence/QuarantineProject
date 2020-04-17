@@ -16,6 +16,9 @@ public:
 	// Sets default values for this component's properties
 	UQP_HealthComponent();
 	FORCEINLINE float GetCurrentHealth() const { return CurrentHealth; };
+	FORCEINLINE float GetCurrentStamina() const { return CurrentStamina; };
+	UFUNCTION()
+	void ChangeCurrentStaminaTo(float StaminaCost);
 
 protected:
 	// Called when the game starts
