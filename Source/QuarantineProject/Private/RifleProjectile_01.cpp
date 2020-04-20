@@ -54,7 +54,6 @@ void ARifleProjectile_01::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor
 				TSubclassOf<UDamageType> const ValidDamageTypeClass = TSubclassOf<UDamageType>(UDamageType::StaticClass());
 				FDamageEvent DamageEvent(ValidDamageTypeClass);
 
-				const float DamageAmount = 30.0f;
 				OtherActor->TakeDamage(DamageAmount, 
 											DamageEvent, 
 											GetWorld()->GetFirstPlayerController(),

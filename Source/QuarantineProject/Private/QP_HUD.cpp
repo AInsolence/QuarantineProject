@@ -21,6 +21,7 @@ void AQP_HUD::BeginPlay()
 		if (AimingWidget)
 		{
 			AimingWidget->AddToViewport();
+			AimingWidget->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
 	// add player state  widget

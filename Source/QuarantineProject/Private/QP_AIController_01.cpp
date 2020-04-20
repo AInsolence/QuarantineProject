@@ -4,6 +4,7 @@
 #include "QP_AIController_01.h"
 #include "QuarantineProject/QuarantineProjectCharacter.h"
 #include "TimerManager.h"
+#include "Engine/World.h"
 
 void AQP_AIController_01::BeginPlay()
 {
@@ -16,7 +17,23 @@ void AQP_AIController_01::BeginPlay()
 void AQP_AIController_01::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	auto const World = GetWorld();
 
+	if (World)
+	{
+		auto const Controller = World->GetFirstPlayerController();
+
+		if (Controller)
+		{
+			auto PlayerCharacter = Controller->GetPawn();
+			if (PlayerCharacter)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Try to move to character"))
+				MoveToActor(PlayerCharacter, 1500, true, true, false);
+			}
+				
+		}
+	}
 }
 
 ACharacter* AQP_AIController_01::GetControlledCharacter() const

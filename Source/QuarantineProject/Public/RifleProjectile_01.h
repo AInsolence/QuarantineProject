@@ -27,6 +27,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 	class UParticleSystem* ExplosionParticles = nullptr;
 
+	// Set damage value
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	float DamageAmount = 30.0f;
+
 	/** Explosion effect */
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 	TSubclassOf<class AQuarantineProjectCharacter> InflictDamageToThisClass;

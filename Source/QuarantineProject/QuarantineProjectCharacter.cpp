@@ -17,6 +17,7 @@
 #include "GameFramework/PlayerController.h"
 #include "QP_HUD.h"
 #include "QP_HealthComponent.h"
+#include "QuarantineProject/Public/QP_WeaponBase.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AQuarantineProjectCharacter
@@ -60,18 +61,6 @@ AQuarantineProjectCharacter::AQuarantineProjectCharacter()
 	// Create health component
 	HealthComponent = CreateDefaultSubobject<UQP_HealthComponent>(TEXT("HealthComponent"));
 
-	// Create weapon in character hands
-	WeaponInHands = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponInHands"));
-	FVector InHandLocation = GetMesh()->GetSocketLocation(FName("RightHandWeaponSocket"));
-	WeaponInHands->AttachToComponent(GetMesh(),
-		FAttachmentTransformRules::SnapToTargetNotIncludingScale,
-		FName("RightHandWeaponSocket"));
-	// Set init crosshair visibility
-	//GetPlayerHUD()->SetCrosshairVisibility(bIsAiming);
-
-	// Init base speed sprint variables
-	BaseWalkingSpeed = GetCharacterMovement()->MaxWalkSpeed;
-
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
@@ -87,8 +76,32 @@ void AQuarantineProjectCharacter::BeginPlay()
 	bUseControllerRotationYaw = true; // allow to move camera up'n'down TRUE
 	bUseControllerRotationRoll = false;
 
+	// set base speed sprint variables
+	BaseWalkingSpeed = GetCharacterMovement()->MaxWalkSpeed;
+	
 	//
 	OnTakeAnyDamage.AddDynamic(this, &AQuarantineProjectCharacter::OnTakeDamage);
+
+	// Init weapon
+	if (WeaponInHandsClass)
+	{
+		UWorld* const World = GetWorld();
+		if (World != nullptr)
+		{
+			WeaponInHands = World->SpawnActor<AQP_WeaponBase>(WeaponInHandsClass);
+		}
+	}
+
+	if (WeaponInHands)
+	{
+
+		// Create weapon in character hands
+		FVector InHandLocation = GetMesh()->GetSocketLocation(FName("RightHandWeaponSocket"));
+		WeaponInHands->AttachToComponent(GetMesh(),
+										FAttachmentTransformRules::SnapToTargetNotIncludingScale,
+										FName("RightHandWeaponSocket"));
+	}
+
 }
 
 void AQuarantineProjectCharacter::Tick(float DeltaTime)
@@ -256,57 +269,29 @@ void AQuarantineProjectCharacter::AimToTarget()
 
 void AQuarantineProjectCharacter::OnFire()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Try to fire"))
 	// try and fire a projectile
-	if (ProjectileClass != NULL)
+	if (ProjectileClass != nullptr)
 	{
 		UWorld* const World = GetWorld();
-		if (World != NULL)
+		if (World != nullptr)
 		{
 			if (WeaponInHands)
 			{
 				FRotator MuzzleRotation;
-				FVector MuzzleLocation = WeaponInHands->GetSocketLocation("Muzzle");
 				if (bIsAiming && !bIsSprinting)
 				{
 					MuzzleRotation = AimingCamera->GetComponentRotation();
+					WeaponInHands->Fire(MuzzleRotation);
 				}
 				else
 				{
-					MuzzleRotation = WeaponInHands->GetSocketRotation("Muzzle");
+					MuzzleRotation = WeaponInHands->GetMuzzleRotation();
+					WeaponInHands->Fire(MuzzleRotation);
 				}
-				//Set Spawn Collision Handling Override
-				FActorSpawnParameters ActorSpawnParams;
-				ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-				// spawn the projectile at the place
-				World->SpawnActor<ARifleProjectile_01>(ProjectileClass, 
-														MuzzleLocation, 
-														MuzzleRotation, 
-														ActorSpawnParams);
-				// spawn the projectiles shell
-				World->SpawnActor<ARifleProjectile_01>(ShellClass,
-														WeaponInHands->GetSocketLocation("ShellSocket"),
-														WeaponInHands->GetSocketRotation("ShellSocket"),
-														ActorSpawnParams);
-				if (MuzzleFireEffect)
-				{
-					// spawn muzzle fire effect
-					auto Explosion = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),
-																				MuzzleFireEffect,
-																				MuzzleLocation);
-					Explosion->SetRelativeScale3D(FVector(0.03f));
-				}
-				
+
 			}
 		}
 	}
-
-	// try and play the sound if specified
-	if (FireSound != NULL)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
-	}
-
 	// try and play a firing animation if specified
 	if (FireAnimationHip && FireAnimationAiming)
 	{
@@ -336,20 +321,33 @@ void AQuarantineProjectCharacter::OnTakeDamage(AActor* DamagedActor,
 {
 	if (HealthComponent) 
 	{
-		// Disable collision capsule if the character is dead
+		//Update HUD health status
+		if (GetPlayerHUD())
+		{
+			GetPlayerHUD()->UpdateHealthState(HealthComponent->GetCurrentHealth() / 100);
+		}
+
+		//*** DEATH ***//
 		if (HealthComponent->GetCurrentHealth() <= 0)
 		{
+			// Disable collision capsule if the character is dead
 			auto Capsule = DamagedActor->FindComponentByClass<UCapsuleComponent>();
 			if (Capsule)
 			{
 				Capsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			}
+			// Disable controller
+			AController* CurrentController = GetController();
+			if (CurrentController) {
+				// stop movement so the death animation plays immediately
+				CurrentController->StopMovement();
+				// unpossess to stop AI
+				CurrentController->UnPossess();
+				// destroy the controller, since it's not part of the enemy anymore
+				CurrentController->Destroy();
+			}
 		}
-		//update HUD health status
-		if (GetPlayerHUD())
-		{
-			GetPlayerHUD()->UpdateHealthState(HealthComponent->GetCurrentHealth() / 100);
-		}
+		// *** DEATH END *** //
 	}
 
 	// try and play injured animation if specified

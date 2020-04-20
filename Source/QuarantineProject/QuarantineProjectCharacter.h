@@ -11,12 +11,9 @@ class AQuarantineProjectCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
-
 public:
 	AQuarantineProjectCharacter();
-
 protected:
-
 	/** Called for actor in a start of the game */
 	virtual void BeginPlay() override;
 
@@ -41,17 +38,10 @@ protected:
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	/** Weapon component */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, meta = (AllowPrivateAccess = "true"))
-	class USkeletalMeshComponent* WeaponInHands;
-	/** Projectile class to spawn */
-	UPROPERTY(EditDefaultsOnly, Category = Projectile)
-	TSubclassOf<class ARifleProjectile_01> ProjectileClass;
-	/** Projectiles shell class to spawn */
-	UPROPERTY(EditDefaultsOnly, Category = Projectile)
-	TSubclassOf<class ARifleProjectile_01> ShellClass;
-	/** Muzzle fire effect */
-	UPROPERTY(EditDefaultsOnly, Category = Projectile)
-	class UParticleSystem* MuzzleFireEffect = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Weapon, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class AQP_WeaponBase> WeaponInHandsClass;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Weapon, meta = (AllowPrivateAccess = "true"))
+	AQP_WeaponBase* WeaponInHands;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
@@ -72,9 +62,6 @@ protected:
 	/** Aiming to target */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AimingSettings")
 	bool bIsAiming = false;
-	/** Sound to play each time we fire */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	class USoundBase* FireSound;
 	/** AnimMontages to play */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	class UAnimMontage* FireAnimationAiming;
