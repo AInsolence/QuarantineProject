@@ -269,29 +269,25 @@ void AQuarantineProjectCharacter::AimToTarget()
 
 void AQuarantineProjectCharacter::OnFire()
 {
-	// try and fire a projectile
-	if (ProjectileClass != nullptr)
+	UWorld* const World = GetWorld();
+	if (World != nullptr)
 	{
-		UWorld* const World = GetWorld();
-		if (World != nullptr)
+		if (WeaponInHands)
 		{
-			if (WeaponInHands)
+			FRotator MuzzleRotation;
+			if (bIsAiming && !bIsSprinting)
 			{
-				FRotator MuzzleRotation;
-				if (bIsAiming && !bIsSprinting)
-				{
-					MuzzleRotation = AimingCamera->GetComponentRotation();
-					WeaponInHands->Fire(MuzzleRotation);
-				}
-				else
-				{
-					MuzzleRotation = WeaponInHands->GetMuzzleRotation();
-					WeaponInHands->Fire(MuzzleRotation);
-				}
-
+				MuzzleRotation = AimingCamera->GetComponentRotation();
+				WeaponInHands->Fire(MuzzleRotation);
+			}
+			else
+			{
+				MuzzleRotation = WeaponInHands->GetMuzzleRotation();
+				WeaponInHands->Fire(MuzzleRotation);
 			}
 		}
 	}
+
 	// try and play a firing animation if specified
 	if (FireAnimationHip && FireAnimationAiming)
 	{
