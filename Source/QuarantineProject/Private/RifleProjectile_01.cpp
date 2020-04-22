@@ -8,6 +8,7 @@
 #include "Components/SphereComponent.h"
 #include "QuarantineProject/QuarantineProjectCharacter.h"
 #include "GameFramework/DamageType.h"
+#include "Engine/Engine.h"
 
 // Sets default values
 ARifleProjectile_01::ARifleProjectile_01()
@@ -53,7 +54,23 @@ void ARifleProjectile_01::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor
 				// Create a damage event  
 				TSubclassOf<UDamageType> const ValidDamageTypeClass = TSubclassOf<UDamageType>(UDamageType::StaticClass());
 				FDamageEvent DamageEvent(ValidDamageTypeClass);
+				// change damage amount in correspondence to hitted bone
+				FName BoneName = Hit.BoneName;
+				if (BoneName == FName("head"))
+				{
+					DamageAmount *= 5;
+				}
+				else if (BoneName == FName("neck_01"))
+				{
+					DamageAmount *= 3;
+				}
+				else if (BoneName == FName("spine_03"))
+				{
+					DamageAmount *= 2;
+				}
 
+				GEngine->AddOnScreenDebugMessage(1, 5.0f, FColor::Black, TEXT("Hitted bone: ") + BoneName.ToString(), false);
+				GEngine->AddOnScreenDebugMessage(2, 5.0f, FColor::Black, TEXT("DAMAGE: %f") + FString::SanitizeFloat(DamageAmount), false);
 				OtherActor->TakeDamage(DamageAmount, 
 											DamageEvent, 
 											GetWorld()->GetFirstPlayerController(),

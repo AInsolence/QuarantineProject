@@ -11,7 +11,7 @@ void AQP_AIController_01::BeginPlay()
 	Super::BeginPlay();
 
 	FTimerHandle TimerHandle;
-	GetWorldTimerManager().SetTimer(TimerHandle, this, &AQP_AIController_01::OnFire, 1.0f, true);
+	//GetWorldTimerManager().SetTimer(TimerHandle, this, &AQP_AIController_01::OnFire, 1.0f, true);
 }
 
 void AQP_AIController_01::Tick(float DeltaTime)
@@ -28,7 +28,6 @@ void AQP_AIController_01::Tick(float DeltaTime)
 			auto PlayerCharacter = Controller->GetPawn();
 			if (PlayerCharacter)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Try to move to character"))
 				MoveToActor(PlayerCharacter, 1500, true, true, false);
 			}
 				

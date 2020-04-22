@@ -353,7 +353,7 @@ void AQuarantineProjectCharacter::OnTakeDamage(AActor* DamagedActor,
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if (AnimInstance != NULL)
 		{
-			AnimInstance->Montage_Play(InjuredAnimation, 0.5f);
+			AnimInstance->Montage_Play(InjuredAnimation, 2.0f);
 		}
 	}
 }
