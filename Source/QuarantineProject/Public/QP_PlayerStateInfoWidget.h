@@ -24,6 +24,8 @@ public:
 	class UProgressBar* HealthBar;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	class UProgressBar* StaminaBar;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	class UImage* Blood;
 	UFUNCTION()
 	void UpdateHealthState(float CurrentHealth);
 	UFUNCTION()

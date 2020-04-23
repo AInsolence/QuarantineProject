@@ -9,7 +9,7 @@
 void AQP_AIController_01::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	FTimerHandle TimerHandle;
 	//GetWorldTimerManager().SetTimer(TimerHandle, this, &AQP_AIController_01::OnFire, 1.0f, true);
 }

@@ -43,11 +43,6 @@ void UQP_HealthComponent::TakeDamage(AActor* DamagedActor,
 										AController* InstigatedBy, 
 										AActor* DamageCauser)
 {
-	if (Damage <= 0.0)
-	{
-		return;
-	}
 	CurrentHealth = FMath::Clamp(CurrentHealth - Damage, 0.0f, DefaultHealth);
-	UE_LOG(LogTemp, Warning, TEXT("Current Health: %f"), CurrentHealth)
 }
 

@@ -19,7 +19,7 @@ void UQP_PlayerStateInfoWidget::NativeConstruct()
     HealthBarAnimation = GetAnimationByName(FName("HealthBarAnimation"));
     StaminaBarAnimation = GetAnimationByName(FName("StaminaBarAnimation"));
 
-    if (HealthBar && StaminaBar)
+    if (HealthBar && StaminaBar && Blood)
     {// show if hidden
         if (HealthBar->Visibility == ESlateVisibility::Hidden)
         {
@@ -28,6 +28,10 @@ void UQP_PlayerStateInfoWidget::NativeConstruct()
         if (StaminaBar->Visibility == ESlateVisibility::Hidden)
         {
             StaminaBar->SetVisibility(ESlateVisibility::Visible);
+        }
+        if (Blood->Visibility == ESlateVisibility::Hidden)
+        {
+            Blood->SetVisibility(ESlateVisibility::Visible);
         }
     }
 }
@@ -39,6 +43,7 @@ void UQP_PlayerStateInfoWidget::UpdateHealthState(float CurrentHealth)
     {
         PlayAnimation(HealthBarAnimation, 0.0f, 1, EUMGSequencePlayMode::Forward, 1.0, false);
     }
+    Blood->SetOpacity(0.7f - CurrentHealth);
 }
 
 void UQP_PlayerStateInfoWidget::UpdateStaminaState(float CurrentStamina)

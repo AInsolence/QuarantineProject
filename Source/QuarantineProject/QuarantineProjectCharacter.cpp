@@ -119,7 +119,6 @@ void AQuarantineProjectCharacter::Tick(float DeltaTime)
 			if (GetPlayerHUD() != nullptr)
 			{
 				GetPlayerHUD()->UpdateStaminaState(HealthComponent->GetCurrentStamina() / 100);
-				UE_LOG(LogTemp, Warning, TEXT("Stamina is : %f"), HealthComponent->GetCurrentStamina())
 			}
 		}
 
