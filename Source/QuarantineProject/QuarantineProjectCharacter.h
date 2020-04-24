@@ -40,7 +40,7 @@ protected:
 	/** Weapon component */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Weapon, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AQP_WeaponBase> WeaponInHandsClass;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Weapon, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(meta = (AllowPrivateAccess = "true"))
 	AQP_WeaponBase* WeaponInHands;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */

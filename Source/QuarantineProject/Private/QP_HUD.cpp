@@ -31,6 +31,17 @@ void AQP_HUD::BeginPlay()
 		if (PlayerStateInfoWidget)
 		{
 			PlayerStateInfoWidget->AddToViewport();
+			// Hide player status widget in main menu
+			auto LevelName = GetWorld()->GetName();
+			if (LevelName == "MainMenu")
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Try to hid %s"), *LevelName)
+					PlayerStateInfoWidget->SetVisibility(ESlateVisibility::Hidden);
+			}
+			else // show in the game
+			{
+				PlayerStateInfoWidget->SetVisibility(ESlateVisibility::Visible);
+			}
 		}
 	}
 }
@@ -38,6 +49,7 @@ void AQP_HUD::BeginPlay()
 void AQP_HUD::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	auto LevelName = GetWorld()->GetName();
 }
 
 void AQP_HUD::DrawHUD()
