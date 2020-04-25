@@ -19,7 +19,6 @@ AQP_WeaponBase::AQP_WeaponBase()
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
 
 	SetRootComponent(WeaponMesh);
-	WeaponMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 }
 
 void AQP_WeaponBase::Fire(FRotator MuzzleRotation)

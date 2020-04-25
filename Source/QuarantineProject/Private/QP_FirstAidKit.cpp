@@ -20,7 +20,7 @@ AQP_FirstAidKit::AQP_FirstAidKit()
 	AidMesh = CreateDefaultSubobject<UStaticMeshComponent>("AidMesh");
 	if (AidMesh)
 	{
-		AidMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		AidMesh->SetupAttachment(BoxCollision);
 	}
 }
 
