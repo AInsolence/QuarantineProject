@@ -79,7 +79,7 @@ void AQuarantineProjectCharacter::BeginPlay()
 	// set base speed sprint variables
 	BaseWalkingSpeed = GetCharacterMovement()->MaxWalkSpeed;
 	
-	//
+	// On take damage subscribing
 	OnTakeAnyDamage.AddDynamic(this, &AQuarantineProjectCharacter::OnTakeDamage);
 
 	// Init weapon
@@ -94,12 +94,13 @@ void AQuarantineProjectCharacter::BeginPlay()
 
 	if (WeaponInHands)
 	{
-
 		// Create weapon in character hands
 		FVector InHandLocation = GetMesh()->GetSocketLocation(FName("RightHandWeaponSocket"));
 		WeaponInHands->AttachToComponent(GetMesh(),
 										FAttachmentTransformRules::SnapToTargetNotIncludingScale,
 										FName("RightHandWeaponSocket"));
+		// Describe to reloading event
+		WeaponInHands->OnReloading.AddDynamic(this, &AQuarantineProjectCharacter::ShowReloadAnimation);
 	}
 
 }
@@ -141,6 +142,25 @@ void AQuarantineProjectCharacter::Tick(float DeltaTime)
 }
 
 //*****            INPUT LOGIC                *****//
+
+void AQuarantineProjectCharacter::ShowReloadAnimation()
+{
+	if (ReloadIronsightAnimation && ReloadHitAnimation)
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance != NULL)
+		{
+			if (bIsAiming)
+			{
+				AnimInstance->Montage_Play(ReloadIronsightAnimation, 1.0f);
+			}
+			else
+			{
+				AnimInstance->Montage_Play(ReloadHitAnimation, 1.f);
+			}
+		}
+	}
+}
 
 void AQuarantineProjectCharacter::OnResetVR()
 {
@@ -290,6 +310,7 @@ void AQuarantineProjectCharacter::OnFire()
 	// try and play a firing animation if specified
 	if (FireAnimationHip && FireAnimationAiming)
 	{
+		if (!WeaponInHands->IsWeaponCanShoot()) return;
 		// Get the animation object for the mesh
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if (AnimInstance != NULL)

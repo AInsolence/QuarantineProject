@@ -62,13 +62,22 @@ protected:
 	/** Aiming to target */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AimingSettings")
 	bool bIsAiming = false;
+
 	/** AnimMontages to play */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	class UAnimMontage* FireAnimationAiming;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	class UAnimMontage* FireAnimationHip;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	class UAnimMontage* ReloadIronsightAnimation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	class UAnimMontage* ReloadHitAnimation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	class UAnimMontage* InjuredAnimation;
+
+	/** Play anim montages functions */
+	UFUNCTION()
+	void ShowReloadAnimation();
 
 public:
 	/** Resets HMD orientation in VR. */
