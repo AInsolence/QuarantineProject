@@ -18,8 +18,10 @@ AQP_FirstAidKit::AQP_FirstAidKit()
 	RootComponent = BoxCollision;
 	
 	AidMesh = CreateDefaultSubobject<UStaticMeshComponent>("AidMesh");
-	AidMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-	AidMesh->SetSimulatePhysics(true);
+	if (AidMesh)
+	{
+		AidMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	}
 }
 
 // Called when the game starts or when spawned

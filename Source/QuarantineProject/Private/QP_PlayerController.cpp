@@ -3,6 +3,7 @@
 
 #include "QP_PlayerController.h"
 #include "QuarantineProject/QuarantineProjectCharacter.h"
+#include "QP_HUD.h"
 
 void AQP_PlayerController::BeginPlay()
 {
@@ -23,6 +24,7 @@ void AQP_PlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 	// Set up gameplay key bindings
+	InputComponent->BindAction("Exit", IE_Pressed, this, &AQP_PlayerController::Exit);
 
 	InputComponent->BindAction("Jump", IE_Pressed, this, &AQP_PlayerController::Jump);
 	InputComponent->BindAction("Jump", IE_Released, this, &AQP_PlayerController::StopJumping);
@@ -111,6 +113,11 @@ void AQP_PlayerController::AimToTarget()
 void AQP_PlayerController::OnFire()
 {
 	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->OnFire();
+}
+
+void AQP_PlayerController::Exit()
+{
+	Cast<AQP_HUD>(GetHUD())->Exit();
 }
 
 void AQP_PlayerController::TurnAtRate(float Rate)

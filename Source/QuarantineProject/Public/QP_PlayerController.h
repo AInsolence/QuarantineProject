@@ -53,6 +53,9 @@ protected:
 	/** Fire */
 	void OnFire();
 
+	/** Quit */
+	void Exit();
+
 	/**
 	 * Called via input to turn at a given rate.
 	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate

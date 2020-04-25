@@ -4,6 +4,8 @@
 #include "QP_HUD.h"
 #include "AimingWidget.h"
 #include "QP_PlayerStateInfoWidget.h"
+#include "QP_PauseGameWidget.h"
+#include "Kismet/GameplayStatics.h"
 
 AQP_HUD::AQP_HUD(const FObjectInitializer& ObjectInitializer) 
 	: Super(ObjectInitializer)
@@ -14,6 +16,7 @@ AQP_HUD::AQP_HUD(const FObjectInitializer& ObjectInitializer)
 void AQP_HUD::BeginPlay()
 {
 	Super::BeginPlay();
+	//*** NOTE ZOrder for created widgets depends on their order in this code ***//
 	// add aiming widget
 	if (AimingWidgetClass)
 	{
@@ -42,6 +45,16 @@ void AQP_HUD::BeginPlay()
 			{
 				PlayerStateInfoWidget->SetVisibility(ESlateVisibility::Visible);
 			}
+		}
+	}
+	// add pause widget
+	if (PauseGameWidgetClass)
+	{
+		PauseGameWidget = CreateWidget<UQP_PauseGameWidget>(GetWorld(), PauseGameWidgetClass);
+		if (PauseGameWidget)
+		{
+			PauseGameWidget->AddToViewport();
+			PauseGameWidget->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
 }
@@ -82,5 +95,26 @@ void AQP_HUD::UpdateStaminaState(float CurrentStamina)
 	if (PlayerStateInfoWidget)
 	{
 		PlayerStateInfoWidget->UpdateStaminaState(CurrentStamina);
+	}
+}
+
+void AQP_HUD::Exit()
+{
+	if (PauseGameWidget)
+	{
+		if (PauseGameWidget->Visibility == ESlateVisibility::Hidden)
+		{
+			PauseGameWidget->SetVisibility(ESlateVisibility::Visible);
+			GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameAndUI());
+			GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
+			UGameplayStatics::SetGamePaused(GetWorld(), true);
+		}
+		else
+		{
+			PauseGameWidget->SetVisibility(ESlateVisibility::Hidden);
+			GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
+			GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
+			UGameplayStatics::SetGamePaused(GetWorld(), false);
+		}
 	}
 }
