@@ -1,33 +1,25 @@
-// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
+// Fill out your copyright notice in the Description page of Project Settings.
 
-#include "QuarantineProjectCharacter.h"
+
+#include "EnemyBaseCharacter.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
-#include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/Controller.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Animation/AnimInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "Math/UnrealMathUtility.h"
-#include "GameFramework/PlayerController.h"
-#include "QP_HUD.h"
 #include "QP_HealthComponent.h"
 #include "QuarantineProject/Public/QP_WeaponBase.h"
 
-//////////////////////////////////////////////////////////////////////////
-// AQuarantineProjectCharacter
-
-AQuarantineProjectCharacter::AQuarantineProjectCharacter()
+AEnemyBaseCharacter::AEnemyBaseCharacter()
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-
-	// set our turn rates for input
-	BaseTurnRate = 45.f;
-	BaseLookUpRate = 45.f;
+	// Prevent capsule to be hitted with projectile
+	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
+	GetCapsuleComponent()->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
 
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
@@ -36,36 +28,15 @@ AQuarantineProjectCharacter::AQuarantineProjectCharacter()
 	GetCharacterMovement()->AirControl = 0.1f;
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 
-	// Create a camera boom (pulls in towards the player if there is a collision)
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 300.0f; // The camera follows at this distance behind the character	
-	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
-
-	// Create a follow camera
-	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
-	FollowCamera->SetRelativeLocation(FVector(0, 50.f, 90.f));
-	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
-	FollowCamera->SetFieldOfView(110.f);
-
-	// Create a follow camera
-	AimingCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("AimingCamera"));
-	AimingCamera->SetupAttachment(GetCapsuleComponent()); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
-	AimingCamera->SetRelativeLocation(FVector(-50.f, 50.f, 90.f));
-	AimingCamera->bUsePawnControlRotation = true; // Camera does not rotate relative to arm
-	AimingCamera->SetFieldOfView(80.f);
-
 	// Create health component
 	HealthComponent = CreateDefaultSubobject<UQP_HealthComponent>(TEXT("HealthComponent"));
+	// Create AI perception component
 
-	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
-	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
 
 //////////////////////////////////////////////////////////////////////////
 
-void AQuarantineProjectCharacter::BeginPlay()
+void AEnemyBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -76,9 +47,9 @@ void AQuarantineProjectCharacter::BeginPlay()
 
 	// set base speed sprint variables
 	BaseWalkingSpeed = GetCharacterMovement()->MaxWalkSpeed;
-	
+
 	// On take damage subscribing
-	OnTakeAnyDamage.AddDynamic(this, &AQuarantineProjectCharacter::OnTakeDamage);
+	OnTakeAnyDamage.AddDynamic(this, &AEnemyBaseCharacter::OnTakeDamage);
 
 	// Init weapon
 	if (WeaponInHandsClass)
@@ -95,15 +66,15 @@ void AQuarantineProjectCharacter::BeginPlay()
 		// Create weapon in character hands
 		FVector InHandLocation = GetMesh()->GetSocketLocation(FName("RightHandWeaponSocket"));
 		WeaponInHands->AttachToComponent(GetMesh(),
-										FAttachmentTransformRules::SnapToTargetNotIncludingScale,
-										FName("RightHandWeaponSocket"));
+			FAttachmentTransformRules::SnapToTargetNotIncludingScale,
+			FName("RightHandWeaponSocket"));
 		// Describe to reloading event
-		WeaponInHands->OnReloading.AddDynamic(this, &AQuarantineProjectCharacter::ShowReloadAnimation);
+		WeaponInHands->OnReloading.AddDynamic(this, &AEnemyBaseCharacter::ShowReloadAnimation);
 	}
 
 }
 
-void AQuarantineProjectCharacter::Tick(float DeltaTime)
+void AEnemyBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
@@ -112,36 +83,17 @@ void AQuarantineProjectCharacter::Tick(float DeltaTime)
 	if (bIsSprinting && HealthComponent->GetCurrentStamina() > 0.5f)
 	{
 		BaseSprintMultiplier += RampThisFrame;
-		// change stamina bar percentage
-		if (HealthComponent)
-		{
-			HealthComponent->ChangeCurrentStaminaTo(-0.5f);
-			if (GetPlayerHUD() != nullptr)
-			{
-				GetPlayerHUD()->UpdateStaminaState(HealthComponent->GetCurrentStamina() / 100);
-			}
-		}
-
 	}
 	else
 	{
 		BaseSprintMultiplier -= RampThisFrame;
-		// change stamina bar percentage
-		if (HealthComponent)
-		{
-			HealthComponent->ChangeCurrentStaminaTo(0.1f);
-			if (GetPlayerHUD() != nullptr)
-			{
-				GetPlayerHUD()->UpdateStaminaState(HealthComponent->GetCurrentStamina() / 100);
-			}
-		}
 	}
 	BaseSprintMultiplier = FMath::Clamp(BaseSprintMultiplier, 1.0f, MaxSprintMultiplier);
 	GetCharacterMovement()->MaxWalkSpeed = BaseWalkingSpeed * BaseSprintMultiplier;
 	/**  Sprint logic end */
 }
 
-void AQuarantineProjectCharacter::ShowReloadAnimation()
+void AEnemyBaseCharacter::ShowReloadAnimation()
 {
 	if (ReloadIronsightAnimation && ReloadHitAnimation)
 	{
@@ -162,52 +114,34 @@ void AQuarantineProjectCharacter::ShowReloadAnimation()
 
 //*****            INPUT LOGIC                *****//
 
-void AQuarantineProjectCharacter::OnResetVR()
+void AEnemyBaseCharacter::OnResetVR()
 {
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
 }
 
-void AQuarantineProjectCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
+void AEnemyBaseCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
 {
 	Jump();
 }
 
-void AQuarantineProjectCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
+void AEnemyBaseCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
 {
 	StopJumping();
 }
 
-AQP_HUD* AQuarantineProjectCharacter::GetPlayerHUD() const
-{// helper to get player HUD from controller
-	if (GetWorld()->GetFirstPlayerController())
-	{
-		if (Cast<APlayerController>(GetController()))
-		{
-			auto HUDPtr = Cast<AQP_HUD>(Cast<APlayerController>(GetController())->GetHUD());
-			if (HUDPtr)
-			{
-				return HUDPtr;
-			}
-			return nullptr;
-		}
-		return nullptr;
-	}
-	return nullptr;
-}
-
-void AQuarantineProjectCharacter::TurnAtRate(float Rate)
+void AEnemyBaseCharacter::TurnAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
 	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
 }
 
-void AQuarantineProjectCharacter::LookUpAtRate(float Rate)
+void AEnemyBaseCharacter::LookUpAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
-void AQuarantineProjectCharacter::MoveForward(float Value)
+void AEnemyBaseCharacter::MoveForward(float Value)
 {
 	if ((Controller != NULL) && (Value != 0.0f))
 	{
@@ -221,14 +155,14 @@ void AQuarantineProjectCharacter::MoveForward(float Value)
 	}
 }
 
-void AQuarantineProjectCharacter::MoveRight(float Value)
+void AEnemyBaseCharacter::MoveRight(float Value)
 {
-	if ( (Controller != NULL) && (Value != 0.0f) )
+	if ((Controller != NULL) && (Value != 0.0f))
 	{
 		// find out which way is right
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
-	
+
 		// get right vector 
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
@@ -236,57 +170,54 @@ void AQuarantineProjectCharacter::MoveRight(float Value)
 	}
 }
 
-void AQuarantineProjectCharacter::Jump()
+void AEnemyBaseCharacter::Jump()
 {
 	Super::Jump();
 }
 
-void AQuarantineProjectCharacter::StopJumping()
+void AEnemyBaseCharacter::StopJumping()
 {
 	Super::StopJumping();
 }
 
-void AQuarantineProjectCharacter::AddControllerYawInput(float Value)
+void AEnemyBaseCharacter::AddControllerYawInput(float Value)
 {
 	Super::AddControllerYawInput(Value);
 }
 
-void AQuarantineProjectCharacter::AddControllerPitchInput(float Value)
+void AEnemyBaseCharacter::AddControllerPitchInput(float Value)
 {
 	Super::AddControllerPitchInput(Value);
 }
 
-void AQuarantineProjectCharacter::Crouch()
+void AEnemyBaseCharacter::Crouch()
 {
 	Super::Crouch();
 }
 
-void AQuarantineProjectCharacter::UnCrouch()
+void AEnemyBaseCharacter::UnCrouch()
 {
 	Super::UnCrouch();
 }
 
-void AQuarantineProjectCharacter::SprintStart()
+void AEnemyBaseCharacter::SprintStart()
 {
 	bIsSprinting = true;
 }
 
-void AQuarantineProjectCharacter::SprintEnd()
+void AEnemyBaseCharacter::SprintEnd()
 {
 	bIsSprinting = false;
 }
 
-void AQuarantineProjectCharacter::AimToTarget()
+void AEnemyBaseCharacter::AimToTarget()
 {// Switch aiming status
 	bIsAiming = !bIsAiming;
-	// Switch camera
-	AimingCamera->SetActive(bIsAiming); //TODO change to real swith depends on the weapon type
-	FollowCamera->SetActive(!bIsAiming);
-	// Show crosshair in aiming mode
-	GetPlayerHUD()->SetCrosshairVisibility(bIsAiming);
+	// TODO make aiming logic for NPC here
+
 }
 
-void AQuarantineProjectCharacter::OnFire()
+void AEnemyBaseCharacter::OnFire()
 {
 	UWorld* const World = GetWorld();
 	if (World != nullptr)
@@ -294,16 +225,8 @@ void AQuarantineProjectCharacter::OnFire()
 		if (WeaponInHands)
 		{
 			FRotator MuzzleRotation;
-			if (bIsAiming && !bIsSprinting)
-			{
-				MuzzleRotation = AimingCamera->GetComponentRotation();
-				WeaponInHands->Fire(MuzzleRotation);
-			}
-			else
-			{
-				MuzzleRotation = WeaponInHands->GetMuzzleRotation();
-				WeaponInHands->Fire(MuzzleRotation);
-			}
+			MuzzleRotation = WeaponInHands->GetMuzzleRotation();
+			WeaponInHands->Fire(MuzzleRotation);
 		}
 	}
 
@@ -322,27 +245,21 @@ void AQuarantineProjectCharacter::OnFire()
 			else
 			{
 				AnimInstance->Montage_Play(FireAnimationHip, 1.f);
-			}	
+			}
 		}
 	}
 }
 
 //*****                                        *****//
 
-void AQuarantineProjectCharacter::OnTakeDamage(AActor* DamagedActor, 
-												float Damage, 
-												const UDamageType* DamageType,
-												AController* InstigatedBy,
-												AActor* DamageCauser)
+void AEnemyBaseCharacter::OnTakeDamage(AActor* DamagedActor,
+										float Damage,
+										const UDamageType* DamageType,
+										AController* InstigatedBy,
+										AActor* DamageCauser)
 {
-	if (HealthComponent) 
+	if (HealthComponent)
 	{
-		//Update HUD health status
-		if (GetPlayerHUD())
-		{
-			GetPlayerHUD()->UpdateHealthState(HealthComponent->GetCurrentHealth() / 100);
-		}
-
 		//*** DEATH ***//
 		if (HealthComponent->GetCurrentHealth() <= 0)
 		{

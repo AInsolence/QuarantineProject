@@ -49,7 +49,7 @@ void ARifleProjectile_01::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor
 		Explosion->SetRelativeScale3D(FVector(0.3f));
 		if (InflictDamageToThisClass)
 		{
-			if (OtherActor->GetClass() == InflictDamageToThisClass)
+			if (OtherActor->GetClass()->IsChildOf(InflictDamageToThisClass))
 			{
 				// Create a damage event  
 				TSubclassOf<UDamageType> const ValidDamageTypeClass = TSubclassOf<UDamageType>(UDamageType::StaticClass());
