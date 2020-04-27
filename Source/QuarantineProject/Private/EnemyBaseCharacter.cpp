@@ -12,6 +12,7 @@
 #include "Math/UnrealMathUtility.h"
 #include "QP_HealthComponent.h"
 #include "QuarantineProject/Public/QP_WeaponBase.h"
+#include "Perception/AIPerceptionComponent.h"
 
 AEnemyBaseCharacter::AEnemyBaseCharacter()
 {
@@ -31,7 +32,7 @@ AEnemyBaseCharacter::AEnemyBaseCharacter()
 	// Create health component
 	HealthComponent = CreateDefaultSubobject<UQP_HealthComponent>(TEXT("HealthComponent"));
 	// Create AI perception component
-
+	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent"));
 }
 
 //////////////////////////////////////////////////////////////////////////
