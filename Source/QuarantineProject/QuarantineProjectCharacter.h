@@ -106,6 +106,7 @@ public:
 	/** Firing */
 	void OnFire();
 	void OnStopFiring();
+	void OnReloading();
 	/** OnTakeAnyDamage event function */
 	UFUNCTION()
 	void OnTakeDamage(AActor* DamagedActor,

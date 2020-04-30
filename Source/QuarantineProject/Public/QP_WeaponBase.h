@@ -44,6 +44,8 @@ public:
 	UFUNCTION()
 	void Reload();
 	UFUNCTION()
+	void Reloading(); // on player press R
+	UFUNCTION()
 	FRotator GetMuzzleRotation();
 	// Is weapon have any ammo
 	bool FORCEINLINE IsWeaponCanShoot() { return CurrentBulletsInMagazine != 0; };
@@ -106,4 +108,5 @@ private:
 	bool bCanFireAfterRate = true;
 	double LastFireTime = 0.0;
 	bool bIsWeaponReloading = false;
+	void StartReload();
 };

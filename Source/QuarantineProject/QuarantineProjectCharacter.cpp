@@ -341,6 +341,14 @@ void AQuarantineProjectCharacter::OnStopFiring()
 	}
 }
 
+void AQuarantineProjectCharacter::OnReloading()
+{
+	if (WeaponInHands)
+	{
+		WeaponInHands->Reloading();
+	}
+}
+
 //*****                                        *****//
 
 void AQuarantineProjectCharacter::OnTakeDamage(AActor* DamagedActor, 

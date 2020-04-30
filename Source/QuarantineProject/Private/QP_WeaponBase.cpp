@@ -122,6 +122,35 @@ void AQP_WeaponBase::SpawnProjectile(FRotator MuzzleRotation)
 	}
 }
 
+void AQP_WeaponBase::StartReload()
+{
+	// play the empty magazine sound
+	if (OutOfBulletsSound != NULL)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, OutOfBulletsSound, GetActorLocation());
+	}
+	// check if any additional ammo exist for reloading
+	if ((TotalBulletsForThisWeapon - BulletsInMagazine) > 0)
+	{// if weapon has ammo
+		OnReloading.Broadcast();
+		// play reload sound
+		if (ReloadSound != NULL && !bIsWeaponReloading)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, ReloadSound, GetActorLocation());
+		}
+		bIsWeaponReloading = true;
+		// waiting for reloading time and reload
+		if (GetWorld())
+		{
+			GetWorld()->GetTimerManager().SetTimer(ReloadTimer,
+				this,
+				&AQP_WeaponBase::Reload,
+				ReloadingTime,
+				false);
+		}
+	}
+}
+
 void AQP_WeaponBase::FireLoop(FRotator MuzzleRotation)
 {// check bullets in magazine before spawning projectile
 	if (CurrentBulletsInMagazine)
@@ -131,31 +160,7 @@ void AQP_WeaponBase::FireLoop(FRotator MuzzleRotation)
 	}
 	else // try to reload
 	{
-		// play the empty magazine sound
-		if (OutOfBulletsSound != NULL)
-		{
-			UGameplayStatics::PlaySoundAtLocation(this, OutOfBulletsSound, GetActorLocation());
-		}
-		// check if any additional ammo exist for reloading
-		if ((TotalBulletsForThisWeapon - BulletsInMagazine) > 0)
-		{// if weapon has ammo
-			OnReloading.Broadcast();
-			// play reload sound
-			if (ReloadSound != NULL && !bIsWeaponReloading)
-			{
-				UGameplayStatics::PlaySoundAtLocation(this, ReloadSound, GetActorLocation());
-			}
-			bIsWeaponReloading = true;
-			// waiting for reloading time and reload
-			if (GetWorld())
-			{
-				GetWorld()->GetTimerManager().SetTimer(ReloadTimer,
-														this,
-														&AQP_WeaponBase::Reload,
-														ReloadingTime,
-														false);
-			}
-		}
+		StartReload();
 	}
 	GEngine->AddOnScreenDebugMessage(3, 5.0f, FColor::Red, TEXT("Bullets: %f") + FString::FromInt(CurrentBulletsInMagazine), false);
 }
@@ -163,14 +168,17 @@ void AQP_WeaponBase::FireLoop(FRotator MuzzleRotation)
 void AQP_WeaponBase::Reload()
 {
 	GEngine->AddOnScreenDebugMessage(4, 5.0f, FColor::Red, TEXT("Reloading") + FString::FromInt(TotalBulletsForThisWeapon), false);
+	// check if some bullets in mag
+	int32 RemainBullets = CurrentBulletsInMagazine;
 	// update current bullets value
-	CurrentBulletsInMagazine = FMath::Clamp(TotalBulletsForThisWeapon - BulletsInMagazine,
+	CurrentBulletsInMagazine = FMath::Clamp(TotalBulletsForThisWeapon - BulletsInMagazine + RemainBullets,
 											0, 
 											BulletsInMagazine);
 	// update total bullets value
-	TotalBulletsForThisWeapon = FMath::Clamp(TotalBulletsForThisWeapon - BulletsInMagazine,
+	TotalBulletsForThisWeapon = FMath::Clamp(TotalBulletsForThisWeapon - BulletsInMagazine + RemainBullets,
 											0,
 											120);
+	UE_LOG(LogTemp, Warning, TEXT("Remain Bullets: %d"), RemainBullets)
 	UE_LOG(LogTemp, Warning, TEXT("TOTAL Bullets: %d"), TotalBulletsForThisWeapon)
 	if (GetWorld())
 	{
@@ -178,4 +186,12 @@ void AQP_WeaponBase::Reload()
 	}
 	// weapon now can be reloaded
 	bIsWeaponReloading = false;
+}
+
+void AQP_WeaponBase::Reloading()
+{
+	if (CurrentBulletsInMagazine != BulletsInMagazine)
+	{
+		StartReload();
+	}
 }

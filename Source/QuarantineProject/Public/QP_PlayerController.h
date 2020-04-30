@@ -53,6 +53,7 @@ protected:
 	/** Fire */
 	void OnFire();
 	void OnStopFiring();
+	void OnReloading();
 
 	/** Quit */
 	void Exit();

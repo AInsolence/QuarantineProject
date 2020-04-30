@@ -26,14 +26,16 @@ void AQP_PlayerController::SetupInputComponent()
 	// Set up gameplay key bindings
 	InputComponent->BindAction("Exit", IE_Pressed, this, &AQP_PlayerController::Exit);
 
-	InputComponent->BindAction("Jump", IE_Pressed, this, &AQP_PlayerController::Jump);
-	InputComponent->BindAction("Jump", IE_Released, this, &AQP_PlayerController::StopJumping);
-
 	InputComponent->BindAction("Fire", IE_Pressed, this, &AQP_PlayerController::OnFire);
 	InputComponent->BindAction("Fire", IE_Released, this, &AQP_PlayerController::OnStopFiring);
 
+	InputComponent->BindAction("Reload", IE_Released, this, &AQP_PlayerController::OnReloading);
+
 	InputComponent->BindAction("Sprint", IE_Pressed, this, &AQP_PlayerController::SprintStart);
 	InputComponent->BindAction("Sprint", IE_Released, this, &AQP_PlayerController::SprintEnd);
+
+	InputComponent->BindAction("Jump", IE_Pressed, this, &AQP_PlayerController::Jump);
+	InputComponent->BindAction("Jump", IE_Released, this, &AQP_PlayerController::StopJumping);
 
 	InputComponent->BindAction("Crouch", IE_Pressed, this, &AQP_PlayerController::Crouch);
 	InputComponent->BindAction("Crouch", IE_Released, this, &AQP_PlayerController::UnCrouch);
@@ -119,6 +121,11 @@ void AQP_PlayerController::OnFire()
 void AQP_PlayerController::OnStopFiring()
 {
 	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->OnStopFiring();
+}
+
+void AQP_PlayerController::OnReloading()
+{
+	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->OnReloading();
 }
 
 void AQP_PlayerController::Exit()
