@@ -59,6 +59,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Sprint")
 	float TimeToMaxSprintSpeed = 2.0f;
 
+public:
 	/** Aiming to target */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AimingSettings")
 	bool bIsAiming = false;
@@ -78,8 +79,10 @@ protected:
 	/** Play anim montages functions */
 	UFUNCTION()
 	void ShowReloadAnimation();
+	UFUNCTION()
+	void ShowFireAnimation();
 
-public:
+
 	/** Resets HMD orientation in VR. */
 	void OnResetVR();
 	/** Called for forwards/backward input */
@@ -102,6 +105,7 @@ public:
 	void AimToTarget();
 	/** Firing */
 	void OnFire();
+	void OnStopFiring();
 	/** OnTakeAnyDamage event function */
 	UFUNCTION()
 	void OnTakeDamage(AActor* DamagedActor,

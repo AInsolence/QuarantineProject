@@ -30,6 +30,7 @@ void AQP_PlayerController::SetupInputComponent()
 	InputComponent->BindAction("Jump", IE_Released, this, &AQP_PlayerController::StopJumping);
 
 	InputComponent->BindAction("Fire", IE_Pressed, this, &AQP_PlayerController::OnFire);
+	InputComponent->BindAction("Fire", IE_Released, this, &AQP_PlayerController::OnStopFiring);
 
 	InputComponent->BindAction("Sprint", IE_Pressed, this, &AQP_PlayerController::SprintStart);
 	InputComponent->BindAction("Sprint", IE_Released, this, &AQP_PlayerController::SprintEnd);
@@ -113,6 +114,11 @@ void AQP_PlayerController::AimToTarget()
 void AQP_PlayerController::OnFire()
 {
 	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->OnFire();
+}
+
+void AQP_PlayerController::OnStopFiring()
+{
+	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->OnStopFiring();
 }
 
 void AQP_PlayerController::Exit()

@@ -37,8 +37,6 @@ protected:
 	/** Weapon component */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Weapon, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AQP_WeaponBase> WeaponInHandsClass;
-	UPROPERTY(meta = (AllowPrivateAccess = "true"))
-	AQP_WeaponBase* WeaponInHands;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
@@ -75,8 +73,13 @@ protected:
 	/** Play anim montages functions */
 	UFUNCTION()
 	void ShowReloadAnimation();
+	UFUNCTION()
+	void ShowFireAnimation();
 
 public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+	AQP_WeaponBase* WeaponInHands;
 	/** Resets HMD orientation in VR. */
 	void OnResetVR();
 	/** Called for forwards/backward input */
@@ -98,7 +101,10 @@ public:
 	/** Aiming */
 	void AimToTarget();
 	/** Firing */
+	UFUNCTION(BlueprintCallable)
 	void OnFire();
+	UFUNCTION(BlueprintCallable)
+	void OnStopFiring();
 	/** OnTakeAnyDamage event function */
 	UFUNCTION()
 		void OnTakeDamage(AActor* DamagedActor,

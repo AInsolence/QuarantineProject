@@ -2,7 +2,7 @@
 
 
 #include "QP_AIController_01.h"
-#include "QuarantineProject/QuarantineProjectCharacter.h"
+#include "EnemyBaseCharacter.h"
 #include "TimerManager.h"
 #include "Engine/World.h"
 
@@ -17,7 +17,7 @@ void AQP_AIController_01::BeginPlay()
 void AQP_AIController_01::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	auto const World = GetWorld();
+	/*auto const World = GetWorld();
 
 	if (World)
 	{
@@ -32,7 +32,7 @@ void AQP_AIController_01::Tick(float DeltaTime)
 			}
 				
 		}
-	}
+	}*/
 }
 
 ACharacter* AQP_AIController_01::GetControlledCharacter() const
@@ -42,12 +42,12 @@ ACharacter* AQP_AIController_01::GetControlledCharacter() const
 
 void AQP_AIController_01::MoveForward(float Value)
 {
-	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->MoveForward(Value);
+	Cast<AEnemyBaseCharacter>(GetControlledCharacter())->MoveForward(Value);
 }
 
 void AQP_AIController_01::MoveRight(float Value)
 {
-	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->MoveRight(Value);
+	Cast<AEnemyBaseCharacter>(GetControlledCharacter())->MoveRight(Value);
 }
 
 void AQP_AIController_01::AddControllerYawInput(float Value)
@@ -72,52 +72,57 @@ void AQP_AIController_01::StopJumping()
 
 void AQP_AIController_01::Crouch()
 {
-	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->Crouch();
+	Cast<AEnemyBaseCharacter>(GetControlledCharacter())->Crouch();
 }
 
 void AQP_AIController_01::UnCrouch()
 {
-	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->UnCrouch();
+	Cast<AEnemyBaseCharacter>(GetControlledCharacter())->UnCrouch();
 }
 
 void AQP_AIController_01::SprintStart()
 {
-	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->SprintStart();
+	Cast<AEnemyBaseCharacter>(GetControlledCharacter())->SprintStart();
 }
 
 void AQP_AIController_01::SprintEnd()
 {
-	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->SprintEnd();
+	Cast<AEnemyBaseCharacter>(GetControlledCharacter())->SprintEnd();
 }
 
 void AQP_AIController_01::AimToTarget()
 {
-	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->AimToTarget();
+	Cast<AEnemyBaseCharacter>(GetControlledCharacter())->AimToTarget();
 }
 
 void AQP_AIController_01::OnFire()
 {
-	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->OnFire();
+	Cast<AEnemyBaseCharacter>(GetControlledCharacter())->OnFire();
+}
+
+void AQP_AIController_01::OnStopFiring()
+{
+	Cast<AEnemyBaseCharacter>(GetControlledCharacter())->OnStopFiring();
 }
 
 void AQP_AIController_01::TurnAtRate(float Rate)
 {
-	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->TurnAtRate(Rate);
+	Cast<AEnemyBaseCharacter>(GetControlledCharacter())->TurnAtRate(Rate);
 }
 
 void AQP_AIController_01::LookUpAtRate(float Rate)
 {
-	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->LookUpAtRate(Rate);
+	Cast<AEnemyBaseCharacter>(GetControlledCharacter())->LookUpAtRate(Rate);
 }
 
 void AQP_AIController_01::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
 {
-	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->
+	Cast<AEnemyBaseCharacter>(GetControlledCharacter())->
 		TouchStarted(FingerIndex, Location);
 }
 
 void AQP_AIController_01::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
 {
-	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->
+	Cast<AEnemyBaseCharacter>(GetControlledCharacter())->
 		TouchStopped(FingerIndex, Location);
 }

@@ -9,6 +9,7 @@
 #include "QuarantineProject/Public/RifleProjectile_01.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
+#include "TimerManager.h"
 
 // Sets default values
 AQP_WeaponBase::AQP_WeaponBase()
@@ -23,41 +24,38 @@ AQP_WeaponBase::AQP_WeaponBase()
 
 void AQP_WeaponBase::Fire(FRotator MuzzleRotation)
 {
-	if (CurrentBulletsInMagazine)
-	{
-		// try to fire a projectile
-		SpawnProjectile(MuzzleRotation);
-		CurrentBulletsInMagazine -= 1;
+	if (bCanFireAfterRate)
+	{// start fire
+		bCanFireAfterRate = false;
+		// start fire without delay
+		FireLoop(MuzzleRotation);
+		
+		// start fire loop by timer if still pressed
+		if (GetWorld())
+		{
+			GetWorld()->GetTimerManager().SetTimer(
+				FireRateTimer,
+				FTimerDelegate::CreateUObject(this, &AQP_WeaponBase::Fire, MuzzleRotation),
+				ShotsPerSecond,
+				true);
+		}
 	}
 	else
-	{
-		// try and play the sound if specified
-		if (OutOfBulletsSound != NULL)
+	{// wait for delay after last firing time
+		bCanFireAfterRate = ((FPlatformTime::Seconds() - LastFireTime) > ShotsPerSecond);
+		if (bCanFireAfterRate)
 		{
-			UGameplayStatics::PlaySoundAtLocation(this, OutOfBulletsSound, GetActorLocation());
-		}
-		// if any additional ammo exist
-		if ((TotalBulletsForThisWeapon - BulletsInMagazine) > 0)
-		{// if weapon has ammo
-			OnReloading.Broadcast();
-			// play reload sound
-			if (ReloadSound != NULL && !bIsWeaponReloading)
-			{
-				UGameplayStatics::PlaySoundAtLocation(this, ReloadSound, GetActorLocation());
-			}
-			bIsWeaponReloading = true;
-			// waiting for reloading time and reload
-			if (GetWorld())
-			{
-				GetWorld()->GetTimerManager().SetTimer(ReloadTimer, 
-														this, 
-														&AQP_WeaponBase::Reload, 
-														ReloadingTime, 
-														false);
-			}
+			LastFireTime = FPlatformTime::Seconds();
 		}
 	}
-	GEngine->AddOnScreenDebugMessage(3, 5.0f, FColor::Red, TEXT("Bullets: %f") + FString::FromInt(CurrentBulletsInMagazine), false);
+}
+
+void AQP_WeaponBase::StopFiring()
+{
+	if (GetWorld())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(FireRateTimer);
+	}
 }
 
 FRotator AQP_WeaponBase::GetMuzzleRotation()
@@ -90,7 +88,8 @@ void AQP_WeaponBase::SpawnProjectile(FRotator MuzzleRotation)
 			if (WeaponMesh)
 			{
 				FVector MuzzleLocation = WeaponMesh->GetSocketLocation("Muzzle");
-
+				// Broadcast OnFireEvent
+				OnFireEvent.Broadcast();
 				//Set Spawn Collision Handling Override
 				FActorSpawnParameters ActorSpawnParams;
 				ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
@@ -121,6 +120,44 @@ void AQP_WeaponBase::SpawnProjectile(FRotator MuzzleRotation)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
 	}
+}
+
+void AQP_WeaponBase::FireLoop(FRotator MuzzleRotation)
+{// check bullets in magazine before spawning projectile
+	if (CurrentBulletsInMagazine)
+	{
+		SpawnProjectile(MuzzleRotation);
+		CurrentBulletsInMagazine -= 1;
+	}
+	else // try to reload
+	{
+		// play the empty magazine sound
+		if (OutOfBulletsSound != NULL)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, OutOfBulletsSound, GetActorLocation());
+		}
+		// check if any additional ammo exist for reloading
+		if ((TotalBulletsForThisWeapon - BulletsInMagazine) > 0)
+		{// if weapon has ammo
+			OnReloading.Broadcast();
+			// play reload sound
+			if (ReloadSound != NULL && !bIsWeaponReloading)
+			{
+				UGameplayStatics::PlaySoundAtLocation(this, ReloadSound, GetActorLocation());
+			}
+			bIsWeaponReloading = true;
+			// waiting for reloading time and reload
+			if (GetWorld())
+			{
+				GetWorld()->GetTimerManager().SetTimer(ReloadTimer,
+														this,
+														&AQP_WeaponBase::Reload,
+														ReloadingTime,
+														false);
+			}
+		}
+	}
+	GEngine->AddOnScreenDebugMessage(3, 5.0f, FColor::Red, TEXT("Bullets: %f") + FString::FromInt(CurrentBulletsInMagazine), false);
 }
 
 void AQP_WeaponBase::Reload()

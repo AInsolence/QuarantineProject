@@ -71,6 +71,7 @@ void AEnemyBaseCharacter::BeginPlay()
 			FName("RightHandWeaponSocket"));
 		// Describe to reloading event
 		WeaponInHands->OnReloading.AddDynamic(this, &AEnemyBaseCharacter::ShowReloadAnimation);
+		WeaponInHands->OnFireEvent.AddDynamic(this, &AEnemyBaseCharacter::ShowFireAnimation);
 	}
 
 }
@@ -108,6 +109,28 @@ void AEnemyBaseCharacter::ShowReloadAnimation()
 			else
 			{
 				AnimInstance->Montage_Play(ReloadHitAnimation, 1.f);
+			}
+		}
+	}
+}
+
+void AEnemyBaseCharacter::ShowFireAnimation()
+{
+	// play a firing animation if specified
+	if (FireAnimationHip && FireAnimationAiming)
+	{
+		if (!WeaponInHands->IsWeaponCanShoot()) return;
+		// Get the animation object for the mesh
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance != NULL)
+		{
+			if (bIsAiming)
+			{
+				AnimInstance->Montage_Play(FireAnimationAiming, 1.f);
+			}
+			else
+			{
+				AnimInstance->Montage_Play(FireAnimationHip, 1.f);
 			}
 		}
 	}
@@ -230,24 +253,13 @@ void AEnemyBaseCharacter::OnFire()
 			WeaponInHands->Fire(MuzzleRotation);
 		}
 	}
+}
 
-	// try and play a firing animation if specified
-	if (FireAnimationHip && FireAnimationAiming)
+void AEnemyBaseCharacter::OnStopFiring()
+{
+	if (WeaponInHands)
 	{
-		if (!WeaponInHands->IsWeaponCanShoot()) return;
-		// Get the animation object for the mesh
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		if (AnimInstance != NULL)
-		{
-			if (bIsAiming)
-			{
-				AnimInstance->Montage_Play(FireAnimationAiming, 1.f);
-			}
-			else
-			{
-				AnimInstance->Montage_Play(FireAnimationHip, 1.f);
-			}
-		}
+		WeaponInHands->StopFiring();
 	}
 }
 
@@ -279,6 +291,7 @@ void AEnemyBaseCharacter::OnTakeDamage(AActor* DamagedActor,
 				CurrentController->UnPossess();
 				// destroy the controller, since it's not part of the enemy anymore
 				CurrentController->Destroy();
+				UE_LOG(LogTemp, Warning, TEXT("Destroy AI controller"))
 			}
 		}
 		// *** DEATH END *** //

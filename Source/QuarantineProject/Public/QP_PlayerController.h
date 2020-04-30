@@ -52,6 +52,7 @@ protected:
 	
 	/** Fire */
 	void OnFire();
+	void OnStopFiring();
 
 	/** Quit */
 	void Exit();

@@ -19,7 +19,18 @@ public:
 	/** Called every frame */
 	virtual void Tick(float DeltaTime) override;
 
-protected:
+
+	/** Aiming */
+	UFUNCTION(BlueprintCallable)
+	void AimToTarget();
+
+	/** Fire */
+	UFUNCTION(BlueprintCallable)
+	void OnFire();
+	/** Stop firing */
+	UFUNCTION(BlueprintCallable)
+	void OnStopFiring();
+
 	UFUNCTION(BlueprintCallable, Category = Setup)
 	ACharacter* GetControlledCharacter() const;
 
@@ -44,12 +55,6 @@ protected:
 	/** This overrides the Crouch() in character */
 	void SprintStart();
 	void SprintEnd();
-
-	/** Aiming */
-	void AimToTarget();
-
-	/** Fire */
-	void OnFire();
 
 	/**
 	 * Called via input to turn at a given rate.

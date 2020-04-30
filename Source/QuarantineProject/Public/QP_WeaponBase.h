@@ -26,6 +26,7 @@ enum class EFireMode
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FReloadingEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFireEvent);
 
 UCLASS()
 class QUARANTINEPROJECT_API AQP_WeaponBase : public AActor
@@ -39,6 +40,8 @@ public:
 	UFUNCTION()
 	void Fire(FRotator MuzzleRotation);
 	UFUNCTION()
+	void StopFiring();
+	UFUNCTION()
 	void Reload();
 	UFUNCTION()
 	FRotator GetMuzzleRotation();
@@ -46,6 +49,9 @@ public:
 	bool FORCEINLINE IsWeaponCanShoot() { return CurrentBulletsInMagazine != 0; };
 	// Get reloading event
 	FReloadingEvent OnReloading;
+	FFireEvent OnFireEvent;
+	UFUNCTION()
+	void FireLoop(FRotator MuzzleRotation);
 
 protected:
 	// Called when the game starts or when spawned
@@ -96,5 +102,8 @@ protected:
 private:
 	void SpawnProjectile(FRotator MuzzleRotation);
 	FTimerHandle ReloadTimer;
+	FTimerHandle FireRateTimer;
+	bool bCanFireAfterRate = true;
+	double LastFireTime = 0.0;
 	bool bIsWeaponReloading = false;
 };

@@ -99,6 +99,9 @@ void AQuarantineProjectCharacter::BeginPlay()
 										FName("RightHandWeaponSocket"));
 		// Describe to reloading event
 		WeaponInHands->OnReloading.AddDynamic(this, &AQuarantineProjectCharacter::ShowReloadAnimation);
+		// Describe to fire event
+		WeaponInHands->OnFireEvent.AddDynamic(this, &AQuarantineProjectCharacter::ShowFireAnimation);
+
 	}
 
 }
@@ -155,6 +158,28 @@ void AQuarantineProjectCharacter::ShowReloadAnimation()
 			else
 			{
 				AnimInstance->Montage_Play(ReloadHitAnimation, 1.f);
+			}
+		}
+	}
+}
+
+void AQuarantineProjectCharacter::ShowFireAnimation()
+{
+	// play a firing animation if specified
+	if (FireAnimationHip && FireAnimationAiming)
+	{
+		if (!WeaponInHands->IsWeaponCanShoot()) return;
+		// Get the animation object for the mesh
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance != NULL)
+		{
+			if (bIsAiming)
+			{
+				AnimInstance->Montage_Play(FireAnimationAiming, 1.f);
+			}
+			else
+			{
+				AnimInstance->Montage_Play(FireAnimationHip, 1.f);
 			}
 		}
 	}
@@ -306,24 +331,13 @@ void AQuarantineProjectCharacter::OnFire()
 			}
 		}
 	}
+}
 
-	// try and play a firing animation if specified
-	if (FireAnimationHip && FireAnimationAiming)
+void AQuarantineProjectCharacter::OnStopFiring()
+{
+	if (WeaponInHands)
 	{
-		if (!WeaponInHands->IsWeaponCanShoot()) return;
-		// Get the animation object for the mesh
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		if (AnimInstance != NULL)
-		{
-			if (bIsAiming)
-			{
-				AnimInstance->Montage_Play(FireAnimationAiming, 1.f);
-			}
-			else
-			{
-				AnimInstance->Montage_Play(FireAnimationHip, 1.f);
-			}	
-		}
+		WeaponInHands->StopFiring();
 	}
 }
 
