@@ -91,7 +91,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponProperties")
 	float AimingFealdOfView = 80.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponProperties")
-	float ReloadingTime = 1.5f;
+	float ReloadingTime = 2.3f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponProperties")
 	float ShotsPerSecond = 1.0f;
 

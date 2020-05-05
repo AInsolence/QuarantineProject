@@ -7,7 +7,7 @@
 #include "QP_PauseGameWidget.generated.h"
 
 /**
- * 
+	Widget used for pause game and game over options
  */
 
 UCLASS()
@@ -22,12 +22,20 @@ public:
 	virtual void NativeConstruct() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	class UButton* RestartLevelButton;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	class UButton* ResumeButton;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	class UButton* ExitButton;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	class UTextBlock* GameOverText;
 
+	UFUNCTION()
+	void RestartLevel();
 	UFUNCTION()
 	void ResumeGame();
 	UFUNCTION()
 	void ExitGame();
+	UFUNCTION()
+	void ShowGameOverText();
 };

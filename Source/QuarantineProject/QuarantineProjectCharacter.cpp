@@ -16,6 +16,7 @@
 #include "QP_HUD.h"
 #include "QP_HealthComponent.h"
 #include "QuarantineProject/Public/QP_WeaponBase.h"
+#include "QP_InventorySystemComponent.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AQuarantineProjectCharacter
@@ -58,7 +59,8 @@ AQuarantineProjectCharacter::AQuarantineProjectCharacter()
 
 	// Create health component
 	HealthComponent = CreateDefaultSubobject<UQP_HealthComponent>(TEXT("HealthComponent"));
-
+	// Create inventory component
+	InventoryComponent = CreateDefaultSubobject<UQP_InventorySystemComponent>(TEXT("InventoryComponent"));
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
@@ -186,6 +188,22 @@ void AQuarantineProjectCharacter::ShowFireAnimation()
 }
 
 //*****            INPUT LOGIC                *****//
+
+void AQuarantineProjectCharacter::PickUpItem()
+{
+	if (InventoryComponent)
+	{
+		InventoryComponent->AddItemToInventory();
+	}
+}
+
+void AQuarantineProjectCharacter::DropItem()
+{
+	if (InventoryComponent)
+	{
+		InventoryComponent->ThrowItemFromInventory();
+	}
+}
 
 void AQuarantineProjectCharacter::OnResetVR()
 {
@@ -359,15 +377,26 @@ void AQuarantineProjectCharacter::OnTakeDamage(AActor* DamagedActor,
 {
 	if (HealthComponent) 
 	{
+
+		// try and play injured animation if specified
+		if (InjuredAnimation)
+		{
+			// Get the animation object for the mesh
+			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+			if (AnimInstance != NULL)
+			{
+				AnimInstance->Montage_Play(InjuredAnimation, 2.0f);
+			}
+		}
 		//Update HUD health status
 		if (GetPlayerHUD())
 		{
 			GetPlayerHUD()->UpdateHealthState(HealthComponent->GetCurrentHealth() / 100);
 		}
-
 		//*** DEATH ***//
 		if (HealthComponent->GetCurrentHealth() <= 0)
 		{
+			OnGameOverByPlayersDeath.Broadcast();
 			// Disable collision capsule if the character is dead
 			auto Capsule = DamagedActor->FindComponentByClass<UCapsuleComponent>();
 			if (Capsule)
@@ -379,23 +408,13 @@ void AQuarantineProjectCharacter::OnTakeDamage(AActor* DamagedActor,
 			if (CurrentController) {
 				// stop movement so the death animation plays immediately
 				CurrentController->StopMovement();
+				/* AI logic option */
 				// unpossess to stop AI
-				CurrentController->UnPossess();
+				//CurrentController->UnPossess();
 				// destroy the controller, since it's not part of the enemy anymore
-				CurrentController->Destroy();
+				//CurrentController->Destroy();
 			}
 		}
 		// *** DEATH END *** //
-	}
-
-	// try and play injured animation if specified
-	if (InjuredAnimation)
-	{
-		// Get the animation object for the mesh
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		if (AnimInstance != NULL)
-		{
-			AnimInstance->Montage_Play(InjuredAnimation, 2.0f);
-		}
 	}
 }

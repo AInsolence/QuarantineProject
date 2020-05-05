@@ -271,6 +271,7 @@ void AEnemyBaseCharacter::OnTakeDamage(AActor* DamagedActor,
 										AController* InstigatedBy,
 										AActor* DamageCauser)
 {
+	OnActorOnEnemyFire.Broadcast();
 	if (HealthComponent)
 	{
 		//*** DEATH ***//
@@ -287,11 +288,12 @@ void AEnemyBaseCharacter::OnTakeDamage(AActor* DamagedActor,
 			if (CurrentController) {
 				// stop movement so the death animation plays immediately
 				CurrentController->StopMovement();
+				// stop fire if firing in that moment+
+ 				OnStopFiring();
 				// unpossess to stop AI
 				CurrentController->UnPossess();
 				// destroy the controller, since it's not part of the enemy anymore
 				CurrentController->Destroy();
-				UE_LOG(LogTemp, Warning, TEXT("Destroy AI controller"))
 			}
 		}
 		// *** DEATH END *** //

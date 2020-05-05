@@ -22,40 +22,11 @@ AQP_WeaponBase::AQP_WeaponBase()
 	SetRootComponent(WeaponMesh);
 }
 
-void AQP_WeaponBase::Fire(FRotator MuzzleRotation)
+// Called when the game starts or when spawned
+void AQP_WeaponBase::BeginPlay()
 {
-	if (bCanFireAfterRate)
-	{// start fire
-		bCanFireAfterRate = false;
-		// start fire without delay
-		FireLoop(MuzzleRotation);
-		
-		// start fire loop by timer if still pressed
-		if (GetWorld())
-		{
-			GetWorld()->GetTimerManager().SetTimer(
-				FireRateTimer,
-				FTimerDelegate::CreateUObject(this, &AQP_WeaponBase::Fire, MuzzleRotation),
-				ShotsPerSecond,
-				true);
-		}
-	}
-	else
-	{// wait for delay after last firing time
-		bCanFireAfterRate = ((FPlatformTime::Seconds() - LastFireTime) > ShotsPerSecond);
-		if (bCanFireAfterRate)
-		{
-			LastFireTime = FPlatformTime::Seconds();
-		}
-	}
-}
+	Super::BeginPlay();
 
-void AQP_WeaponBase::StopFiring()
-{
-	if (GetWorld())
-	{
-		GetWorld()->GetTimerManager().ClearTimer(FireRateTimer);
-	}
 }
 
 FRotator AQP_WeaponBase::GetMuzzleRotation()
@@ -71,11 +42,54 @@ FRotator AQP_WeaponBase::GetMuzzleRotation()
 	}
 }
 
-// Called when the game starts or when spawned
-void AQP_WeaponBase::BeginPlay()
+void AQP_WeaponBase::Fire(FRotator MuzzleRotation)
 {
-	Super::BeginPlay();
-	
+	if (!TotalBulletsForThisWeapon && !CurrentBulletsInMagazine)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Out of bullets in weapon"))
+		return;
+	}
+	if (bIsWeaponReloading) return;
+
+	if (bCanFireAfterRate)
+	{// start fire
+		bCanFireAfterRate = false;
+		// start fire without delay
+		FireLoop(MuzzleRotation);
+
+		// start fire loop by timer if still pressed
+		if (GetWorld())
+		{
+			GetWorld()->GetTimerManager().SetTimer(
+				FireRateTimer,
+				FTimerDelegate::CreateUObject(this, &AQP_WeaponBase::Fire, MuzzleRotation),
+				ShotsPerSecond,
+				true);
+		}
+	}
+	else
+	{// wait for delay after last firing time to avoid hypertapping cheat
+		bCanFireAfterRate = ((FPlatformTime::Seconds() - LastFireTime) > ShotsPerSecond);
+		if (bCanFireAfterRate)
+		{
+			LastFireTime = FPlatformTime::Seconds();
+			FireLoop(MuzzleRotation);
+		}
+	}
+}
+
+void AQP_WeaponBase::FireLoop(FRotator MuzzleRotation)
+{// check bullets in magazine before spawning projectile
+	if (CurrentBulletsInMagazine)
+	{
+		SpawnProjectile(MuzzleRotation);
+		CurrentBulletsInMagazine -= 1;
+	}
+	else // try to reload
+	{
+		StartReload();
+	}
+	GEngine->AddOnScreenDebugMessage(3, 5.0f, FColor::Red, TEXT("Bullets: %f") + FString::FromInt(CurrentBulletsInMagazine), false);
 }
 
 void AQP_WeaponBase::SpawnProjectile(FRotator MuzzleRotation)
@@ -122,6 +136,14 @@ void AQP_WeaponBase::SpawnProjectile(FRotator MuzzleRotation)
 	}
 }
 
+void AQP_WeaponBase::StopFiring()
+{
+	if (GetWorld())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(FireRateTimer);
+	}
+}
+
 void AQP_WeaponBase::StartReload()
 {
 	// play the empty magazine sound
@@ -149,20 +171,6 @@ void AQP_WeaponBase::StartReload()
 				false);
 		}
 	}
-}
-
-void AQP_WeaponBase::FireLoop(FRotator MuzzleRotation)
-{// check bullets in magazine before spawning projectile
-	if (CurrentBulletsInMagazine)
-	{
-		SpawnProjectile(MuzzleRotation);
-		CurrentBulletsInMagazine -= 1;
-	}
-	else // try to reload
-	{
-		StartReload();
-	}
-	GEngine->AddOnScreenDebugMessage(3, 5.0f, FColor::Red, TEXT("Bullets: %f") + FString::FromInt(CurrentBulletsInMagazine), false);
 }
 
 void AQP_WeaponBase::Reload()

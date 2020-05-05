@@ -10,7 +10,7 @@
 AQP_HUD::AQP_HUD(const FObjectInitializer& ObjectInitializer) 
 	: Super(ObjectInitializer)
 {
-
+	
 }
 
 void AQP_HUD::BeginPlay()
@@ -116,5 +116,18 @@ void AQP_HUD::Exit()
 			GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
 			UGameplayStatics::SetGamePaused(GetWorld(), false);
 		}
+	}
+}
+
+void AQP_HUD::GameOver()
+{
+	if (PauseGameWidget)
+	{
+		if (!GetWorld()) return;
+		UGameplayStatics::SetGamePaused(GetWorld(), true);
+		PauseGameWidget->SetVisibility(ESlateVisibility::Visible);
+		PauseGameWidget->ShowGameOverText();
+		GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameAndUI());
+		GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
 	}
 }

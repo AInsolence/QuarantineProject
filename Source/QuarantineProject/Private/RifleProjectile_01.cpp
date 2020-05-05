@@ -71,10 +71,16 @@ void ARifleProjectile_01::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor
 
 				GEngine->AddOnScreenDebugMessage(1, 5.0f, FColor::Black, TEXT("Hitted bone: ") + BoneName.ToString(), false);
 				GEngine->AddOnScreenDebugMessage(2, 5.0f, FColor::Black, TEXT("DAMAGE: %f") + FString::SanitizeFloat(DamageAmount), false);
-				OtherActor->TakeDamage(DamageAmount, 
-											DamageEvent, 
-											GetWorld()->GetFirstPlayerController(),
-											this);
+				if (GetWorld())
+				{
+					if (GetWorld()->GetFirstPlayerController())
+					{
+						OtherActor->TakeDamage(DamageAmount,
+							DamageEvent,
+							GetWorld()->GetFirstPlayerController(),
+							this);
+					}
+				}
 			}
 		}
 		// destroy projectile

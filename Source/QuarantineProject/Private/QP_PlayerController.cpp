@@ -8,6 +8,11 @@
 void AQP_PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+	if (GetCharacter() && GetHUD())
+	{
+		Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->
+			OnGameOverByPlayersDeath.AddDynamic(this, &AQP_PlayerController::GameOver);
+	}
 }
 
 void AQP_PlayerController::Tick(float DeltaTime)
@@ -29,7 +34,9 @@ void AQP_PlayerController::SetupInputComponent()
 	InputComponent->BindAction("Fire", IE_Pressed, this, &AQP_PlayerController::OnFire);
 	InputComponent->BindAction("Fire", IE_Released, this, &AQP_PlayerController::OnStopFiring);
 
-	InputComponent->BindAction("Reload", IE_Released, this, &AQP_PlayerController::OnReloading);
+	InputComponent->BindAction("Reload", IE_Pressed, this, &AQP_PlayerController::OnReloading);
+	InputComponent->BindAction("Interact", IE_Pressed, this, &AQP_PlayerController::Interact);
+	InputComponent->BindAction("Drop", IE_Pressed, this, &AQP_PlayerController::Drop);
 
 	InputComponent->BindAction("Sprint", IE_Pressed, this, &AQP_PlayerController::SprintStart);
 	InputComponent->BindAction("Sprint", IE_Released, this, &AQP_PlayerController::SprintEnd);
@@ -131,6 +138,24 @@ void AQP_PlayerController::OnReloading()
 void AQP_PlayerController::Exit()
 {
 	Cast<AQP_HUD>(GetHUD())->Exit();
+}
+
+void AQP_PlayerController::GameOver()
+{
+	if (GetHUD())
+	{
+		Cast<AQP_HUD>(GetHUD())->GameOver();
+	}
+}
+
+void AQP_PlayerController::Interact()
+{
+	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->PickUpItem();
+}
+
+void AQP_PlayerController::Drop()
+{
+	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->DropItem();
 }
 
 void AQP_PlayerController::TurnAtRate(float Rate)

@@ -45,4 +45,6 @@ public:
     void UpdateStaminaState(float CurrentStamina);
     UFUNCTION()
     void Exit();
+    UFUNCTION()
+    void GameOver();
 };

@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "QuarantineProjectCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameOverByPlayersDeath);
+
 UCLASS(config=Game)
 class AQuarantineProjectCharacter : public ACharacter
 {
@@ -29,13 +31,16 @@ protected:
 	/** Aiming camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* AimingCamera;
-	/** Health component */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Health, meta = (AllowPrivateAccess = "true"))
-	class UQP_HealthComponent* HealthComponent;
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+	/** Health component */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Health, meta = (AllowPrivateAccess = "true"))
+	class UQP_HealthComponent* HealthComponent;
+	/** Inventory system component */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Health, meta = (AllowPrivateAccess = "true"))
+	class UQP_InventorySystemComponent* InventoryComponent;
 
 	/** Weapon component */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Weapon, meta = (AllowPrivateAccess = "true"))
@@ -82,6 +87,11 @@ public:
 	UFUNCTION()
 	void ShowFireAnimation();
 
+	/** Inventory component */
+	UFUNCTION()
+	void PickUpItem();
+	UFUNCTION()
+	void DropItem();
 
 	/** Resets HMD orientation in VR. */
 	void OnResetVR();
@@ -131,5 +141,6 @@ public:
 	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
 
 	class AQP_HUD* GetPlayerHUD() const;
+	FGameOverByPlayersDeath OnGameOverByPlayersDeath;
 };
 

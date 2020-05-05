@@ -11,6 +11,8 @@
 	is controlled by AI controller 
  */
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActorOnEnemyFire);
+
 UCLASS()
 class QUARANTINEPROJECT_API AEnemyBaseCharacter : public ACharacter
 {
@@ -35,7 +37,7 @@ protected:
 	class UAIPerceptionComponent* PerceptionComponent;
 
 	/** Weapon component */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Weapon, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AQP_WeaponBase> WeaponInHandsClass;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
@@ -127,4 +129,7 @@ public:
 	void TouchStarted(ETouchIndex::Type FingerIndex, FVector Location);
 	/** Handler for when a touch input stops. */
 	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
+
+	UPROPERTY(BlueprintAssignable)
+	FActorOnEnemyFire OnActorOnEnemyFire;
 };
