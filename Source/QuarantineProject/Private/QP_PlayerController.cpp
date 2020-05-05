@@ -4,14 +4,24 @@
 #include "QP_PlayerController.h"
 #include "QuarantineProject/QuarantineProjectCharacter.h"
 #include "QP_HUD.h"
+#include "QP_InventorySystemComponent.h"
 
 void AQP_PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	if (GetCharacter() && GetHUD())
 	{
+		// set binding to show Game over widget
 		Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->
 			OnGameOverByPlayersDeath.AddDynamic(this, &AQP_PlayerController::GameOver);
+		// set binding to show pick up tip
+		auto HUD = Cast<AQP_HUD>(GetHUD());
+		auto Inventory = Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->
+			FindComponentByClass<UQP_InventorySystemComponent>();
+		if (Inventory)
+		{
+			Inventory->OnItemCanBePickedUp.BindDynamic(HUD, &AQP_HUD::SetPickUpTipVisibility);
+		}
 	}
 }
 

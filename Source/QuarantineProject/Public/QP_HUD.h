@@ -44,6 +44,8 @@ public:
     UFUNCTION()
     void UpdateStaminaState(float CurrentStamina);
     UFUNCTION()
+    void SetPickUpTipVisibility(bool Show);
+    UFUNCTION()
     void Exit();
     UFUNCTION()
     void GameOver();

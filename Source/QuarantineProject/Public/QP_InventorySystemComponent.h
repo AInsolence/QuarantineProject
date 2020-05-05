@@ -12,7 +12,7 @@
 	store and manage pickable items by character.
 */
 
-DECLARE_DYNAMIC_DELEGATE(FItemCanBePickedUp);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FItemCanBePickedUp, bool, bIsPickupTipNeedToBeShown);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class QUARANTINEPROJECT_API UQP_InventorySystemComponent : public UActorComponent

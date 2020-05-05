@@ -98,6 +98,14 @@ void AQP_HUD::UpdateStaminaState(float CurrentStamina)
 	}
 }
 
+void AQP_HUD::SetPickUpTipVisibility(bool Show)
+{
+	if (PlayerStateInfoWidget)
+	{
+		PlayerStateInfoWidget->SetPickUpTipVisibility(Show);
+	}
+}
+
 void AQP_HUD::Exit()
 {
 	if (PauseGameWidget)

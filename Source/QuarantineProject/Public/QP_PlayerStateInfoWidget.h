@@ -26,10 +26,15 @@ public:
 	class UProgressBar* StaminaBar;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	class UImage* Blood;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* PickUpInfo = nullptr;
+
 	UFUNCTION()
 	void UpdateHealthState(float CurrentHealth);
 	UFUNCTION()
 	void UpdateStaminaState(float CurrentStamina);
+	UFUNCTION()
+	void SetPickUpTipVisibility(bool Show);
 
 private:
 	void StoreWidgetAnimations();

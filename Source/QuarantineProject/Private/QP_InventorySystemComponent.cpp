@@ -58,7 +58,7 @@ AActor* UQP_InventorySystemComponent::RaycastToFindPickableItem()
 															RayStart,
 															RayEnd,
 															ECollisionChannel::ECC_WorldDynamic);
-		DrawDebugLine(GetWorld(), RayStart, RayEnd, FColor::Red, false, 0.2f, 0, 5.f);
+		//DrawDebugLine(GetWorld(), RayStart, RayEnd, FColor::Red, false, 0.2f, 0, 5.f);
 		// if hit smth check if an item is pickable
 		if (bHasHitSmth)
 		{
@@ -67,15 +67,21 @@ AActor* UQP_InventorySystemComponent::RaycastToFindPickableItem()
 			auto ActorPickableComponent = HittedActor->FindComponentByClass<UQP_PickableComponent>();
 			if (ActorPickableComponent)
 			{// if it is pickable show the pick up option to player
-				OnItemCanBePickedUp.ExecuteIfBound();
+				OnItemCanBePickedUp.ExecuteIfBound(true);
 				return HittedActor;
 			}
-			// item is not pickable
-			return nullptr;
+			else
+			{
+				OnItemCanBePickedUp.ExecuteIfBound(false);
+				// item is not pickable
+				return nullptr;
+			}
 		}
+		OnItemCanBePickedUp.ExecuteIfBound(false);
 		// nothing was hit
 		return nullptr;
 	}
+	OnItemCanBePickedUp.ExecuteIfBound(false);
 	// cannot find world or owner
 	return nullptr;
 }
