@@ -60,6 +60,10 @@ protected:
 	void Interact();
 	UFUNCTION()
 	void Drop();
+	UFUNCTION()
+	void NextWeapon();
+	UFUNCTION()
+	void PreviousWeapon();
 
 	/** Quit */
 	void Exit();

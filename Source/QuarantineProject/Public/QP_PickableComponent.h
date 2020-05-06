@@ -11,6 +11,20 @@
 	Just add this component to the actor and describe to OnPickUp delegate.
 */
 
+UENUM()
+enum class EPickableItemType
+{
+	Ammo,
+	Helmet,
+	Armor,
+	FirstAidKit,
+	ColdSteel,
+	Pistol,
+	Rifle,
+	LongWeapon,
+	Grenade
+};
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class QUARANTINEPROJECT_API UQP_PickableComponent : public UActorComponent
 {
@@ -22,4 +36,6 @@ public:
 	// calls when owner actor is picked up by player
 	UFUNCTION()
 	void PickUp();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponProperties")
+	EPickableItemType ItemType = EPickableItemType::Rifle;
 };

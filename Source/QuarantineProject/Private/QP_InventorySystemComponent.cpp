@@ -6,7 +6,6 @@
 #include "Engine/World.h"
 #include "GameFramework/Controller.h"
 #include "DrawDebugHelpers.h"
-#include "QP_PickableComponent.h"
 
 // Sets default values for this component's properties
 UQP_InventorySystemComponent::UQP_InventorySystemComponent()
@@ -15,7 +14,20 @@ UQP_InventorySystemComponent::UQP_InventorySystemComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// ...
+	// create ammunition
+	EquipedItemsContainer.Add(EPickableItemType::Helmet, nullptr);
+	EquipedItemsContainer.Add(EPickableItemType::Armor, nullptr);
+	EquipedItemsContainer.Add(EPickableItemType::ColdSteel, nullptr);
+	EquipedItemsContainer.Add(EPickableItemType::Pistol, nullptr);
+	EquipedItemsContainer.Add(EPickableItemType::Rifle, nullptr);
+	EquipedItemsContainer.Add(EPickableItemType::LongWeapon, nullptr);
+	EquipedItemsContainer.Add(EPickableItemType::Grenade, nullptr);
+	// create ammunition type list to use switching
+	AmmunitionTypeArray.Add(EPickableItemType::ColdSteel);
+	AmmunitionTypeArray.Add(EPickableItemType::Pistol);
+	AmmunitionTypeArray.Add(EPickableItemType::Rifle);
+	AmmunitionTypeArray.Add(EPickableItemType::LongWeapon);
+	AmmunitionTypeArray.Add(EPickableItemType::Grenade);
 }
 
 
@@ -39,7 +51,6 @@ void UQP_InventorySystemComponent::TickComponent(float DeltaTime, ELevelTick Tic
 	// raycast to find pickable components on the map
 	RaycastToFindPickableItem();
 }
-
 
 AActor* UQP_InventorySystemComponent::RaycastToFindPickableItem()
 {
@@ -86,9 +97,8 @@ AActor* UQP_InventorySystemComponent::RaycastToFindPickableItem()
 	return nullptr;
 }
 
-void UQP_InventorySystemComponent::AddItemToInventory()
+void UQP_InventorySystemComponent::AddItemToInventory(AActor* HittedActor)
 {
-	auto HittedActor = RaycastToFindPickableItem();
 	if (!HittedActor) return;
 
 	auto PickableItem = HittedActor->GetClass();
@@ -96,14 +106,37 @@ void UQP_InventorySystemComponent::AddItemToInventory()
 	// check if pickable item exist
 	if (PickableItem)
 	{
-		InventoryContainer.Add(1, PickableItem);
-		HittedActor->FindComponentByClass<UQP_PickableComponent>()->PickUp();
+		auto PickupComponent = HittedActor->FindComponentByClass<UQP_PickableComponent>();
+		InventoryContainer.Add(PickableItem);
+		if (PickupComponent)
+		{
+			// try to equip item
+			EquipItem(PickableItem, PickupComponent->ItemType);
+			// execute delegate
+			PickupComponent->PickUp();
+		}
 	}
 	else
 	{
 		GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, "I Cannot take it");
 		return;
 	}
+}
+
+bool UQP_InventorySystemComponent::EquipItem(UClass* PickedItem, EPickableItemType ItemType)
+{
+	// if item already equiped
+	if (EquipedItemsContainer.FindRef(ItemType))
+	{// move it to inventory
+		auto Item = EquipedItemsContainer[ItemType]->GetClass();
+		GEngine->AddOnScreenDebugMessage(5, 2.f, FColor::Red, "Substituted: ");
+	}
+	EquipedItemsContainer[ItemType] = PickedItem;
+	GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, 
+									 "Item equiped: " + PickedItem->GetName() + 
+									 " Item type: " + 
+									 UEnum::GetValueAsString <EPickableItemType>(ItemType));
+	return true;
 }
 
 void UQP_InventorySystemComponent::ThrowItemFromInventory()
@@ -118,14 +151,14 @@ void UQP_InventorySystemComponent::ThrowItemFromInventory()
 		//Set Spawn Collision Handling Override
 		FActorSpawnParameters ActorSpawnParams;
 		ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-		if (InventoryContainer.Contains(1))
+		if (InventoryContainer.Num() >= 1)
 		{// try to throw(spawn) item in the world
-			if (World->SpawnActor<AActor>(InventoryContainer[1],
+			if (World->SpawnActor<AActor>(InventoryContainer.Pop(),
 				SpawnLocation,
 				FRotator(0, 0, 0),
 				ActorSpawnParams))
 			{// remove item reference from inventory after spawning
-				InventoryContainer.Remove(1);
+				//InventoryContainer.Pop();
 			}
 		}
 		else
@@ -135,3 +168,27 @@ void UQP_InventorySystemComponent::ThrowItemFromInventory()
 	}
 }
 
+void UQP_InventorySystemComponent::NextWeapon()
+{
+	// check if ammunition array is not empty
+	if (AmmunitionTypeArray.Num() > 0)
+	{
+		// check if current item is not the last in array
+		if (AmmunitionTypeArray.IndexOfByKey(CurrentWeapon) !=
+			AmmunitionTypeArray.Num() - 1)
+		{// set next type in array
+			CurrentWeapon = AmmunitionTypeArray[
+				AmmunitionTypeArray.IndexOfByKey(CurrentWeapon) + 1];
+		}
+		else
+		{// set first type
+			CurrentWeapon = AmmunitionTypeArray[0];
+		}
+	}
+	GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, "NextWeapon");
+}
+
+void UQP_InventorySystemComponent::PreviousWeapon()
+{
+	GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, "PreviousWeapon");
+}

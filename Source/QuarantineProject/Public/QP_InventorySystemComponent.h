@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "GameplayTagContainer.h"
+#include "QP_PickableComponent.h"
 #include "QP_InventorySystemComponent.generated.h"
 
 /*
@@ -26,10 +26,16 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-	TMap<int32, UClass*> InventoryContainer;
+
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	TMap<EPickableItemType, UClass*> EquipedItemsContainer;
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	TArray<UClass*> InventoryContainer;
+	UFUNCTION()
+	bool EquipItem(UClass* PickedItem, EPickableItemType ItemType);
+
 	APawn* Owner = nullptr;
 	UWorld* World = nullptr;
-	AActor* RaycastToFindPickableItem();
 
 public:	
 	// Called every frame
@@ -39,6 +45,19 @@ public:
 
 	FItemCanBePickedUp OnItemCanBePickedUp;
 	// get item from raycast and try to add to inventory
-	void AddItemToInventory();
+	UFUNCTION()
+	AActor* RaycastToFindPickableItem();
+	UFUNCTION()
+	void AddItemToInventory(AActor* HittedActor);
+	UFUNCTION()
 	void ThrowItemFromInventory();
+	UFUNCTION()
+	void NextWeapon();
+	UFUNCTION()
+	void PreviousWeapon();
+
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	EPickableItemType CurrentWeapon = EPickableItemType::Rifle;
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	TArray<EPickableItemType> AmmunitionTypeArray;
 };

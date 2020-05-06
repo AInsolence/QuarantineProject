@@ -45,8 +45,12 @@ void AQP_PlayerController::SetupInputComponent()
 	InputComponent->BindAction("Fire", IE_Released, this, &AQP_PlayerController::OnStopFiring);
 
 	InputComponent->BindAction("Reload", IE_Pressed, this, &AQP_PlayerController::OnReloading);
+	
 	InputComponent->BindAction("Interact", IE_Pressed, this, &AQP_PlayerController::Interact);
 	InputComponent->BindAction("Drop", IE_Pressed, this, &AQP_PlayerController::Drop);
+
+	InputComponent->BindAction("NextWeapon", IE_Pressed, this, &AQP_PlayerController::NextWeapon);
+	InputComponent->BindAction("PreviousWeapon", IE_Pressed, this, &AQP_PlayerController::PreviousWeapon);
 
 	InputComponent->BindAction("Sprint", IE_Pressed, this, &AQP_PlayerController::SprintStart);
 	InputComponent->BindAction("Sprint", IE_Released, this, &AQP_PlayerController::SprintEnd);
@@ -166,6 +170,16 @@ void AQP_PlayerController::Interact()
 void AQP_PlayerController::Drop()
 {
 	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->DropItem();
+}
+
+void AQP_PlayerController::NextWeapon()
+{
+	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->NextWeapon();
+}
+
+void AQP_PlayerController::PreviousWeapon()
+{
+	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->PreviousWeapon();
 }
 
 void AQP_PlayerController::TurnAtRate(float Rate)

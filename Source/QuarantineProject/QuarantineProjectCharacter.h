@@ -92,6 +92,11 @@ public:
 	void PickUpItem();
 	UFUNCTION()
 	void DropItem();
+	UFUNCTION()
+	void NextWeapon();
+	UFUNCTION()
+	void PreviousWeapon();
+
 
 	/** Resets HMD orientation in VR. */
 	void OnResetVR();

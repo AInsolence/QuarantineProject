@@ -7,17 +7,6 @@
 #include "QP_WeaponBase.generated.h"
 
 UENUM()
-enum class EWeaponType
-{
-	ColdSteel,
-	Pistol,
-	Rifle,
-	SniperRifle,
-	Turret,
-	Grenade
-};
-
-UENUM()
 enum class EFireMode
 {
 	SemiAuto,
@@ -78,8 +67,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponProperties")
 	TSubclassOf<class UAimingWidget> CrosshairWidget;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponProperties")
-	EWeaponType WeaponType = EWeaponType::Rifle;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponProperties")
 	int32 BulletsInMagazine = 10;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponProperties")
