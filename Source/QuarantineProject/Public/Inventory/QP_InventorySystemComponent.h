@@ -59,9 +59,9 @@ public:
 	UFUNCTION()
 	void DropItem();
 	UFUNCTION()
-	void NextWeapon();
+	EPickableItemType NextWeapon();
 	UFUNCTION()
-	void PreviousWeapon();
+	EPickableItemType PreviousWeapon();
 
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	EPickableItemType CurrentWeapon = EPickableItemType::Rifle;

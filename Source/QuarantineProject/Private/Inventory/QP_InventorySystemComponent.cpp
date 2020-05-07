@@ -91,16 +91,23 @@ void UQP_InventorySystemComponent::PickUpItem()
 {
 	// get hitted actor
 	auto HittedActor = RaycastToFindPickableItem();
-	// try to get pickable component
-	auto HittedItemPickableComp = HittedActor->FindComponentByClass<UQP_PickableComponent>();
-	if (HittedItemPickableComp)
+	if (HittedActor)
 	{
-		AddItemToInventory(HittedItemPickableComp->InventoryItemInfo);
-		HittedItemPickableComp->PickUp();
+		// try to get pickable component
+		auto HittedItemPickableComp = HittedActor->FindComponentByClass<UQP_PickableComponent>();
+		if (HittedItemPickableComp)
+		{
+			AddItemToInventory(HittedItemPickableComp->InventoryItemInfo);
+			HittedItemPickableComp->PickUp();
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, "I cannot pick up it");
+		}
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, "I cannot pick up it");
+		GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, "I cannot pick any");
 	}
 }
 
@@ -114,7 +121,16 @@ bool UQP_InventorySystemComponent::AddItemToInventory(FInventoryItemInfo ItemInf
 	// check if item's class is valid
 	if (ItemInfo.ItemClassPtr)
 	{
-		InventoryContainer.Add(ItemInfo);
+		if (AmmunitionTypeArray.Contains(ItemInfo.ItemType))
+		{
+			GEngine->AddOnScreenDebugMessage(7, 2.f, FColor::Red, "I find weapon and equip");
+			EquipItem(ItemInfo);
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(7, 2.f, FColor::Red, "I find smth and add to inventory");
+			InventoryContainer.Add(ItemInfo);
+		}
 		return true;
 	}
 	else
@@ -143,12 +159,12 @@ bool UQP_InventorySystemComponent::ThrowItemFromInventory()
 {
 	if (World)
 	{
-		// set spawn parameters
+		// Set spawn parameters
 		FVector ViewLocation;
 		FRotator ViewRotation;
 		Owner->GetController()->GetPlayerViewPoint(ViewLocation, ViewRotation);
 		FVector SpawnLocation = ViewLocation + (ViewRotation.Vector() * 400);
-		//Set Spawn Collision Handling Override
+		//Set spawn collision handling
 		FActorSpawnParameters ActorSpawnParams;
 		ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 		if (InventoryContainer.Num() >= 1)
@@ -171,7 +187,7 @@ bool UQP_InventorySystemComponent::ThrowItemFromInventory()
 	return false;
 }
 
-void UQP_InventorySystemComponent::NextWeapon()
+EPickableItemType UQP_InventorySystemComponent::NextWeapon()
 {
 	// check if ammunition array is not empty
 	if (AmmunitionTypeArray.Num() > 0)
@@ -179,19 +195,35 @@ void UQP_InventorySystemComponent::NextWeapon()
 		// check if current item is not the last in array
 		if (AmmunitionTypeArray.IndexOfByKey(CurrentWeapon) !=
 			AmmunitionTypeArray.Num() - 1)
-		{// set next type in array
+		{// set current weapon as next weapon in array
 			CurrentWeapon = AmmunitionTypeArray[
 				AmmunitionTypeArray.IndexOfByKey(CurrentWeapon) + 1];
 		}
 		else
-		{// set first type
+		{// set current weapon as first weapon in array
 			CurrentWeapon = AmmunitionTypeArray[0];
 		}
 	}
 	GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, "NextWeapon");
+	return CurrentWeapon;
 }
 
-void UQP_InventorySystemComponent::PreviousWeapon()
+EPickableItemType UQP_InventorySystemComponent::PreviousWeapon()
 {
+	// check if ammunition array is not empty
+	if (AmmunitionTypeArray.Num() > 0)
+	{
+		// check if current item is not the last in array
+		if (AmmunitionTypeArray.IndexOfByKey(CurrentWeapon) > 0)
+		{// set current weapon as next weapon in array
+			CurrentWeapon = AmmunitionTypeArray[
+				AmmunitionTypeArray.IndexOfByKey(CurrentWeapon) - 1];
+		}
+		else
+		{// set current weapon as first weapon in array
+			CurrentWeapon = AmmunitionTypeArray.Last();
+		}
+	}
 	GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, "PreviousWeapon");
+	return CurrentWeapon;
 }
