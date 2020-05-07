@@ -193,8 +193,7 @@ void AQuarantineProjectCharacter::PickUpItem()
 {
 	if (InventoryComponent)
 	{
-		auto PickableItem = InventoryComponent->RaycastToFindPickableItem();
-		InventoryComponent->AddItemToInventory(PickableItem);
+		InventoryComponent->PickUpItem();
 	}
 }
 
@@ -202,7 +201,7 @@ void AQuarantineProjectCharacter::DropItem()
 {
 	if (InventoryComponent)
 	{
-		InventoryComponent->ThrowItemFromInventory();
+		InventoryComponent->DropItem();
 	}
 }
 

@@ -28,11 +28,16 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, Category = "Inventory")
-	TMap<EPickableItemType, UClass*> EquipedItemsContainer;
+	TArray<FInventoryItemInfo> EquipedItemsContainer;
 	UPROPERTY(EditAnywhere, Category = "Inventory")
-	TArray<UClass*> InventoryContainer;
+	TArray<FInventoryItemInfo> InventoryContainer;
+
 	UFUNCTION()
-	bool EquipItem(UClass* PickedItem, EPickableItemType ItemType);
+	bool AddItemToInventory(FInventoryItemInfo ItemInfo);
+	UFUNCTION()
+	bool EquipItem(FInventoryItemInfo ItemInfo);
+	UFUNCTION()
+	bool ThrowItemFromInventory();
 
 	APawn* Owner = nullptr;
 	UWorld* World = nullptr;
@@ -42,15 +47,17 @@ public:
 	virtual void TickComponent(float DeltaTime, 
 								ELevelTick TickType, 
 								FActorComponentTickFunction* ThisTickFunction) override;
-
+	// event is called when item was picked up
 	FItemCanBePickedUp OnItemCanBePickedUp;
-	// get item from raycast and try to add to inventory
+	
+	///*** API ***///
 	UFUNCTION()
+	// Get item from raycast. Return AActor* only if item is pickable, or nullptr.
 	AActor* RaycastToFindPickableItem();
 	UFUNCTION()
-	void AddItemToInventory(AActor* HittedActor);
+	void PickUpItem();
 	UFUNCTION()
-	void ThrowItemFromInventory();
+	void DropItem();
 	UFUNCTION()
 	void NextWeapon();
 	UFUNCTION()

@@ -4,38 +4,28 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "QuarantineProject/Public/Inventory/QP_InventoryItem.h"
 #include "QP_PickableComponent.generated.h"
 
 /*
-	This class is a component to make any actors pickable by the player in the game.
+	This class is a component to make any actors will be pickable by the player in the game.
 	Just add this component to the actor and describe to OnPickUp delegate.
 */
-
-UENUM()
-enum class EPickableItemType
-{
-	Ammo,
-	Helmet,
-	Armor,
-	FirstAidKit,
-	ColdSteel,
-	Pistol,
-	Rifle,
-	LongWeapon,
-	Grenade
-};
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class QUARANTINEPROJECT_API UQP_PickableComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
+protected:
+	virtual void BeginPlay() override;
 public:	
 	// Sets default values for this component's properties
 	UQP_PickableComponent();
 	// calls when owner actor is picked up by player
 	UFUNCTION()
 	void PickUp();
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponProperties")
-	EPickableItemType ItemType = EPickableItemType::Rifle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PickableItemProperties")
+	FInventoryItemInfo InventoryItemInfo;
 };

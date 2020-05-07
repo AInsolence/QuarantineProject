@@ -13,15 +13,6 @@ UQP_InventorySystemComponent::UQP_InventorySystemComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// create ammunition
-	EquipedItemsContainer.Add(EPickableItemType::Helmet, nullptr);
-	EquipedItemsContainer.Add(EPickableItemType::Armor, nullptr);
-	EquipedItemsContainer.Add(EPickableItemType::ColdSteel, nullptr);
-	EquipedItemsContainer.Add(EPickableItemType::Pistol, nullptr);
-	EquipedItemsContainer.Add(EPickableItemType::Rifle, nullptr);
-	EquipedItemsContainer.Add(EPickableItemType::LongWeapon, nullptr);
-	EquipedItemsContainer.Add(EPickableItemType::Grenade, nullptr);
 	// create ammunition type list to use switching
 	AmmunitionTypeArray.Add(EPickableItemType::ColdSteel);
 	AmmunitionTypeArray.Add(EPickableItemType::Pistol);
@@ -66,10 +57,9 @@ AActor* UQP_InventorySystemComponent::RaycastToFindPickableItem()
 		// hit
 		FHitResult HitResult;
 		bool bHasHitSmth = GetWorld()->LineTraceSingleByChannel(HitResult,
-															RayStart,
-															RayEnd,
-															ECollisionChannel::ECC_WorldDynamic);
-		//DrawDebugLine(GetWorld(), RayStart, RayEnd, FColor::Red, false, 0.2f, 0, 5.f);
+													RayStart,
+													RayEnd,
+													ECollisionChannel::ECC_WorldDynamic);
 		// if hit smth check if an item is pickable
 		if (bHasHitSmth)
 		{
@@ -97,49 +87,59 @@ AActor* UQP_InventorySystemComponent::RaycastToFindPickableItem()
 	return nullptr;
 }
 
-void UQP_InventorySystemComponent::AddItemToInventory(AActor* HittedActor)
+void UQP_InventorySystemComponent::PickUpItem()
 {
-	if (!HittedActor) return;
-
-	auto PickableItem = HittedActor->GetClass();
-	GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, "Pickable item: " + PickableItem->GetName());
-	// check if pickable item exist
-	if (PickableItem)
+	// get hitted actor
+	auto HittedActor = RaycastToFindPickableItem();
+	// try to get pickable component
+	auto HittedItemPickableComp = HittedActor->FindComponentByClass<UQP_PickableComponent>();
+	if (HittedItemPickableComp)
 	{
-		auto PickupComponent = HittedActor->FindComponentByClass<UQP_PickableComponent>();
-		InventoryContainer.Add(PickableItem);
-		if (PickupComponent)
-		{
-			// try to equip item
-			EquipItem(PickableItem, PickupComponent->ItemType);
-			// execute delegate
-			PickupComponent->PickUp();
-		}
+		AddItemToInventory(HittedItemPickableComp->InventoryItemInfo);
+		HittedItemPickableComp->PickUp();
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, "I Cannot take it");
-		return;
+		GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, "I cannot pick up it");
 	}
 }
 
-bool UQP_InventorySystemComponent::EquipItem(UClass* PickedItem, EPickableItemType ItemType)
+void UQP_InventorySystemComponent::DropItem()
 {
-	// if item already equiped
-	if (EquipedItemsContainer.FindRef(ItemType))
-	{// move it to inventory
-		auto Item = EquipedItemsContainer[ItemType]->GetClass();
-		GEngine->AddOnScreenDebugMessage(5, 2.f, FColor::Red, "Substituted: ");
-	}
-	EquipedItemsContainer[ItemType] = PickedItem;
-	GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, 
-									 "Item equiped: " + PickedItem->GetName() + 
-									 " Item type: " + 
-									 UEnum::GetValueAsString <EPickableItemType>(ItemType));
-	return true;
+	ThrowItemFromInventory();
 }
 
-void UQP_InventorySystemComponent::ThrowItemFromInventory()
+bool UQP_InventorySystemComponent::AddItemToInventory(FInventoryItemInfo ItemInfo)
+{
+	// check if item's class is valid
+	if (ItemInfo.ItemClassPtr)
+	{
+		InventoryContainer.Add(ItemInfo);
+		return true;
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, "I cannot add it to inventory");
+		return false;
+	}
+}
+
+bool UQP_InventorySystemComponent::EquipItem(FInventoryItemInfo ItemInfo)
+{
+	// check if item's class is valid
+	if (ItemInfo.ItemClassPtr)
+	{
+		EquipedItemsContainer.Add(ItemInfo);
+		return true;
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, "I cannot equip it");
+		return false;
+	}
+}
+
+bool UQP_InventorySystemComponent::ThrowItemFromInventory()
 {
 	if (World)
 	{
@@ -153,19 +153,22 @@ void UQP_InventorySystemComponent::ThrowItemFromInventory()
 		ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 		if (InventoryContainer.Num() >= 1)
 		{// try to throw(spawn) item in the world
-			if (World->SpawnActor<AActor>(InventoryContainer.Pop(),
+			if (World->SpawnActor<AActor>(InventoryContainer.Pop().ItemClassPtr,
 				SpawnLocation,
 				FRotator(0, 0, 0),
 				ActorSpawnParams))
-			{// remove item reference from inventory after spawning
-				//InventoryContainer.Pop();
+			{
+				return true;
 			}
+			return false;
 		}
 		else
 		{
 			GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, "Inventory empty");
+			return false;
 		}
 	}
+	return false;
 }
 
 void UQP_InventorySystemComponent::NextWeapon()
