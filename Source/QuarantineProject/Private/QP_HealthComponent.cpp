@@ -6,7 +6,6 @@
 #include "QuarantineProject/QuarantineProjectCharacter.h"
 #include "Engine/World.h"
 #include "QP_PlayerController.h"
-#include "QP_HUD.h"
 #include "Components/CapsuleComponent.h"
 
 // Sets default values for this component's properties

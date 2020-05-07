@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "QP_HUD.h"
-#include "AimingWidget.h"
-#include "QP_PlayerStateInfoWidget.h"
-#include "QP_PauseGameWidget.h"
+#include "QuarantineProject/Public/HUD/QP_HUD.h"
+#include "QuarantineProject/Public/HUD/AimingWidget.h"
+#include "QuarantineProject/Public/HUD/QP_PlayerStateInfoWidget.h"
+#include "QuarantineProject/Public/HUD/QP_PauseGameWidget.h"
 #include "Kismet/GameplayStatics.h"
 
 AQP_HUD::AQP_HUD(const FObjectInitializer& ObjectInitializer) 

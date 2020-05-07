@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "QP_PauseGameWidget.h"
+#include "QuarantineProject/Public/HUD/QP_PauseGameWidget.h"
 #include "Runtime/UMG/Public/UMG.h"
 #include "Kismet/GameplayStatics.h"
 
