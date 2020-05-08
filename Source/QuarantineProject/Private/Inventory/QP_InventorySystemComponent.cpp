@@ -187,43 +187,27 @@ bool UQP_InventorySystemComponent::ThrowItemFromInventory()
 	return false;
 }
 
-EPickableItemType UQP_InventorySystemComponent::NextWeapon()
+FInventoryItemInfo UQP_InventorySystemComponent::NextWeapon(AActor* WeaponInHand)
 {
-	// check if ammunition array is not empty
-	if (AmmunitionTypeArray.Num() > 0)
+	UE_LOG(LogTemp, Warning, TEXT("IN NEXT WEAPON"))
+	// check if any weapons equipped
+	if (!EquipedItemsContainer.IsValidIndex(0)) return FInventoryItemInfo();
+	// return first element and add WeaponInHand to equipment
+	if (WeaponInHand)
 	{
-		// check if current item is not the last in array
-		if (AmmunitionTypeArray.IndexOfByKey(CurrentWeapon) !=
-			AmmunitionTypeArray.Num() - 1)
-		{// set current weapon as next weapon in array
-			CurrentWeapon = AmmunitionTypeArray[
-				AmmunitionTypeArray.IndexOfByKey(CurrentWeapon) + 1];
-		}
-		else
-		{// set current weapon as first weapon in array
-			CurrentWeapon = AmmunitionTypeArray[0];
+		auto PickableComp = WeaponInHand->FindComponentByClass<UQP_PickableComponent>();
+		if (PickableComp)
+		{// equip and destroy
+			EquipItem(PickableComp->InventoryItemInfo);
 		}
 	}
-	GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, "NextWeapon");
-	return CurrentWeapon;
+	auto Weapon = EquipedItemsContainer[0];
+	EquipedItemsContainer.RemoveAt(0);
+	UE_LOG(LogTemp, Warning, TEXT("TRY TO EQUIP: %s"), Weapon.ItemClassPtr)
+	return Weapon;
 }
 
-EPickableItemType UQP_InventorySystemComponent::PreviousWeapon()
+FInventoryItemInfo UQP_InventorySystemComponent::PreviousWeapon(AActor* WeaponInHand)
 {
-	// check if ammunition array is not empty
-	if (AmmunitionTypeArray.Num() > 0)
-	{
-		// check if current item is not the last in array
-		if (AmmunitionTypeArray.IndexOfByKey(CurrentWeapon) > 0)
-		{// set current weapon as next weapon in array
-			CurrentWeapon = AmmunitionTypeArray[
-				AmmunitionTypeArray.IndexOfByKey(CurrentWeapon) - 1];
-		}
-		else
-		{// set current weapon as first weapon in array
-			CurrentWeapon = AmmunitionTypeArray.Last();
-		}
-	}
-	GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, "PreviousWeapon");
-	return CurrentWeapon;
+	return FInventoryItemInfo();
 }

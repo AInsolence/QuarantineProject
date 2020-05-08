@@ -49,8 +49,8 @@ void AQP_PlayerController::SetupInputComponent()
 	InputComponent->BindAction("Interact", IE_Pressed, this, &AQP_PlayerController::Interact);
 	InputComponent->BindAction("Drop", IE_Pressed, this, &AQP_PlayerController::Drop);
 
-	InputComponent->BindAction("NextWeapon", IE_Pressed, this, &AQP_PlayerController::NextWeapon);
-	InputComponent->BindAction("PreviousWeapon", IE_Pressed, this, &AQP_PlayerController::PreviousWeapon);
+	InputComponent->BindAction("NextWeapon", IE_Released, this, &AQP_PlayerController::NextWeapon);
+	InputComponent->BindAction("PreviousWeapon", IE_Released, this, &AQP_PlayerController::PreviousWeapon);
 
 	InputComponent->BindAction("Sprint", IE_Pressed, this, &AQP_PlayerController::SprintStart);
 	InputComponent->BindAction("Sprint", IE_Released, this, &AQP_PlayerController::SprintEnd);

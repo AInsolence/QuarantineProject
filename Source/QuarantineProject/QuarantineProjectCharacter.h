@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "QuarantineProject/Public/Inventory/QP_InventoryItem.h"
 #include "QuarantineProjectCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameOverByPlayersDeath);
@@ -38,15 +39,6 @@ protected:
 	/** Health component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Health, meta = (AllowPrivateAccess = "true"))
 	class UQP_HealthComponent* HealthComponent;
-	/** Inventory system component */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Health, meta = (AllowPrivateAccess = "true"))
-	class UQP_InventorySystemComponent* InventoryComponent;
-
-	/** Weapon component */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Weapon, meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<class AQP_WeaponBase> WeaponInHandsClass;
-	UPROPERTY(meta = (AllowPrivateAccess = "true"))
-	AQP_WeaponBase* WeaponInHands;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
@@ -64,7 +56,21 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Sprint")
 	float TimeToMaxSprintSpeed = 2.0f;
 
+
+	class AQP_HUD* GetPlayerHUD() const;
+	void ChangeWeapon(FInventoryItemInfo WeaponInfo);
+
 public:
+	/** Inventory system component */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Health, meta = (AllowPrivateAccess = "true"))
+		class UQP_InventorySystemComponent* InventoryComponent;
+
+	/** Weapon component */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Weapon, meta = (AllowPrivateAccess = "true"))
+		TSubclassOf<class AQP_WeaponBase> WeaponInHandsClass;
+	UPROPERTY(meta = (AllowPrivateAccess = "true"))
+		AQP_WeaponBase* WeaponInHands;
+
 	/** Aiming to target */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AimingSettings")
 	bool bIsAiming = false;
@@ -144,8 +150,6 @@ public:
 	void TouchStarted(ETouchIndex::Type FingerIndex, FVector Location);
 	/** Handler for when a touch input stops. */
 	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
-
-	class AQP_HUD* GetPlayerHUD() const;
 	FGameOverByPlayersDeath OnGameOverByPlayersDeath;
 };
 

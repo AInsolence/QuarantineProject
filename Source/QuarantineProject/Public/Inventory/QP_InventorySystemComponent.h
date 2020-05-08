@@ -59,12 +59,10 @@ public:
 	UFUNCTION()
 	void DropItem();
 	UFUNCTION()
-	EPickableItemType NextWeapon();
+	FInventoryItemInfo NextWeapon(AActor* WeaponInHand);
 	UFUNCTION()
-	EPickableItemType PreviousWeapon();
+	FInventoryItemInfo PreviousWeapon(AActor* WeaponInHand);
 
-	UPROPERTY(EditAnywhere, Category = "Inventory")
-	EPickableItemType CurrentWeapon = EPickableItemType::Rifle;
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	TArray<EPickableItemType> AmmunitionTypeArray;
 };

@@ -187,6 +187,51 @@ void AQuarantineProjectCharacter::ShowFireAnimation()
 	}
 }
 
+AQP_HUD* AQuarantineProjectCharacter::GetPlayerHUD() const
+{// helper to get player HUD from controller
+	if (GetWorld()->GetFirstPlayerController())
+	{
+		if (Cast<APlayerController>(GetController()))
+		{
+			auto HUDPtr = Cast<AQP_HUD>(Cast<APlayerController>(GetController())->GetHUD());
+			if (HUDPtr)
+			{
+				return HUDPtr;
+			}
+			return nullptr;
+		}
+		return nullptr;
+	}
+	return nullptr;
+}
+
+void AQuarantineProjectCharacter::ChangeWeapon(FInventoryItemInfo WeaponInfo)
+{
+	if(GetWorld())
+	{
+		if (WeaponInfo.ItemClassPtr)
+		{
+			if (WeaponInHands)
+			{
+				WeaponInHands->Destroy();
+			}
+			WeaponInHands = GetWorld()->SpawnActor<AQP_WeaponBase>(WeaponInfo.ItemClassPtr);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("No CLASS TO SPAWN"))
+		}
+	}
+	if (WeaponInHands)
+	{
+		// Set weapon location as character hands
+		FVector InHandLocation = GetMesh()->GetSocketLocation(FName("RightHandWeaponSocket"));
+		WeaponInHands->AttachToComponent(GetMesh(),
+										FAttachmentTransformRules::SnapToTargetNotIncludingScale,
+										FName("RightHandWeaponSocket"));
+	}
+}
+
 //*****            INPUT LOGIC                *****//
 
 void AQuarantineProjectCharacter::PickUpItem()
@@ -209,7 +254,7 @@ void AQuarantineProjectCharacter::NextWeapon()
 {
 	if (InventoryComponent)
 	{
-		InventoryComponent->NextWeapon();
+		ChangeWeapon(InventoryComponent->NextWeapon(WeaponInHands));
 	}
 }
 
@@ -217,7 +262,7 @@ void AQuarantineProjectCharacter::PreviousWeapon()
 {
 	if (InventoryComponent)
 	{
-		InventoryComponent->PreviousWeapon();
+		ChangeWeapon(InventoryComponent->PreviousWeapon(WeaponInHands));
 	}
 }
 
@@ -234,24 +279,6 @@ void AQuarantineProjectCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FV
 void AQuarantineProjectCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
 {
 	StopJumping();
-}
-
-AQP_HUD* AQuarantineProjectCharacter::GetPlayerHUD() const
-{// helper to get player HUD from controller
-	if (GetWorld()->GetFirstPlayerController())
-	{
-		if (Cast<APlayerController>(GetController()))
-		{
-			auto HUDPtr = Cast<AQP_HUD>(Cast<APlayerController>(GetController())->GetHUD());
-			if (HUDPtr)
-			{
-				return HUDPtr;
-			}
-			return nullptr;
-		}
-		return nullptr;
-	}
-	return nullptr;
 }
 
 void AQuarantineProjectCharacter::TurnAtRate(float Rate)
