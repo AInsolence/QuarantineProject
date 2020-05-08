@@ -230,6 +230,10 @@ void AQuarantineProjectCharacter::ChangeWeapon(FInventoryItemInfo WeaponInfo)
 		WeaponInHands->AttachToComponent(GetMesh(),
 										FAttachmentTransformRules::SnapToTargetNotIncludingScale,
 										FName("RightHandWeaponSocket"));
+		// Describe to reloading event
+		WeaponInHands->OnReloading.AddDynamic(this, &AQuarantineProjectCharacter::ShowReloadAnimation);
+		// Describe to fire event
+		WeaponInHands->OnFireEvent.AddDynamic(this, &AQuarantineProjectCharacter::ShowFireAnimation);
 		// set appropriate collision settings
 		if (WeaponInHands)
 		{
