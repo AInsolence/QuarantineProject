@@ -36,6 +36,8 @@ public:
 	void Reloading(); // on player press R
 	UFUNCTION()
 	FRotator GetMuzzleRotation();
+	UFUNCTION()
+	void SetMeshCollision(ECollisionResponse Response);
 	// Is weapon have any ammo
 	bool FORCEINLINE IsWeaponCanShoot() { return CurrentBulletsInMagazine != 0; };
 	// Get reloading event

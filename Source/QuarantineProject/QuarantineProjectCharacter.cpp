@@ -222,6 +222,7 @@ void AQuarantineProjectCharacter::ChangeWeapon(FInventoryItemInfo WeaponInfo)
 			UE_LOG(LogTemp, Warning, TEXT("No CLASS TO SPAWN"))
 		}
 	}
+	// when created
 	if (WeaponInHands)
 	{
 		// Set weapon location as character hands
@@ -229,6 +230,11 @@ void AQuarantineProjectCharacter::ChangeWeapon(FInventoryItemInfo WeaponInfo)
 		WeaponInHands->AttachToComponent(GetMesh(),
 										FAttachmentTransformRules::SnapToTargetNotIncludingScale,
 										FName("RightHandWeaponSocket"));
+		// set appropriate collision settings
+		if (WeaponInHands)
+		{
+			WeaponInHands->SetMeshCollision(ECollisionResponse::ECR_Overlap);
+		}
 	}
 }
 

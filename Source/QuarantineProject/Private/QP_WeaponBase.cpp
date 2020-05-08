@@ -42,6 +42,11 @@ FRotator AQP_WeaponBase::GetMuzzleRotation()
 	}
 }
 
+void AQP_WeaponBase::SetMeshCollision(ECollisionResponse Response)
+{
+	WeaponMesh->SetCollisionResponseToAllChannels(Response);
+}
+
 void AQP_WeaponBase::Fire(FRotator MuzzleRotation)
 {
 	if (!TotalBulletsForThisWeapon && !CurrentBulletsInMagazine)
