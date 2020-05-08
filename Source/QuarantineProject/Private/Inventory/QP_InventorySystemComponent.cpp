@@ -145,7 +145,7 @@ bool UQP_InventorySystemComponent::EquipItem(FInventoryItemInfo ItemInfo)
 	// check if item's class is valid
 	if (ItemInfo.ItemClassPtr)
 	{
-		EquipedItemsContainer.Add(ItemInfo);
+		EquipedItemsContainer.AddTail(ItemInfo);
 		return true;
 	}
 	else
@@ -189,25 +189,40 @@ bool UQP_InventorySystemComponent::ThrowItemFromInventory()
 
 FInventoryItemInfo UQP_InventorySystemComponent::NextWeapon(AActor* WeaponInHand)
 {
-	UE_LOG(LogTemp, Warning, TEXT("IN NEXT WEAPON"))
 	// check if any weapons equipped
-	if (!EquipedItemsContainer.IsValidIndex(0)) return FInventoryItemInfo();
+	if (EquipedItemsContainer.Num() <= 0) return FInventoryItemInfo();
 	// return first element and add WeaponInHand to equipment
 	if (WeaponInHand)
 	{
 		auto PickableComp = WeaponInHand->FindComponentByClass<UQP_PickableComponent>();
 		if (PickableComp)
-		{// equip and destroy
+		{// move weapon from hands to equipment
 			EquipItem(PickableComp->InventoryItemInfo);
 		}
 	}
-	auto Weapon = EquipedItemsContainer[0];
-	EquipedItemsContainer.RemoveAt(0);
+	// get new weapon from equipment
+	auto Weapon = EquipedItemsContainer.GetHead()->GetValue();
+	EquipedItemsContainer.RemoveNode(EquipedItemsContainer.GetHead());
 	UE_LOG(LogTemp, Warning, TEXT("TRY TO EQUIP: %s"), Weapon.ItemClassPtr)
 	return Weapon;
 }
 
 FInventoryItemInfo UQP_InventorySystemComponent::PreviousWeapon(AActor* WeaponInHand)
 {
-	return FInventoryItemInfo();
+	// check if any weapons equipped
+	if (EquipedItemsContainer.Num() <= 0) return FInventoryItemInfo();
+	// return first element and add WeaponInHand to equipment
+	if (WeaponInHand)
+	{
+		auto PickableComp = WeaponInHand->FindComponentByClass<UQP_PickableComponent>();
+		if (PickableComp)
+		{// move weapon from hands to equipment
+			EquipedItemsContainer.AddHead(PickableComp->InventoryItemInfo);
+		}
+	}
+	// get new weapon from equipment
+	auto Weapon = EquipedItemsContainer.GetTail()->GetValue();
+	EquipedItemsContainer.RemoveNode(EquipedItemsContainer.GetTail());
+	UE_LOG(LogTemp, Warning, TEXT("TRY TO EQUIP: %s"), Weapon.ItemClassPtr)
+	return Weapon;
 }

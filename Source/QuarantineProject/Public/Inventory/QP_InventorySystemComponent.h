@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "QP_PickableComponent.h"
+#include "Containers/List.h"
 #include "QP_InventorySystemComponent.generated.h"
 
 /*
@@ -27,8 +28,8 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere, Category = "Inventory")
-	TArray<FInventoryItemInfo> EquipedItemsContainer;
+	//UPROPERTY(EditAnywhere, Category = "Inventory")
+	TDoubleLinkedList<FInventoryItemInfo> EquipedItemsContainer;
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	TArray<FInventoryItemInfo> InventoryContainer;
 
