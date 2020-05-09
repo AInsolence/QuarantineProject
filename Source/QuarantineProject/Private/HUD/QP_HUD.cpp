@@ -5,6 +5,7 @@
 #include "QuarantineProject/Public/HUD/AimingWidget.h"
 #include "QuarantineProject/Public/HUD/QP_PlayerStateInfoWidget.h"
 #include "QuarantineProject/Public/HUD/QP_PauseGameWidget.h"
+#include "QuarantineProject/Public/HUD/QP_InventoryWidget.h"
 #include "Kismet/GameplayStatics.h"
 
 AQP_HUD::AQP_HUD(const FObjectInitializer& ObjectInitializer) 
@@ -45,6 +46,16 @@ void AQP_HUD::BeginPlay()
 			{
 				PlayerStateInfoWidget->SetVisibility(ESlateVisibility::Visible);
 			}
+		}
+	}
+	// add inventory widget
+	if (InventoryWidgetClass)
+	{
+		InventoryWidget = CreateWidget<UQP_InventoryWidget>(GetWorld(), InventoryWidgetClass);
+		if (InventoryWidget)
+		{
+			InventoryWidget->AddToViewport();
+			InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
 	// add pause widget
@@ -103,6 +114,25 @@ void AQP_HUD::SetPickUpTipVisibility(bool Show)
 	if (PlayerStateInfoWidget)
 	{
 		PlayerStateInfoWidget->SetPickUpTipVisibility(Show);
+	}
+}
+
+void AQP_HUD::ShowInventory(bool Show)
+{
+	if (InventoryWidget)
+	{
+		if (Show)
+		{
+			InventoryWidget->SetVisibility(ESlateVisibility::Visible);
+			GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameAndUI());
+			GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
+		}
+		else
+		{
+			InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
+			GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
+			GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
+		}
 	}
 }
 

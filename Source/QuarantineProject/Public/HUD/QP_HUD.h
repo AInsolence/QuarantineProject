@@ -23,20 +23,24 @@ public:
     virtual void Tick(float DeltaTime) override;
     virtual void DrawHUD() override;
 
-    // Binding property in "meta" to prohibit compiling the HUD without widget
+    // Binding property in "meta" to prohibit compiling the HUD without appropriate widgets
     UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
     TSubclassOf<class UAimingWidget> AimingWidgetClass;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
     TSubclassOf<class UQP_PlayerStateInfoWidget> PlayerStateInfoWidgetClass;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
     TSubclassOf<class UQP_PauseGameWidget> PauseGameWidgetClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	TSubclassOf<class UQP_InventoryWidget> InventoryWidgetClass;
 
     TArray<UUserWidget*> HUDWidgetsArray;// TODO make useful for storing all widgets
 
     UAimingWidget* AimingWidget;
     UQP_PlayerStateInfoWidget* PlayerStateInfoWidget;
     UQP_PauseGameWidget* PauseGameWidget;
+    UQP_InventoryWidget* InventoryWidget;
 
+    /// *** API *** ///
     UFUNCTION()
     void SetCrosshairVisibility(bool bIsCrosshairVisible);
     UFUNCTION()
@@ -45,6 +49,8 @@ public:
     void UpdateStaminaState(float CurrentStamina);
     UFUNCTION()
     void SetPickUpTipVisibility(bool Show);
+    UFUNCTION()
+    void ShowInventory(bool Show);
     UFUNCTION()
     void Exit();
     UFUNCTION()
