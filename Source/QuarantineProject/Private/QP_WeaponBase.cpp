@@ -47,6 +47,11 @@ void AQP_WeaponBase::SetMeshCollision(ECollisionResponse Response)
 	WeaponMesh->SetCollisionResponseToAllChannels(Response);
 }
 
+float AQP_WeaponBase::GetAimingFieldOfView()
+{
+	return AimingFealdOfView;
+}
+
 void AQP_WeaponBase::Fire(FRotator MuzzleRotation)
 {
 	if (!TotalBulletsForThisWeapon && !CurrentBulletsInMagazine)

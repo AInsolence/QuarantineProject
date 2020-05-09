@@ -38,6 +38,8 @@ public:
 	FRotator GetMuzzleRotation();
 	UFUNCTION()
 	void SetMeshCollision(ECollisionResponse Response);
+	UFUNCTION()
+	float GetAimingFieldOfView();
 	// Is weapon have any ammo
 	bool FORCEINLINE IsWeaponCanShoot() { return CurrentBulletsInMagazine != 0; };
 	// Get reloading event

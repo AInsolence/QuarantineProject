@@ -61,7 +61,7 @@ AQuarantineProjectCharacter::AQuarantineProjectCharacter()
 	HealthComponent = CreateDefaultSubobject<UQP_HealthComponent>(TEXT("HealthComponent"));
 	// Create inventory component
 	InventoryComponent = CreateDefaultSubobject<UQP_InventorySystemComponent>(TEXT("InventoryComponent"));
-	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
+	// Note: The skeletal mesh and animation blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
 
@@ -73,7 +73,7 @@ void AQuarantineProjectCharacter::BeginPlay()
 
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = true; // allow to move camera up'n'down TRUE
+	bUseControllerRotationYaw = true; // allow to move camera up and down TRUE
 	bUseControllerRotationRoll = false;
 
 	// set base speed sprint variables
@@ -234,11 +234,13 @@ void AQuarantineProjectCharacter::ChangeWeapon(FInventoryItemInfo WeaponInfo)
 		WeaponInHands->OnReloading.AddDynamic(this, &AQuarantineProjectCharacter::ShowReloadAnimation);
 		// Describe to fire event
 		WeaponInHands->OnFireEvent.AddDynamic(this, &AQuarantineProjectCharacter::ShowFireAnimation);
-		// set appropriate collision settings
+		// set appropriate collision settings to avoid collision with player
 		if (WeaponInHands)
 		{
 			WeaponInHands->SetMeshCollision(ECollisionResponse::ECR_Overlap);
 		}
+		// set aiming camera field of view depends on weapon
+		AimingCamera->FieldOfView = WeaponInHands->GetAimingFieldOfView();
 	}
 }
 
