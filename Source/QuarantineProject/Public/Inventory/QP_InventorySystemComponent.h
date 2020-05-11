@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "QP_PickableComponent.h"
 #include "Containers/List.h"
+#include "Containers/StaticArray.h"
 #include "QP_InventorySystemComponent.generated.h"
 
 /*
@@ -30,6 +31,7 @@ protected:
 
 	//UPROPERTY(EditAnywhere, Category = "Inventory")
 	TDoubleLinkedList<FInventoryItemInfo> EquipedItemsContainer;
+	TStaticArray<TStaticArray<bool, 12>, 2> EquipedItemsHUDRepresentation;
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	TArray<FInventoryItemInfo> InventoryContainer;
 

@@ -59,6 +59,8 @@ protected:
 	UFUNCTION()
 	void Interact();
 	UFUNCTION()
+	void ShowInventory();
+	UFUNCTION()
 	void Drop();
 	UFUNCTION()
 	void NextWeapon();

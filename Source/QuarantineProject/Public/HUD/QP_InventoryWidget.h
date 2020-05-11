@@ -21,4 +21,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	class UTextBlock* InventoryHeader = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	class UGridPanel* WeaponGridPanel = nullptr;
+
+	void AddSlotToWeaponGrid(UWidget* Content, int32 InRow = 0, int32 InColumn = 0);
 };

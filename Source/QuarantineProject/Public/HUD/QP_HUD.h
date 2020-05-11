@@ -50,7 +50,9 @@ public:
     UFUNCTION()
     void SetPickUpTipVisibility(bool Show);
     UFUNCTION()
-    void ShowInventory(bool Show);
+    void ShowInventory();
+    UFUNCTION()
+    void AddSlotToWeaponGrid(class UWidget* Content, int32 InRow, int32 InColumn);
     UFUNCTION()
     void Exit();
     UFUNCTION()

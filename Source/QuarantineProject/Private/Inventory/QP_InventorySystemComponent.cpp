@@ -6,6 +6,7 @@
 #include "Engine/World.h"
 #include "GameFramework/Controller.h"
 #include "DrawDebugHelpers.h"
+#include "QuarantineProject/Public/HUD/QP_HUD.h"
 
 // Sets default values for this component's properties
 UQP_InventorySystemComponent::UQP_InventorySystemComponent()
@@ -120,14 +121,14 @@ bool UQP_InventorySystemComponent::AddItemToInventory(FInventoryItemInfo ItemInf
 {
 	// check if item's class is valid
 	if (ItemInfo.ItemClassPtr)
-	{
+	{// equip if it is a weapon
 		if (AmmunitionTypeArray.Contains(ItemInfo.ItemType))
 		{
 			GEngine->AddOnScreenDebugMessage(7, 2.f, FColor::Red, "I find weapon and equip");
 			EquipItem(ItemInfo);
 		}
 		else
-		{
+		{// just add to inventory if it is not a weapon
 			GEngine->AddOnScreenDebugMessage(7, 2.f, FColor::Red, "I find smth and add to inventory");
 			InventoryContainer.Add(ItemInfo);
 		}
@@ -146,6 +147,22 @@ bool UQP_InventorySystemComponent::EquipItem(FInventoryItemInfo ItemInfo)
 	if (ItemInfo.ItemClassPtr)
 	{
 		EquipedItemsContainer.AddTail(ItemInfo);
+		// add to inventory widget
+		if (Owner)
+		{
+			auto Controller = Owner->GetController();
+			if (Controller)
+			{
+				auto HUD = Cast<APlayerController>(Controller)->GetHUD();
+				if (HUD)
+				{
+					if (ItemInfo.InventorySlotWidget)
+					{
+						Cast<AQP_HUD>(HUD)->AddSlotToWeaponGrid(ItemInfo.InventorySlotWidget, 0, 0);
+					}
+				}
+			}
+		}
 		return true;
 	}
 	else

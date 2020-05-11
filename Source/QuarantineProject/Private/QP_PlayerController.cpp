@@ -49,6 +49,8 @@ void AQP_PlayerController::SetupInputComponent()
 	InputComponent->BindAction("Interact", IE_Pressed, this, &AQP_PlayerController::Interact);
 	InputComponent->BindAction("Drop", IE_Pressed, this, &AQP_PlayerController::Drop);
 
+	InputComponent->BindAction("Inventory", IE_Pressed, this, &AQP_PlayerController::ShowInventory);
+
 	InputComponent->BindAction("NextWeapon", IE_Released, this, &AQP_PlayerController::NextWeapon);
 	InputComponent->BindAction("PreviousWeapon", IE_Released, this, &AQP_PlayerController::PreviousWeapon);
 
@@ -165,6 +167,11 @@ void AQP_PlayerController::GameOver()
 void AQP_PlayerController::Interact()
 {
 	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->PickUpItem();
+}
+
+void AQP_PlayerController::ShowInventory()
+{
+	Cast<AQP_HUD>(GetHUD())->ShowInventory();
 }
 
 void AQP_PlayerController::Drop()

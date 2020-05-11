@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "Blueprint/UserWidget.h"
 #include "QP_InventoryItem.generated.h"
 
 /**
@@ -34,6 +35,8 @@ public:
 	UClass* ItemClassPtr = nullptr;
 	UPROPERTY(EditAnywhere, Category = "InventoryItem")
 	EPickableItemType ItemType;
+	UPROPERTY(EditAnywhere, Category = "InventoryItem")
+	UUserWidget* InventorySlotWidget;
 	UPROPERTY(EditAnywhere, Category = "InventoryItem")
 	FIntPoint SizeInInventory = FIntPoint(1, 1);
 

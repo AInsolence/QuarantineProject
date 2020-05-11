@@ -117,11 +117,11 @@ void AQP_HUD::SetPickUpTipVisibility(bool Show)
 	}
 }
 
-void AQP_HUD::ShowInventory(bool Show)
+void AQP_HUD::ShowInventory()
 {
 	if (InventoryWidget)
 	{
-		if (Show)
+		if (InventoryWidget->GetVisibility() == ESlateVisibility::Hidden)
 		{
 			InventoryWidget->SetVisibility(ESlateVisibility::Visible);
 			GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameAndUI());
@@ -133,6 +133,14 @@ void AQP_HUD::ShowInventory(bool Show)
 			GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
 			GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
 		}
+	}
+}
+
+void AQP_HUD::AddSlotToWeaponGrid(UWidget* Content, int32 InRow, int32 InColumn)
+{
+	if (InventoryWidget)
+	{
+		InventoryWidget->AddSlotToWeaponGrid(Content, InRow, InColumn);
 	}
 }
 

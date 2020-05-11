@@ -21,3 +21,23 @@ void UQP_InventoryWidget::NativeConstruct()
 		//ExitButton->OnClicked.AddDynamic(this, &UQP_PauseGameWidget::ExitGame);
 	}
 }
+
+void UQP_InventoryWidget::AddSlotToWeaponGrid(UWidget* Content, int32 InRow, int32 InColumn)
+{
+	if (WeaponGridPanel)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("QP_InventoryWidget: Try to add slot"))
+		//auto GridSlot = Cast<UGridSlot>(Content);
+		//GridSlot->SetRowSpan(2);
+		//GridSlot->SetColumnSpan(4);
+		if (Content)
+		{
+			Content->SetVisibility(ESlateVisibility::Visible);
+			WeaponGridPanel->AddChildToGrid(Content, InRow, InColumn);
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning,  TEXT("QP_InventoryWidget: Cannot add widget to slot"))
+	}
+}
