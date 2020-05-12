@@ -84,7 +84,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponProperties")
 	float ReloadingTime = 2.3f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponProperties")
-	float ShotsPerSecond = 1.0f;
+	// Time between shots (rate of fire)
+	float ShotRate = 1.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 	TSubclassOf<class ARifleProjectile_01> Projectile;

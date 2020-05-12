@@ -61,6 +61,16 @@ void AQP_WeaponBase::Fire(FRotator MuzzleRotation)
 	}
 	if (bIsWeaponReloading) return;
 
+	if(!bCanFireAfterRate)
+	{// wait for delay after last firing time to avoid hypertapping cheat
+		bCanFireAfterRate = ((FPlatformTime::Seconds() - LastFireTime) > ShotRate);
+		if (bCanFireAfterRate)
+		{
+			LastFireTime = FPlatformTime::Seconds();
+			//FireLoop(MuzzleRotation);
+		}
+	}
+
 	if (bCanFireAfterRate)
 	{// start fire
 		bCanFireAfterRate = false;
@@ -72,18 +82,9 @@ void AQP_WeaponBase::Fire(FRotator MuzzleRotation)
 		{
 			GetWorld()->GetTimerManager().SetTimer(
 				FireRateTimer,
-				FTimerDelegate::CreateUObject(this, &AQP_WeaponBase::Fire, MuzzleRotation),
-				ShotsPerSecond,
+				FTimerDelegate::CreateUObject(this, &AQP_WeaponBase::FireLoop, MuzzleRotation),
+				ShotRate,
 				true);
-		}
-	}
-	else
-	{// wait for delay after last firing time to avoid hypertapping cheat
-		bCanFireAfterRate = ((FPlatformTime::Seconds() - LastFireTime) > ShotsPerSecond);
-		if (bCanFireAfterRate)
-		{
-			LastFireTime = FPlatformTime::Seconds();
-			FireLoop(MuzzleRotation);
 		}
 	}
 }

@@ -27,17 +27,37 @@ void UQP_InventoryWidget::AddSlotToWeaponGrid(UWidget* Content, int32 InRow, int
 	if (WeaponGridPanel)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("QP_InventoryWidget: Try to add slot"))
-		//auto GridSlot = Cast<UGridSlot>(Content);
-		//GridSlot->SetRowSpan(2);
-		//GridSlot->SetColumnSpan(4);
 		if (Content)
 		{
 			Content->SetVisibility(ESlateVisibility::Visible);
-			WeaponGridPanel->AddChildToGrid(Content, InRow, InColumn);
-		}
+			auto Slots = WeaponGridPanel->GetSlots();
+			int32 row = 0;
+			int32 column = 0;
+			for (auto WeaponSlot : Slots)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("QP_InventoryWidget: Slots start"))
+				if (WeaponSlot)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("QP_InventoryWidget: Slot in Slots"))
+					auto WeaponGridSlot = Cast<UGridSlot>(WeaponSlot);
+					if (WeaponGridSlot)
+					{
+						UE_LOG(LogTemp, Warning, TEXT("QP_InventoryWidget: Cast to grid"))
+						if (WeaponGridSlot->Layer > -1)
+						{
+							UE_LOG(LogTemp, Warning, TEXT("QP_InventoryWidget: Set row and col"))
+							row = WeaponGridSlot->Row;
+							column = WeaponGridSlot->Column + 1;
+						}
+					}
+				}
+					
+			}
+			WeaponGridPanel->AddChildToGrid(Content, row, column);
+		}	
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning,  TEXT("QP_InventoryWidget: Cannot add widget to slot"))
+		UE_LOG(LogTemp, Warning, TEXT("QP_InventoryWidget: Cannot add widget to slot"))
 	}
 }
