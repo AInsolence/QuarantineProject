@@ -46,7 +46,7 @@ void ARifleProjectile_01::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor
 	{
 		// create explosion particle effect
 		auto Explosion = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticles, GetActorLocation());
-		Explosion->SetRelativeScale3D(FVector(0.3f));
+		//Explosion->SetRelativeScale3D(FVector(0.3f));
 		if (InflictDamageToThisClass)
 		{
 			if (OtherActor->GetClass()->IsChildOf(InflictDamageToThisClass))

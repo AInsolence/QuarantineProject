@@ -133,8 +133,8 @@ void AQP_WeaponBase::SpawnProjectile(FRotator MuzzleRotation)
 				{
 					auto Explosion = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),
 						MuzzleFireEffect,
-						MuzzleLocation);
-					Explosion->SetRelativeScale3D(FVector(0.03f));
+						MuzzleLocation,
+						MuzzleRotation);
 				}
 
 			}
