@@ -60,7 +60,7 @@ AQuarantineProjectCharacter::AQuarantineProjectCharacter()
 	// Create health component
 	HealthComponent = CreateDefaultSubobject<UQP_HealthComponent>(TEXT("HealthComponent"));
 	// Create inventory component
-	InventoryComponent = CreateDefaultSubobject<UQP_InventorySystemComponent>(TEXT("InventoryComponent"));
+	InventorySystemComponent = CreateDefaultSubobject<UQP_InventorySystemComponent>(TEXT("InventorySystemComponent"));
 	// Note: The skeletal mesh and animation blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
@@ -248,33 +248,33 @@ void AQuarantineProjectCharacter::ChangeWeapon(FInventoryItemInfo WeaponInfo)
 
 void AQuarantineProjectCharacter::PickUpItem()
 {
-	if (InventoryComponent)
+	if (InventorySystemComponent)
 	{
-		InventoryComponent->PickUpItem();
+		InventorySystemComponent->PickUpItem();
 	}
 }
 
 void AQuarantineProjectCharacter::DropItem()
 {
-	if (InventoryComponent)
+	if (InventorySystemComponent)
 	{
-		InventoryComponent->DropItem();
+		InventorySystemComponent->DropItem();
 	}
 }
 
 void AQuarantineProjectCharacter::NextWeapon()
 {
-	if (InventoryComponent)
+	if (InventorySystemComponent)
 	{
-		ChangeWeapon(InventoryComponent->NextWeapon(WeaponInHands));
+		ChangeWeapon(InventorySystemComponent->NextWeapon(WeaponInHands));
 	}
 }
 
 void AQuarantineProjectCharacter::PreviousWeapon()
 {
-	if (InventoryComponent)
+	if (InventorySystemComponent)
 	{
-		ChangeWeapon(InventoryComponent->PreviousWeapon(WeaponInHands));
+		ChangeWeapon(InventorySystemComponent->PreviousWeapon(WeaponInHands));
 	}
 }
 

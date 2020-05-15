@@ -63,13 +63,13 @@ protected:
 public:
 	/** Inventory system component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Health, meta = (AllowPrivateAccess = "true"))
-		class UQP_InventorySystemComponent* InventoryComponent;
+	class UQP_InventorySystemComponent* InventorySystemComponent;
 
 	/** Weapon component */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Weapon, meta = (AllowPrivateAccess = "true"))
-		TSubclassOf<class AQP_WeaponBase> WeaponInHandsClass;
+	TSubclassOf<class AQP_WeaponBase> WeaponInHandsClass;
 	UPROPERTY(meta = (AllowPrivateAccess = "true"))
-		AQP_WeaponBase* WeaponInHands;
+	AQP_WeaponBase* WeaponInHands;
 
 	/** Aiming to target */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AimingSettings")
