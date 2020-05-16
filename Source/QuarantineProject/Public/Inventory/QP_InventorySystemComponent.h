@@ -34,11 +34,15 @@ protected:
 	TStaticArray<TStaticArray<bool, 12>, 2> EquipedItemsHUDRepresentation;
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	TArray<FInventoryItemInfo> InventoryContainer;
-	TStaticArray<TStaticArray<bool, 10>, 5> InventoryHUDRepresentation;
+	TStaticArray<TStaticArray<bool, 10>, 10> InventoryHUDRepresentation;
 
+	// Add item to given inventory container
+	template<int32 col, int32 row>
+	bool AddItemToInventoryContainer(TStaticArray<TStaticArray<bool, col>, row> &TargetContainer, FInventoryItemInfo ItemInfo);
 	// Returns free slot coordinates in given two dimensional container for given item size or FIntPoint(-1, -1)
 	template<int32 col, int32 row>
 	FIntPoint FindFreeSlotForItem(TStaticArray<TStaticArray<bool, col>, row> TargetContainer, FIntPoint ItemSize);
+	// Insert item in given container
 	template<int32 col, int32 row>
 	void InsertItemInContainer(TStaticArray<TStaticArray<bool, col>, row> &TargetContainer,
 																		FIntPoint ItemSize,
@@ -78,6 +82,58 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	TArray<EPickableItemType> AmmunitionTypeArray;
 };
+
+template<int32 col, int32 row>
+bool UQP_InventorySystemComponent::AddItemToInventoryContainer(TStaticArray<TStaticArray<bool, col>, row> &TargetContainer, FInventoryItemInfo ItemInfo)
+{
+	// check if item's class is valid
+	if (ItemInfo.ItemClassPtr)
+	{
+		// check if place in container exist
+		auto FreeSlot = FindFreeSlotForItem<col, row>(TargetContainer, ItemInfo.SizeInInventory);
+		UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot.X, FreeSlot.Y);
+		if (FreeSlot.X != -1)
+		{// add item in container started from the found slot
+			UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot.X, FreeSlot.Y);
+			InsertItemInContainer<col, row>(TargetContainer, ItemInfo.SizeInInventory, FreeSlot);
+			ItemInfo.PositionInInventory = FreeSlot;
+			// add to inventory widget
+			if (Owner)
+			{
+				auto Controller = Owner->GetController();
+				if (Controller)
+				{
+					auto HUD = Cast<APlayerController>(Controller)->GetHUD();
+					if (HUD)
+					{
+						if (ItemInfo.InventorySlotWidget)
+						{// add item widget to HUD, in appropriate grid
+							if (row == 2)
+							{
+								UE_LOG(LogTemp, Warning, TEXT("Add to equipment"));
+								UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot.X, FreeSlot.Y);
+								Cast<AQP_HUD>(HUD)->AddSlotToWeaponGrid(ItemInfo.InventorySlotWidget, FreeSlot);
+							}
+							else
+							{
+								UE_LOG(LogTemp, Warning, TEXT("Add to inventory"));
+								UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot.X, FreeSlot.Y);
+								Cast<AQP_HUD>(HUD)->AddSlotToBackPackGrid(ItemInfo.InventorySlotWidget, FreeSlot);
+							}
+						}
+					}
+				}
+			}
+			return true;
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, "Not enough place in given container");
+			return false;
+		}
+	}
+	return false;
+}
 
 template<int32 col, int32 row>
 FIntPoint UQP_InventorySystemComponent::FindFreeSlotForItem(TStaticArray<TStaticArray<bool, col>, row> TargetContainer, FIntPoint ItemSize)

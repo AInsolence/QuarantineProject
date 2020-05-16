@@ -39,6 +39,8 @@ public:
 	UUserWidget* InventorySlotWidget;
 	UPROPERTY(EditAnywhere, Category = "InventoryItem")
 	FIntPoint SizeInInventory = FIntPoint(1, 1);
+	UPROPERTY(EditAnywhere, Category = "InventoryItem")
+	FIntPoint PositionInInventory = FIntPoint(-1, -1);
 
 	UPROPERTY(EditAnywhere, Category = "InventoryItem")
 	bool bIsCountable = false; // true for items which could be added in one pack

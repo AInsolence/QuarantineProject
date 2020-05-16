@@ -28,7 +28,15 @@ UQP_InventorySystemComponent::UQP_InventorySystemComponent()
 			col = false;
 		}
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Inventory system constructor"))
+	UE_LOG(LogTemp, Warning, TEXT("Inventory HUD grid is constructed"))
+	for (auto row : EquipedItemsHUDRepresentation)
+	{
+		for (auto col : row)
+		{
+			col = false;
+		}
+	}	
+	UE_LOG(LogTemp, Warning, TEXT("Equipment HUD grid is constructed"))
 }
 
 
@@ -42,61 +50,61 @@ void UQP_InventorySystemComponent::BeginPlay()
 	{
 		Owner = Cast<APawn>(GetOwner());
 	}
-	// Show container
-	for (auto row : InventoryHUDRepresentation)
-	{
-		FString str = "";
-		for (auto col : row)
-		{
-			if (col) str += "1";
-			else str += "0";
-		}
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *str)
-	}
+	//// Show container
+	//for (auto row : InventoryHUDRepresentation)
+	//{
+	//	FString str = "";
+	//	for (auto col : row)
+	//	{
+	//		if (col) str += "1";
+	//		else str += "0";
+	//	}
+	//	UE_LOG(LogTemp, Warning, TEXT("%s"), *str)
+	//}
 
-	auto FreeSlot = FindFreeSlotForItem<10, 5>(InventoryHUDRepresentation, FIntPoint(4, 2));
-	UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot.X, FreeSlot.Y);
-	InsertItemInContainer<10, 5>(InventoryHUDRepresentation, FIntPoint(4, 2), FreeSlot);
+	//auto FreeSlot = FindFreeSlotForItem<10, 10>(InventoryHUDRepresentation, FIntPoint(4, 2));
+	//UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot.X, FreeSlot.Y);
+	//InsertItemInContainer<10, 10>(InventoryHUDRepresentation, FIntPoint(4, 2), FreeSlot);
 
-	// Show container
-	for (auto row : InventoryHUDRepresentation)
-	{
-		FString str = "";
-		for (auto col : row)
-		{
-			if (col) str += "1";
-			else str += "0";
-		}
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *str)
-	}
-	auto FreeSlot_1 = FindFreeSlotForItem<10, 5>(InventoryHUDRepresentation, FIntPoint(4, 2));
-	UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot_1.X, FreeSlot_1.Y);
-	InsertItemInContainer<10, 5>(InventoryHUDRepresentation, FIntPoint(4, 2), FreeSlot_1);
-	// Show container
-	for (auto row : InventoryHUDRepresentation)
-	{
-		FString str = "";
-		for (auto col : row)
-		{
-			if (col) str += "1";
-			else str += "0";
-		}
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *str)
-	}
-	auto FreeSlot_2 = FindFreeSlotForItem<10, 5>(InventoryHUDRepresentation, FIntPoint(2, 2));
-	UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot_2.X, FreeSlot_2.Y);
-	InsertItemInContainer<10, 5>(InventoryHUDRepresentation, FIntPoint(2, 2), FreeSlot_2);
-	// Show container
-	for (auto row : InventoryHUDRepresentation)
-	{
-		FString str = "";
-		for (auto col : row)
-		{
-			if (col) str += "1";
-			else str += "0";
-		}
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *str)
-	}
+	//// Show container
+	//for (auto row : InventoryHUDRepresentation)
+	//{
+	//	FString str = "";
+	//	for (auto col : row)
+	//	{
+	//		if (col) str += "1";
+	//		else str += "0";
+	//	}
+	//	UE_LOG(LogTemp, Warning, TEXT("%s"), *str)
+	//}
+	//auto FreeSlot_1 = FindFreeSlotForItem<10, 10>(InventoryHUDRepresentation, FIntPoint(4, 2));
+	//UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot_1.X, FreeSlot_1.Y);
+	//InsertItemInContainer<10, 10>(InventoryHUDRepresentation, FIntPoint(4, 2), FreeSlot_1);
+	//// Show container
+	//for (auto row : InventoryHUDRepresentation)
+	//{
+	//	FString str = "";
+	//	for (auto col : row)
+	//	{
+	//		if (col) str += "1";
+	//		else str += "0";
+	//	}
+	//	UE_LOG(LogTemp, Warning, TEXT("%s"), *str)
+	//}
+	//auto FreeSlot_2 = FindFreeSlotForItem<10, 10>(InventoryHUDRepresentation, FIntPoint(2, 2));
+	//UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot_2.X, FreeSlot_2.Y);
+	//InsertItemInContainer<10, 10>(InventoryHUDRepresentation, FIntPoint(2, 2), FreeSlot_2);
+	//// Show container
+	//for (auto row : InventoryHUDRepresentation)
+	//{
+	//	FString str = "";
+	//	for (auto col : row)
+	//	{
+	//		if (col) str += "1";
+	//		else str += "0";
+	//	}
+	//	UE_LOG(LogTemp, Warning, TEXT("%s"), *str)
+	//}
 }
 
 // Called every frame
@@ -161,9 +169,16 @@ void UQP_InventorySystemComponent::PickUpItem()
 		// try to get pickable component
 		auto HittedItemPickableComp = HittedActor->FindComponentByClass<UQP_PickableComponent>();
 		if (HittedItemPickableComp)
-		{
-			AddItemToInventory(HittedItemPickableComp->InventoryItemInfo);
-			HittedItemPickableComp->PickUp();
+		{// try to add item in inventory
+			if (AddItemToInventory(HittedItemPickableComp->InventoryItemInfo))
+			{
+				HittedItemPickableComp->PickUp();
+				return;
+			}
+			else
+			{
+				GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, "Not enough place Anywhere");
+			}
 		}
 		else
 		{
@@ -187,16 +202,31 @@ bool UQP_InventorySystemComponent::AddItemToInventory(FInventoryItemInfo ItemInf
 	if (ItemInfo.ItemClassPtr)
 	{// equip if it is a weapon
 		if (AmmunitionTypeArray.Contains(ItemInfo.ItemType))
-		{
-			GEngine->AddOnScreenDebugMessage(7, 2.f, FColor::Red, "I find weapon and equip");
-			EquipItem(ItemInfo);
+		{// try to equip
+			if (EquipItem(ItemInfo))
+			{
+				GEngine->AddOnScreenDebugMessage(7, 2.f, FColor::Red, "I find weapon and equip");
+				return true;
+			}
+			// try to add to inventory if is not enough place in equipment
+			if (AddItemToInventoryContainer<10, 10>(InventoryHUDRepresentation, ItemInfo))
+			{
+				InventoryContainer.Add(ItemInfo);
+				GEngine->AddOnScreenDebugMessage(7, 2.f, FColor::Red, "I find weapon and add to inventory");
+				return true;
+			}
+			return false;
 		}
 		else
 		{// just add to inventory if it is not a weapon
-			GEngine->AddOnScreenDebugMessage(7, 2.f, FColor::Red, "I find smth and add to inventory");
-			InventoryContainer.Add(ItemInfo);
+			if (AddItemToInventoryContainer<10, 10>(InventoryHUDRepresentation, ItemInfo))
+			{
+				InventoryContainer.Add(ItemInfo);
+				GEngine->AddOnScreenDebugMessage(7, 2.f, FColor::Red, "I find smth and add to inventory");
+				return true;
+			}
+			return false;
 		}
-		return true;
 	}
 	else
 	{
@@ -207,26 +237,9 @@ bool UQP_InventorySystemComponent::AddItemToInventory(FInventoryItemInfo ItemInf
 
 bool UQP_InventorySystemComponent::EquipItem(FInventoryItemInfo ItemInfo)
 {
-	// check if item's class is valid
-	if (ItemInfo.ItemClassPtr)
+	if (AddItemToInventoryContainer<12, 2>(EquipedItemsHUDRepresentation,ItemInfo))
 	{
 		EquipedItemsContainer.AddTail(ItemInfo);
-		// add to inventory widget
-		if (Owner)
-		{
-			auto Controller = Owner->GetController();
-			if (Controller)
-			{
-				auto HUD = Cast<APlayerController>(Controller)->GetHUD();
-				if (HUD)
-				{
-					if (ItemInfo.InventorySlotWidget)
-					{
-						Cast<AQP_HUD>(HUD)->AddSlotToWeaponGrid(ItemInfo.InventorySlotWidget, 0, 0);
-					}
-				}
-			}
-		}
 		return true;
 	}
 	else

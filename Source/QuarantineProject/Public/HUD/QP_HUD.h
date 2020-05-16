@@ -52,7 +52,9 @@ public:
     UFUNCTION()
     void ShowInventory();
     UFUNCTION()
-    void AddSlotToWeaponGrid(class UWidget* Content, int32 InRow, int32 InColumn);
+	void AddSlotToWeaponGrid(UWidget* Content, FIntPoint SlotPoint);
+    UFUNCTION()
+	void AddSlotToBackPackGrid(UWidget* Content, FIntPoint SlotPoint);
     UFUNCTION()
     void Exit();
     UFUNCTION()

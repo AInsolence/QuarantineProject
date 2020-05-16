@@ -23,6 +23,10 @@ public:
 	class UTextBlock* InventoryHeader = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	class UGridPanel* WeaponGridPanel = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	class UGridPanel* BackPackGridPanel = nullptr;
 
-	void AddSlotToWeaponGrid(UWidget* Content, int32 InRow = 0, int32 InColumn = 0);
+	void AddSlotToGrid(UGridPanel* GridPanel, UWidget* Content, FIntPoint SlotPoint);
+	void AddSlotToWeaponGrid(UWidget* Content, FIntPoint SlotPoint);
+	void AddSlotToBackPackGrid(UWidget* Content, FIntPoint SlotPoint);
 };

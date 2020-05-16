@@ -136,11 +136,19 @@ void AQP_HUD::ShowInventory()
 	}
 }
 
-void AQP_HUD::AddSlotToWeaponGrid(UWidget* Content, int32 InRow, int32 InColumn)
+void AQP_HUD::AddSlotToWeaponGrid(UWidget* Content, FIntPoint SlotPoint)
 {
 	if (InventoryWidget)
 	{
-		InventoryWidget->AddSlotToWeaponGrid(Content, InRow, InColumn);
+		InventoryWidget->AddSlotToWeaponGrid(Content, SlotPoint);
+	}
+}
+
+void AQP_HUD::AddSlotToBackPackGrid(UWidget* Content, FIntPoint SlotPoint)
+{
+	if (InventoryWidget)
+	{
+		InventoryWidget->AddSlotToBackPackGrid(Content, SlotPoint);
 	}
 }
 
