@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "QuarantineProject/Public/Inventory/QP_InventoryItem.h"
 #include "QP_InventoryWidget.generated.h"
 
 /**
@@ -22,11 +23,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	class UTextBlock* InventoryHeader = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	class UGridPanel* WeaponGridPanel = nullptr;
+	class UUniformGridPanel* WeaponGridPanel = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	class UGridPanel* BackPackGridPanel = nullptr;
+	class UUniformGridPanel* BackPackGridPanel = nullptr;
 
-	void AddSlotToGrid(UGridPanel* GridPanel, UWidget* Content, FIntPoint SlotPoint);
-	void AddSlotToWeaponGrid(UWidget* Content, FIntPoint SlotPoint);
-	void AddSlotToBackPackGrid(UWidget* Content, FIntPoint SlotPoint);
+	void AddSlotToGrid(UUniformGridPanel* GridPanel, FInventoryItemInfo ItemInfo, FIntPoint SlotPoint);
+	void AddSlotToWeaponGrid(FInventoryItemInfo ItemInfo, FIntPoint SlotPoint);
+	void AddSlotToBackPackGrid(FInventoryItemInfo ItemInfo, FIntPoint SlotPoint);
 };

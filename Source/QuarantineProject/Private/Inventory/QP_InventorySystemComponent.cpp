@@ -291,7 +291,7 @@ FInventoryItemInfo UQP_InventorySystemComponent::NextWeapon(AActor* WeaponInHand
 		auto PickableComp = WeaponInHand->FindComponentByClass<UQP_PickableComponent>();
 		if (PickableComp)
 		{// move weapon from hands to equipment
-			EquipItem(PickableComp->InventoryItemInfo);
+			EquipedItemsContainer.AddTail(PickableComp->InventoryItemInfo);
 		}
 	}
 	// get new weapon from equipment

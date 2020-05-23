@@ -22,33 +22,22 @@ void UQP_InventoryWidget::NativeConstruct()
 	}
 }
 
-void UQP_InventoryWidget::AddSlotToGrid(UGridPanel* GridPanel, UWidget* Content, FIntPoint SlotPoint)
+void UQP_InventoryWidget::AddSlotToGrid(UUniformGridPanel* GridPanel, FInventoryItemInfo ItemInfo, FIntPoint SlotPoint)
 {
 	if (GridPanel)
 	{
+		auto Content = ItemInfo.InventorySlotWidget;
 		if (Content)
 		{
 			Content->SetVisibility(ESlateVisibility::Visible);
-			auto Slots = GridPanel->GetSlots();
+			Content->SetRenderTransformPivot(FVector2D(0, 0));
+			Content->SetRenderScale(FVector2D(ItemInfo.SizeInInventory.X,
+												ItemInfo.SizeInInventory.Y));
+			
 			int32 column = SlotPoint.X;
 			int32 row = SlotPoint.Y;
-			for (auto slot : Slots)
-			{
-				if (slot)
-				{
-					auto GridSlot = Cast<UGridSlot>(slot);
-					if (GridSlot)
-					{
-						if (GridSlot->Layer > -1)
-						{
-							/*row = GridSlot->Row;
-							column = GridSlot->Column + 1;*/
-						}
-					}
-				}
-					
-			}
-			GridPanel->AddChildToGrid(Content, row, column);
+			auto InsertedItem = GridPanel->AddChildToUniformGrid(Content, row, column);
+			
 		}	
 	}
 	else
@@ -57,12 +46,12 @@ void UQP_InventoryWidget::AddSlotToGrid(UGridPanel* GridPanel, UWidget* Content,
 	}
 }
 
-void UQP_InventoryWidget::AddSlotToWeaponGrid(UWidget* Content, FIntPoint SlotPoint)
+void UQP_InventoryWidget::AddSlotToWeaponGrid(FInventoryItemInfo ItemInfo, FIntPoint SlotPoint)
 {
-	AddSlotToGrid(WeaponGridPanel, Content, SlotPoint);
+	AddSlotToGrid(WeaponGridPanel, ItemInfo, SlotPoint);
 }
 
-void UQP_InventoryWidget::AddSlotToBackPackGrid(UWidget* Content, FIntPoint SlotPoint)
+void UQP_InventoryWidget::AddSlotToBackPackGrid(FInventoryItemInfo ItemInfo, FIntPoint SlotPoint)
 {
-	AddSlotToGrid(BackPackGridPanel, Content, SlotPoint);
+	AddSlotToGrid(BackPackGridPanel, ItemInfo, SlotPoint);
 }

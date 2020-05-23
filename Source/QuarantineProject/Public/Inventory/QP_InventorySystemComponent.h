@@ -112,13 +112,13 @@ bool UQP_InventorySystemComponent::AddItemToInventoryContainer(TStaticArray<TSta
 							{
 								UE_LOG(LogTemp, Warning, TEXT("Add to equipment"));
 								UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot.X, FreeSlot.Y);
-								Cast<AQP_HUD>(HUD)->AddSlotToWeaponGrid(ItemInfo.InventorySlotWidget, FreeSlot);
+								Cast<AQP_HUD>(HUD)->AddSlotToWeaponGrid(ItemInfo, FreeSlot);
 							}
 							else
 							{
 								UE_LOG(LogTemp, Warning, TEXT("Add to inventory"));
 								UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot.X, FreeSlot.Y);
-								Cast<AQP_HUD>(HUD)->AddSlotToBackPackGrid(ItemInfo.InventorySlotWidget, FreeSlot);
+								Cast<AQP_HUD>(HUD)->AddSlotToBackPackGrid(ItemInfo, FreeSlot);
 							}
 						}
 					}
