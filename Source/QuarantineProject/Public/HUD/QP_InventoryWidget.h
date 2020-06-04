@@ -23,11 +23,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	class UTextBlock* InventoryHeader = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	class UUniformGridPanel* WeaponGridPanel = nullptr;
+	class UQP_InventoryUniformGridPanel* WeaponGridPanel = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	class UUniformGridPanel* BackPackGridPanel = nullptr;
+	class UQP_InventoryUniformGridPanel* BackPackGridPanel = nullptr;
 
-	void AddSlotToGrid(UUniformGridPanel* GridPanel, FInventoryItemInfo ItemInfo, FIntPoint SlotPoint);
 	void AddSlotToWeaponGrid(FInventoryItemInfo ItemInfo, FIntPoint SlotPoint);
 	void AddSlotToBackPackGrid(FInventoryItemInfo ItemInfo, FIntPoint SlotPoint);
 };

@@ -50,61 +50,6 @@ void UQP_InventorySystemComponent::BeginPlay()
 	{
 		Owner = Cast<APawn>(GetOwner());
 	}
-	//// Show container
-	//for (auto row : InventoryHUDRepresentation)
-	//{
-	//	FString str = "";
-	//	for (auto col : row)
-	//	{
-	//		if (col) str += "1";
-	//		else str += "0";
-	//	}
-	//	UE_LOG(LogTemp, Warning, TEXT("%s"), *str)
-	//}
-
-	//auto FreeSlot = FindFreeSlotForItem<10, 10>(InventoryHUDRepresentation, FIntPoint(4, 2));
-	//UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot.X, FreeSlot.Y);
-	//InsertItemInContainer<10, 10>(InventoryHUDRepresentation, FIntPoint(4, 2), FreeSlot);
-
-	//// Show container
-	//for (auto row : InventoryHUDRepresentation)
-	//{
-	//	FString str = "";
-	//	for (auto col : row)
-	//	{
-	//		if (col) str += "1";
-	//		else str += "0";
-	//	}
-	//	UE_LOG(LogTemp, Warning, TEXT("%s"), *str)
-	//}
-	//auto FreeSlot_1 = FindFreeSlotForItem<10, 10>(InventoryHUDRepresentation, FIntPoint(4, 2));
-	//UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot_1.X, FreeSlot_1.Y);
-	//InsertItemInContainer<10, 10>(InventoryHUDRepresentation, FIntPoint(4, 2), FreeSlot_1);
-	//// Show container
-	//for (auto row : InventoryHUDRepresentation)
-	//{
-	//	FString str = "";
-	//	for (auto col : row)
-	//	{
-	//		if (col) str += "1";
-	//		else str += "0";
-	//	}
-	//	UE_LOG(LogTemp, Warning, TEXT("%s"), *str)
-	//}
-	//auto FreeSlot_2 = FindFreeSlotForItem<10, 10>(InventoryHUDRepresentation, FIntPoint(2, 2));
-	//UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot_2.X, FreeSlot_2.Y);
-	//InsertItemInContainer<10, 10>(InventoryHUDRepresentation, FIntPoint(2, 2), FreeSlot_2);
-	//// Show container
-	//for (auto row : InventoryHUDRepresentation)
-	//{
-	//	FString str = "";
-	//	for (auto col : row)
-	//	{
-	//		if (col) str += "1";
-	//		else str += "0";
-	//	}
-	//	UE_LOG(LogTemp, Warning, TEXT("%s"), *str)
-	//}
 }
 
 // Called every frame
