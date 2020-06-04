@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "QuarantineProject/Public/Inventory/QP_InventoryItem.h"
+#include "QuarantineProject/Public/HUD/QP_InventorySlotWidget.h"
 #include "QP_PickableComponent.generated.h"
 
 /*
@@ -27,5 +27,5 @@ public:
 	void PickUp();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PickableItemProperties")
-	FInventoryItemInfo InventoryItemInfo;
+	UQP_InventorySlotWidget* InventoryItemWidget;
 };

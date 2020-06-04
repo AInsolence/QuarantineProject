@@ -4,12 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "QuarantineProject/Public/Inventory/QP_InventoryItem.h"
 #include "QP_InventorySlotWidget.generated.h"
 
 /**
  * 
  */
-UCLASS()
+
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class QUARANTINEPROJECT_API UQP_InventorySlotWidget : public UUserWidget
 {
 	GENERATED_BODY()
@@ -25,6 +27,9 @@ public:
 	virtual void NativeOnMouseLeave(const FPointerEvent& MouseEvent) override;
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, 
 										   const FPointerEvent& InMouseEvent) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PickableItemProperties")
+	FInventoryItemInfo InventoryItemInfo;
 	// virtual void  	OnDragDetected
 	// 							(
 	// 							    FGeometry MyGeometry,

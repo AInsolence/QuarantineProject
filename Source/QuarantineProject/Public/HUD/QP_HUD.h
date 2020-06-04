@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
-#include "QuarantineProject/Public/Inventory/QP_InventoryItem.h"
+#include "QuarantineProject/Public/HUD/QP_InventorySlotWidget.h"
 #include "QP_HUD.generated.h"
 
 /**
@@ -53,9 +53,9 @@ public:
     UFUNCTION()
     void ShowInventory();
     UFUNCTION()
-	void AddSlotToWeaponGrid(FInventoryItemInfo ItemInfo, FIntPoint SlotPoint);
+	void AddSlotToWeaponGrid(UQP_InventorySlotWidget* ItemWidget, FIntPoint SlotPoint) const;
     UFUNCTION()
-	void AddSlotToBackPackGrid(FInventoryItemInfo ItemInfo, FIntPoint SlotPoint);
+	void AddSlotToBackPackGrid(UQP_InventorySlotWidget* ItemWidget, FIntPoint SlotPoint) const;
     UFUNCTION()
     void Exit();
     UFUNCTION()

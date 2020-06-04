@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/UniformGridPanel.h"
 #include "Blueprint/UserWidget.h"
-#include "QuarantineProject/Public/Inventory/QP_InventoryItem.h"
+#include "QuarantineProject/Public/HUD/QP_InventorySlotWidget.h"
 #include "QP_InventoryUniformGridPanel.generated.h"
 
 /**
@@ -24,7 +24,7 @@ class QUARANTINEPROJECT_API UQP_InventoryUniformGridPanel : public UUserWidget
     class UUniformGridPanel* GridPanel = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FIntPoint GridSize;
-	void AddSlotToGrid(FInventoryItemInfo ItemInfo, FIntPoint SlotPoint);
+	void AddSlotToGrid(UQP_InventorySlotWidget* ItemWidget, FIntPoint SlotPoint);
 
 	virtual bool NativeOnDrop(const FGeometry & InGeometry,
                               const FDragDropEvent & InDragDropEvent,

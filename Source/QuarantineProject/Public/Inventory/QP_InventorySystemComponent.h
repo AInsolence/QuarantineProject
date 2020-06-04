@@ -7,6 +7,7 @@
 #include "QP_PickableComponent.h"
 #include "Containers/List.h"
 #include "Containers/StaticArray.h"
+#include "QuarantineProject/Public/HUD/QP_InventorySlotWidget.h"
 #include "QP_InventorySystemComponent.generated.h"
 
 /*
@@ -30,15 +31,15 @@ protected:
 	virtual void BeginPlay() override;
 
 	//UPROPERTY(EditAnywhere, Category = "Inventory")
-	TDoubleLinkedList<FInventoryItemInfo> EquipedItemsContainer;
+	TDoubleLinkedList<UQP_InventorySlotWidget*> EquipedItemsContainer;
 	TStaticArray<TStaticArray<bool, 12>, 2> EquipedItemsHUDRepresentation;
 	UPROPERTY(EditAnywhere, Category = "Inventory")
-	TArray<FInventoryItemInfo> InventoryContainer;
+	TArray<UQP_InventorySlotWidget*> InventoryContainer;
 	TStaticArray<TStaticArray<bool, 10>, 10> InventoryHUDRepresentation;
 
 	// Add item to given inventory container
 	template<int32 col, int32 row>
-	bool AddItemToInventoryContainer(TStaticArray<TStaticArray<bool, col>, row> &TargetContainer, FInventoryItemInfo ItemInfo);
+	bool AddItemToInventoryContainer(TStaticArray<TStaticArray<bool, col>, row> &TargetContainer, UQP_InventorySlotWidget* ItemWidget);
 	// Returns free slot coordinates in given two dimensional container for given item size or FIntPoint(-1, -1)
 	template<int32 col, int32 row>
 	FIntPoint FindFreeSlotForItem(TStaticArray<TStaticArray<bool, col>, row> TargetContainer, FIntPoint ItemSize);
@@ -49,9 +50,9 @@ protected:
 																		FIntPoint StartSlot);
 
 	UFUNCTION()
-	bool AddItemToInventory(FInventoryItemInfo ItemInfo);
+	bool AddItemToInventory(UQP_InventorySlotWidget* ItemWidget);
 	UFUNCTION()
-	bool EquipItem(FInventoryItemInfo ItemInfo);
+	bool EquipItem(UQP_InventorySlotWidget* ItemWidget);
 	UFUNCTION()
 	bool ThrowItemFromInventory();
 
@@ -84,19 +85,20 @@ public:
 };
 
 template<int32 col, int32 row>
-bool UQP_InventorySystemComponent::AddItemToInventoryContainer(TStaticArray<TStaticArray<bool, col>, row> &TargetContainer, FInventoryItemInfo ItemInfo)
+bool UQP_InventorySystemComponent::AddItemToInventoryContainer(TStaticArray<TStaticArray<bool, col>, row> &TargetContainer,
+																					UQP_InventorySlotWidget* ItemWidget)
 {
 	// check if item's class is valid
-	if (ItemInfo.ItemClassPtr)
+	if (ItemWidget->InventoryItemInfo.ItemClassPtr)
 	{
 		// check if place in container exist
-		auto FreeSlot = FindFreeSlotForItem<col, row>(TargetContainer, ItemInfo.SizeInInventory);
+		auto FreeSlot = FindFreeSlotForItem<col, row>(TargetContainer, ItemWidget->InventoryItemInfo.SizeInInventory);
 		UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot.X, FreeSlot.Y);
 		if (FreeSlot.X != -1)
 		{// add item in container started from the found slot
 			UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot.X, FreeSlot.Y);
-			InsertItemInContainer<col, row>(TargetContainer, ItemInfo.SizeInInventory, FreeSlot);
-			ItemInfo.PositionInInventory = FreeSlot;
+			InsertItemInContainer<col, row>(TargetContainer, ItemWidget->InventoryItemInfo.SizeInInventory, FreeSlot);
+			ItemWidget->InventoryItemInfo.PositionInInventory = FreeSlot;
 			// add to inventory widget
 			if (Owner)
 			{
@@ -106,19 +108,19 @@ bool UQP_InventorySystemComponent::AddItemToInventoryContainer(TStaticArray<TSta
 					auto HUD = Cast<APlayerController>(Controller)->GetHUD();
 					if (HUD)
 					{
-						if (ItemInfo.InventorySlotWidget)
+						if (ItemWidget)
 						{// add item widget to HUD, in appropriate grid
 							if (row == 2)
 							{
 								UE_LOG(LogTemp, Warning, TEXT("Add to equipment"));
 								UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot.X, FreeSlot.Y);
-								Cast<AQP_HUD>(HUD)->AddSlotToWeaponGrid(ItemInfo, FreeSlot);
+								Cast<AQP_HUD>(HUD)->AddSlotToWeaponGrid(ItemWidget, FreeSlot);
 							}
 							else
 							{
 								UE_LOG(LogTemp, Warning, TEXT("Add to inventory"));
 								UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot.X, FreeSlot.Y);
-								Cast<AQP_HUD>(HUD)->AddSlotToBackPackGrid(ItemInfo, FreeSlot);
+								Cast<AQP_HUD>(HUD)->AddSlotToBackPackGrid(ItemWidget, FreeSlot);
 							}
 						}
 					}

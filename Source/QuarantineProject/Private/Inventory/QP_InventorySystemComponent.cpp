@@ -115,14 +115,17 @@ void UQP_InventorySystemComponent::PickUpItem()
 		auto HittedItemPickableComp = HittedActor->FindComponentByClass<UQP_PickableComponent>();
 		if (HittedItemPickableComp)
 		{// try to add item in inventory
-			if (AddItemToInventory(HittedItemPickableComp->InventoryItemInfo))
+			if (HittedItemPickableComp->InventoryItemWidget)
 			{
-				HittedItemPickableComp->PickUp();
-				return;
-			}
-			else
-			{
-				GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, "Not enough place Anywhere");
+				if (AddItemToInventory(HittedItemPickableComp->InventoryItemWidget))
+				{
+					HittedItemPickableComp->PickUp();
+					return;
+				}
+				else
+				{
+					GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, "Not enough place Anywhere");
+				}
 			}
 		}
 		else
@@ -141,22 +144,26 @@ void UQP_InventorySystemComponent::DropItem()
 	ThrowItemFromInventory();
 }
 
-bool UQP_InventorySystemComponent::AddItemToInventory(FInventoryItemInfo ItemInfo)
+bool UQP_InventorySystemComponent::AddItemToInventory(UQP_InventorySlotWidget* ItemWidget)
 {
+	if (!ItemWidget)
+	{
+		return false;
+	}
 	// check if item's class is valid
-	if (ItemInfo.ItemClassPtr)
+	if (ItemWidget->InventoryItemInfo.ItemClassPtr)
 	{// equip if it is a weapon
-		if (AmmunitionTypeArray.Contains(ItemInfo.ItemType))
+		if (AmmunitionTypeArray.Contains(ItemWidget->InventoryItemInfo.ItemType))
 		{// try to equip
-			if (EquipItem(ItemInfo))
+			if (EquipItem(ItemWidget))
 			{
 				GEngine->AddOnScreenDebugMessage(7, 2.f, FColor::Red, "I find weapon and equip");
 				return true;
 			}
 			// try to add to inventory if is not enough place in equipment
-			if (AddItemToInventoryContainer<10, 10>(InventoryHUDRepresentation, ItemInfo))
+			if (AddItemToInventoryContainer<10, 10>(InventoryHUDRepresentation, ItemWidget))
 			{
-				InventoryContainer.Add(ItemInfo);
+				InventoryContainer.Add(ItemWidget);
 				GEngine->AddOnScreenDebugMessage(7, 2.f, FColor::Red, "I find weapon and add to inventory");
 				return true;
 			}
@@ -164,9 +171,9 @@ bool UQP_InventorySystemComponent::AddItemToInventory(FInventoryItemInfo ItemInf
 		}
 		else
 		{// just add to inventory if it is not a weapon
-			if (AddItemToInventoryContainer<10, 10>(InventoryHUDRepresentation, ItemInfo))
+			if (AddItemToInventoryContainer<10, 10>(InventoryHUDRepresentation, ItemWidget))
 			{
-				InventoryContainer.Add(ItemInfo);
+				InventoryContainer.Add(ItemWidget);
 				GEngine->AddOnScreenDebugMessage(7, 2.f, FColor::Red, "I find smth and add to inventory");
 				return true;
 			}
@@ -180,11 +187,11 @@ bool UQP_InventorySystemComponent::AddItemToInventory(FInventoryItemInfo ItemInf
 	}
 }
 
-bool UQP_InventorySystemComponent::EquipItem(FInventoryItemInfo ItemInfo)
+bool UQP_InventorySystemComponent::EquipItem(UQP_InventorySlotWidget* ItemWidget)
 {
-	if (AddItemToInventoryContainer<12, 2>(EquipedItemsHUDRepresentation,ItemInfo))
+	if (AddItemToInventoryContainer<12, 2>(EquipedItemsHUDRepresentation,ItemWidget))
 	{
-		EquipedItemsContainer.AddTail(ItemInfo);
+		EquipedItemsContainer.AddTail(ItemWidget);
 		return true;
 	}
 	else
@@ -208,7 +215,7 @@ bool UQP_InventorySystemComponent::ThrowItemFromInventory()
 		ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 		if (InventoryContainer.Num() >= 1)
 		{// try to throw(spawn) item in the world
-			if (World->SpawnActor<AActor>(InventoryContainer.Pop().ItemClassPtr,
+			if (World->SpawnActor<AActor>(InventoryContainer.Pop()->InventoryItemInfo.ItemClassPtr,
 				SpawnLocation,
 				FRotator(0, 0, 0),
 				ActorSpawnParams))
@@ -236,14 +243,14 @@ FInventoryItemInfo UQP_InventorySystemComponent::NextWeapon(AActor* WeaponInHand
 		auto PickableComp = WeaponInHand->FindComponentByClass<UQP_PickableComponent>();
 		if (PickableComp)
 		{// move weapon from hands to equipment
-			EquipedItemsContainer.AddTail(PickableComp->InventoryItemInfo);
+			EquipedItemsContainer.AddTail(PickableComp->InventoryItemWidget);
 		}
 	}
 	// get new weapon from equipment
 	auto Weapon = EquipedItemsContainer.GetHead()->GetValue();
 	EquipedItemsContainer.RemoveNode(EquipedItemsContainer.GetHead());
-	UE_LOG(LogTemp, Warning, TEXT("TRY TO EQUIP: %s"), Weapon.ItemClassPtr)
-	return Weapon;
+	UE_LOG(LogTemp, Warning, TEXT("TRY TO EQUIP: %s"), Weapon->InventoryItemInfo.ItemClassPtr)
+	return Weapon->InventoryItemInfo;
 }
 
 FInventoryItemInfo UQP_InventorySystemComponent::PreviousWeapon(AActor* WeaponInHand)
@@ -256,12 +263,12 @@ FInventoryItemInfo UQP_InventorySystemComponent::PreviousWeapon(AActor* WeaponIn
 		auto PickableComp = WeaponInHand->FindComponentByClass<UQP_PickableComponent>();
 		if (PickableComp)
 		{// move weapon from hands to equipment
-			EquipedItemsContainer.AddHead(PickableComp->InventoryItemInfo);
+			EquipedItemsContainer.AddHead(PickableComp->InventoryItemWidget);
 		}
 	}
 	// get new weapon from equipment
 	auto Weapon = EquipedItemsContainer.GetTail()->GetValue();
 	EquipedItemsContainer.RemoveNode(EquipedItemsContainer.GetTail());
-	UE_LOG(LogTemp, Warning, TEXT("TRY TO EQUIP: %s"), Weapon.ItemClassPtr)
-	return Weapon;
+	UE_LOG(LogTemp, Warning, TEXT("TRY TO EQUIP: %s"), Weapon->InventoryItemInfo.ItemClassPtr)
+	return Weapon->InventoryItemInfo;
 }

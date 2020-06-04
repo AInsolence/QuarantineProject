@@ -24,17 +24,17 @@ void UQP_InventoryUniformGridPanel::NativeConstruct()
     }
 }
 
-void UQP_InventoryUniformGridPanel::AddSlotToGrid(FInventoryItemInfo ItemInfo, FIntPoint SlotPoint)
+void UQP_InventoryUniformGridPanel::AddSlotToGrid(UQP_InventorySlotWidget* ItemWidget, FIntPoint SlotPoint)
 {
     if (GridPanel)
     {
-        auto Content = ItemInfo.InventorySlotWidget;
+        auto Content = ItemWidget;
         if (Content)
         {
             Content->SetVisibility(ESlateVisibility::Visible);
             Content->SetRenderTransformPivot(FVector2D(0, 0));
-            Content->SetRenderScale(FVector2D(ItemInfo.SizeInInventory.X,
-                                              ItemInfo.SizeInInventory.Y));
+            Content->SetRenderScale(FVector2D(ItemWidget->InventoryItemInfo.SizeInInventory.X,
+                                              ItemWidget->InventoryItemInfo.SizeInInventory.Y));
 			
             const int32 column = SlotPoint.X;
             const int32 row = SlotPoint.Y;

@@ -21,12 +21,12 @@ void UQP_InventoryWidget::NativeConstruct()
 	}
 }
 
-void UQP_InventoryWidget::AddSlotToWeaponGrid(FInventoryItemInfo ItemInfo, FIntPoint SlotPoint)
+void UQP_InventoryWidget::AddSlotToWeaponGrid(UQP_InventorySlotWidget* ItemWidget, FIntPoint SlotPoint) const
 {
-	WeaponGridPanel->AddSlotToGrid(ItemInfo, SlotPoint);
+	WeaponGridPanel->AddSlotToGrid(ItemWidget, SlotPoint);
 }
 
-void UQP_InventoryWidget::AddSlotToBackPackGrid(FInventoryItemInfo ItemInfo, FIntPoint SlotPoint)
+void UQP_InventoryWidget::AddSlotToBackPackGrid(UQP_InventorySlotWidget* ItemWidget, FIntPoint SlotPoint) const
 {
-	BackPackGridPanel->AddSlotToGrid(ItemInfo, SlotPoint);
+	BackPackGridPanel->AddSlotToGrid(ItemWidget, SlotPoint);
 }

@@ -136,19 +136,19 @@ void AQP_HUD::ShowInventory()
 	}
 }
 
-void AQP_HUD::AddSlotToWeaponGrid(FInventoryItemInfo ItemInfo, FIntPoint SlotPoint)
+void AQP_HUD::AddSlotToWeaponGrid(UQP_InventorySlotWidget* ItemWidget, FIntPoint SlotPoint) const
 {
 	if (InventoryWidget)
 	{
-		InventoryWidget->AddSlotToWeaponGrid(ItemInfo, SlotPoint);
+		InventoryWidget->AddSlotToWeaponGrid(ItemWidget, SlotPoint);
 	}
 }
 
-void AQP_HUD::AddSlotToBackPackGrid(FInventoryItemInfo ItemInfo, FIntPoint SlotPoint)
+void AQP_HUD::AddSlotToBackPackGrid(UQP_InventorySlotWidget* ItemWidget, FIntPoint SlotPoint) const
 {
 	if (InventoryWidget)
 	{
-		InventoryWidget->AddSlotToBackPackGrid(ItemInfo, SlotPoint);
+		InventoryWidget->AddSlotToBackPackGrid(ItemWidget, SlotPoint);
 	}
 }
 
