@@ -21,12 +21,15 @@ void UQP_InventoryWidget::NativeConstruct()
 	}
 }
 
-void UQP_InventoryWidget::AddSlotToWeaponGrid(UQP_InventorySlotWidget* ItemWidget, FIntPoint SlotPoint) const
-{
-	WeaponGridPanel->AddSlotToGrid(ItemWidget, SlotPoint);
+void UQP_InventoryWidget::AddSlotToWeaponGrid(UQP_InventorySlotWidget* ItemWidget) const
+{// try to add to the weapon grid
+	if (!WeaponGridPanel->AddItemToGrid(ItemWidget))
+	{// else add to backpack
+		BackPackGridPanel->AddItemToGrid(ItemWidget);
+	}// TODO need to fix not to destroy items from level if not picked up
 }
 
-void UQP_InventoryWidget::AddSlotToBackPackGrid(UQP_InventorySlotWidget* ItemWidget, FIntPoint SlotPoint) const
+void UQP_InventoryWidget::AddSlotToBackPackGrid(UQP_InventorySlotWidget* ItemWidget) const
 {
-	BackPackGridPanel->AddSlotToGrid(ItemWidget, SlotPoint);
+	BackPackGridPanel->AddItemToGrid(ItemWidget);
 }

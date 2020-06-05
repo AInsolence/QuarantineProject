@@ -49,6 +49,16 @@ FReply UQP_InventorySlotWidget::NativeOnMouseButtonDown(const FGeometry& InGeome
 	return Reply.NativeReply;
 }
 
+FIntPoint UQP_InventorySlotWidget::GetItemSizeInInventory()
+{
+	return InventoryItemInfo.SizeInInventory;
+}
+
+FIntPoint UQP_InventorySlotWidget::GetItemPositionInInventory()
+{
+	return InventoryItemInfo.PositionInInventory;
+}
+
 // void UQP_InventorySlotWidget::NativeOnDragDetected(const FGeometry& InGeometry, 
 // 												   const FPointerEvent& InMouseEvent, 
 // 												   UDragDropOperation*& OutOperation)

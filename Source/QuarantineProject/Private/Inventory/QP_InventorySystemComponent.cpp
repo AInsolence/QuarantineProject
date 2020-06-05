@@ -28,7 +28,7 @@ UQP_InventorySystemComponent::UQP_InventorySystemComponent()
 			col = false;
 		}
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Inventory HUD grid is constructed"))
+
 	for (auto row : EquipedItemsHUDRepresentation)
 	{
 		for (auto col : row)
@@ -36,7 +36,6 @@ UQP_InventorySystemComponent::UQP_InventorySystemComponent()
 			col = false;
 		}
 	}	
-	UE_LOG(LogTemp, Warning, TEXT("Equipment HUD grid is constructed"))
 }
 
 
@@ -247,10 +246,18 @@ FInventoryItemInfo UQP_InventorySystemComponent::NextWeapon(AActor* WeaponInHand
 		}
 	}
 	// get new weapon from equipment
-	auto Weapon = EquipedItemsContainer.GetHead()->GetValue();
-	EquipedItemsContainer.RemoveNode(EquipedItemsContainer.GetHead());
-	UE_LOG(LogTemp, Warning, TEXT("TRY TO EQUIP: %s"), Weapon->InventoryItemInfo.ItemClassPtr)
-	return Weapon->InventoryItemInfo;
+	if (EquipedItemsContainer.GetHead())
+	{
+		if (EquipedItemsContainer.GetHead()->GetValue())
+		{
+			auto Weapon = EquipedItemsContainer.GetHead()->GetValue();
+			EquipedItemsContainer.RemoveNode(EquipedItemsContainer.GetHead());
+			UE_LOG(LogTemp, Warning, TEXT("TRY TO EQUIP: %s"), Weapon->InventoryItemInfo.ItemClassPtr)
+			return Weapon->InventoryItemInfo;
+		}
+		return FInventoryItemInfo();
+	}
+	return FInventoryItemInfo();
 }
 
 FInventoryItemInfo UQP_InventorySystemComponent::PreviousWeapon(AActor* WeaponInHand)
@@ -267,8 +274,15 @@ FInventoryItemInfo UQP_InventorySystemComponent::PreviousWeapon(AActor* WeaponIn
 		}
 	}
 	// get new weapon from equipment
-	auto Weapon = EquipedItemsContainer.GetTail()->GetValue();
-	EquipedItemsContainer.RemoveNode(EquipedItemsContainer.GetTail());
-	UE_LOG(LogTemp, Warning, TEXT("TRY TO EQUIP: %s"), Weapon->InventoryItemInfo.ItemClassPtr)
-	return Weapon->InventoryItemInfo;
+	if (EquipedItemsContainer.GetHead())
+	{
+		if (EquipedItemsContainer.GetHead()->GetValue())
+		{
+			auto Weapon = EquipedItemsContainer.GetTail()->GetValue();
+			EquipedItemsContainer.RemoveNode(EquipedItemsContainer.GetTail());
+			return Weapon->InventoryItemInfo;
+		}
+		return FInventoryItemInfo();
+	}
+	return FInventoryItemInfo();
 }

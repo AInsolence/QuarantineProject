@@ -266,7 +266,10 @@ void AQuarantineProjectCharacter::NextWeapon()
 {
 	if (InventorySystemComponent)
 	{
-		ChangeWeapon(InventorySystemComponent->NextWeapon(WeaponInHands));
+		if (WeaponInHands)
+		{
+			ChangeWeapon(InventorySystemComponent->NextWeapon(WeaponInHands));
+		}
 	}
 }
 
@@ -274,7 +277,10 @@ void AQuarantineProjectCharacter::PreviousWeapon()
 {
 	if (InventorySystemComponent)
 	{
-		ChangeWeapon(InventorySystemComponent->PreviousWeapon(WeaponInHands));
+		if (WeaponInHands)
+		{
+			ChangeWeapon(InventorySystemComponent->PreviousWeapon(WeaponInHands));
+		}
 	}
 }
 

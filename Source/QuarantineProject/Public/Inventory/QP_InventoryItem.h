@@ -31,19 +31,19 @@ struct FInventoryItemInfo
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, Category = "InventoryItem")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InventoryItem")
 	UClass* ItemClassPtr = nullptr;
-	UPROPERTY(EditAnywhere, Category = "InventoryItem")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InventoryItem")
 	EPickableItemType ItemType;
-	UPROPERTY(EditAnywhere, Category = "InventoryItem")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InventoryItem")
 	FIntPoint SizeInInventory = FIntPoint(1, 1);
-	UPROPERTY(EditAnywhere, Category = "InventoryItem")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InventoryItem")
 	FIntPoint PositionInInventory = FIntPoint(-1, -1);
 
-	UPROPERTY(EditAnywhere, Category = "InventoryItem")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InventoryItem")
 	bool bIsCountable = false; // true for items which could be added in one pack
-	UPROPERTY(EditAnywhere, Category = "InventoryItem")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InventoryItem")
 	int32 CurrentPackSize = 0; // set if item is countable
-	UPROPERTY(EditAnywhere, Category = "InventoryItem")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InventoryItem")
 	int32 MaxPackSize = 0; // set if item is countable
 };

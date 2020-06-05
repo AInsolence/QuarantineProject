@@ -30,6 +30,18 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PickableItemProperties")
 	FInventoryItemInfo InventoryItemInfo;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PickableItemProperties")
+	// Set this if widget was dropped in grid
+	class UQP_InventoryUniformGridPanel* CurrentGridOwner = nullptr;
+	UFUNCTION(BlueprintCallable)
+	FIntPoint GetItemSizeInInventory();
+	UFUNCTION(BlueprintCallable)
+	FIntPoint GetItemPositionInInventory();
+
+private:
+	float BaseOpacity = 0.9f;
+	float HoverOpacity = 1.f;
+
 	// virtual void  	OnDragDetected
 	// 							(
 	// 							    FGeometry MyGeometry,
@@ -37,7 +49,4 @@ public:
 	// 							    UDragDropOperation *& Operation
 	// 							) override;
 	// TSubclassOf<class UMyDragDropOperation> DDOperClass;
-private:
-	float BaseOpacity = 0.9f;
-	float HoverOpacity = 1.f;
 };

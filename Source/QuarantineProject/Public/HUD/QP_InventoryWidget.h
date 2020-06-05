@@ -27,6 +27,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	class UQP_InventoryUniformGridPanel* BackPackGridPanel = nullptr;
 
-	void AddSlotToWeaponGrid(UQP_InventorySlotWidget* ItemWidget, FIntPoint SlotPoint) const;
-	void AddSlotToBackPackGrid(UQP_InventorySlotWidget* ItemWidget, FIntPoint SlotPoint) const;
+	void AddSlotToWeaponGrid(UQP_InventorySlotWidget* ItemWidget) const;
+	void AddSlotToBackPackGrid(UQP_InventorySlotWidget* ItemWidget) const;
 };

@@ -32,9 +32,9 @@ protected:
 
 	//UPROPERTY(EditAnywhere, Category = "Inventory")
 	TDoubleLinkedList<UQP_InventorySlotWidget*> EquipedItemsContainer;
-	TStaticArray<TStaticArray<bool, 12>, 2> EquipedItemsHUDRepresentation;
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	TArray<UQP_InventorySlotWidget*> InventoryContainer;
+	TStaticArray<TStaticArray<bool, 12>, 2> EquipedItemsHUDRepresentation;
 	TStaticArray<TStaticArray<bool, 10>, 10> InventoryHUDRepresentation;
 
 	// Add item to given inventory container
@@ -88,52 +88,81 @@ template<int32 col, int32 row>
 bool UQP_InventorySystemComponent::AddItemToInventoryContainer(TStaticArray<TStaticArray<bool, col>, row> &TargetContainer,
 																					UQP_InventorySlotWidget* ItemWidget)
 {
-	// check if item's class is valid
-	if (ItemWidget->InventoryItemInfo.ItemClassPtr)
+	if (Owner)
 	{
-		// check if place in container exist
-		auto FreeSlot = FindFreeSlotForItem<col, row>(TargetContainer, ItemWidget->InventoryItemInfo.SizeInInventory);
-		UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot.X, FreeSlot.Y);
-		if (FreeSlot.X != -1)
-		{// add item in container started from the found slot
-			UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot.X, FreeSlot.Y);
-			InsertItemInContainer<col, row>(TargetContainer, ItemWidget->InventoryItemInfo.SizeInInventory, FreeSlot);
-			ItemWidget->InventoryItemInfo.PositionInInventory = FreeSlot;
-			// add to inventory widget
-			if (Owner)
+		auto Controller = Owner->GetController();
+		if (Controller)
+		{
+			auto HUD = Cast<APlayerController>(Controller)->GetHUD();
+			if (HUD)
 			{
-				auto Controller = Owner->GetController();
-				if (Controller)
-				{
-					auto HUD = Cast<APlayerController>(Controller)->GetHUD();
-					if (HUD)
+				if (ItemWidget)
+				{// add item widget to HUD, in appropriate grid
+					if (row == 2)
 					{
-						if (ItemWidget)
-						{// add item widget to HUD, in appropriate grid
-							if (row == 2)
-							{
-								UE_LOG(LogTemp, Warning, TEXT("Add to equipment"));
-								UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot.X, FreeSlot.Y);
-								Cast<AQP_HUD>(HUD)->AddSlotToWeaponGrid(ItemWidget, FreeSlot);
-							}
-							else
-							{
-								UE_LOG(LogTemp, Warning, TEXT("Add to inventory"));
-								UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot.X, FreeSlot.Y);
-								Cast<AQP_HUD>(HUD)->AddSlotToBackPackGrid(ItemWidget, FreeSlot);
-							}
-						}
+						UE_LOG(LogTemp, Warning, TEXT("Add to equipment"));
+						Cast<AQP_HUD>(HUD)->AddSlotToWeaponGrid(ItemWidget);
+						return true;
+					}
+					else
+					{
+						UE_LOG(LogTemp, Warning, TEXT("Add to inventory"));
+						Cast<AQP_HUD>(HUD)->AddSlotToBackPackGrid(ItemWidget);
+						return true;
 					}
 				}
+				return false;
 			}
-			return true;
-		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, "Not enough place in given container");
 			return false;
 		}
+		return false;
 	}
+	//// check if item's class is valid
+	//if (ItemWidget->InventoryItemInfo.ItemClassPtr)
+	//{
+	//	// check if place in container exist
+	//	auto FreeSlot = FindFreeSlotForItem<col, row>(TargetContainer, ItemWidget->InventoryItemInfo.SizeInInventory);
+	//	UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot.X, FreeSlot.Y);
+	//	if (FreeSlot.X != -1)
+	//	{// add item in container started from the found slot
+	//		UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot.X, FreeSlot.Y);
+	//		InsertItemInContainer<col, row>(TargetContainer, ItemWidget->InventoryItemInfo.SizeInInventory, FreeSlot);
+	//		ItemWidget->InventoryItemInfo.PositionInInventory = FreeSlot;
+	//		// add to inventory widget
+	//		if (Owner)
+	//		{
+	//			auto Controller = Owner->GetController();
+	//			if (Controller)
+	//			{
+	//				auto HUD = Cast<APlayerController>(Controller)->GetHUD();
+	//				if (HUD)
+	//				{
+	//					if (ItemWidget)
+	//					{// add item widget to HUD, in appropriate grid
+	//						if (row == 2)
+	//						{
+	//							UE_LOG(LogTemp, Warning, TEXT("Add to equipment"));
+	//							UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot.X, FreeSlot.Y);
+	//							Cast<AQP_HUD>(HUD)->AddSlotToWeaponGrid(ItemWidget, FreeSlot);
+	//						}
+	//						else
+	//						{
+	//							UE_LOG(LogTemp, Warning, TEXT("Add to inventory"));
+	//							UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot.X, FreeSlot.Y);
+	//							Cast<AQP_HUD>(HUD)->AddSlotToBackPackGrid(ItemWidget, FreeSlot);
+	//						}
+	//					}
+	//				}
+	//			}
+	//		}
+	//		return true;
+	//	}
+	//	else
+	//	{
+	//		GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, "Not enough place in given container");
+	//		return false;
+	//	}
+	//}
 	return false;
 }
 

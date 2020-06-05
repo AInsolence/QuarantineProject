@@ -53,9 +53,9 @@ public:
     UFUNCTION()
     void ShowInventory();
     UFUNCTION()
-	void AddSlotToWeaponGrid(UQP_InventorySlotWidget* ItemWidget, FIntPoint SlotPoint) const;
+	void AddSlotToWeaponGrid(UQP_InventorySlotWidget* ItemWidget) const;
     UFUNCTION()
-	void AddSlotToBackPackGrid(UQP_InventorySlotWidget* ItemWidget, FIntPoint SlotPoint) const;
+	void AddSlotToBackPackGrid(UQP_InventorySlotWidget* ItemWidget) const;
     UFUNCTION()
     void Exit();
     UFUNCTION()
