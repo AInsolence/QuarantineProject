@@ -92,31 +92,36 @@ FIntPoint UQP_InventoryUniformGridPanel::FindFreeSlotForItem(const FIntPoint Ite
 		{// check if slot is free
 			if (Grid[InternalRow][InternalColumn] == false)
 			{/// *** try to find place for whole item ***///
-				bool bIsNotPlaceForItem = false;
-				for (int32 SizeRow = InternalRow; SizeRow < InternalRow + ItemSize.Y; ++SizeRow)
+				if (bIsItemCanBePlacedStartedFromSlot(FIntPoint(InternalColumn, InternalRow), ItemSize))
 				{
-					for (int32 SizeCol = InternalColumn; SizeCol < InternalColumn + ItemSize.X; ++SizeCol)
-					{
-						if (Grid[InternalRow][InternalColumn] == true)
-						{// one of slots is not available
-							bIsNotPlaceForItem = true;
-							break;
-						}
-					}
-					if (bIsNotPlaceForItem)
-					{// one of slots is not available
-						break;
-					}
-				}
-				// after iterating by possible slots for that size -> all slots are empty
-				if (!bIsNotPlaceForItem)
-				{// then return first available slot
 					return FIntPoint(InternalColumn, InternalRow);
 				}
 			}
 		}
 	}
 	return FIntPoint(-1, -1);
+}
+
+bool UQP_InventoryUniformGridPanel::bIsItemCanBePlacedStartedFromSlot(const FIntPoint FreeSlot,
+																		const FIntPoint ItemSize) const
+{
+	auto Row = FreeSlot.Y;
+	auto Column = FreeSlot.X;
+	UE_LOG(LogTemp, Warning, TEXT("Is Item can be placed here col: %d, row: %d"), Column, Row);
+	UE_LOG(LogTemp, Warning, TEXT("Is Item can be placed SIZE: %d, row: %d"), ItemSize.X, ItemSize.Y);
+	for (int32 SizeRow = Row; SizeRow < Row + ItemSize.Y; ++SizeRow)
+	{
+		for (int32 SizeCol = Column; SizeCol < Column + ItemSize.X; ++SizeCol)
+		{
+			if (Grid[SizeRow][SizeCol] == true)
+			{// one of slots is not available
+				return false;
+			}
+			UE_LOG(LogTemp, Warning, TEXT("Checked col: %d, row: %d"), Column, Row);
+		}
+	}
+	// after iterating by all possible slots for that size -> all slots are empty return first available slot
+	return true;
 }
 
 void UQP_InventoryUniformGridPanel::InsertItemInContainer(const FIntPoint ItemSize, const FIntPoint StartSlot, bool bIsItemInserted)
@@ -136,6 +141,24 @@ void UQP_InventoryUniformGridPanel::InsertItemInContainer(const FIntPoint ItemSi
 			
 			Grid[ItemCol][ItemRow] = bIsItemInserted;
 		}
+	}
+	// For debug
+	UE_LOG(LogTemp, Warning, TEXT("Grid after insert/remove item"));
+	for (auto row : Grid)
+	{
+		FString RowText = "";
+		for (auto col : row)
+		{
+			if (col == true)
+			{
+				RowText += " 1";
+			}
+			else
+			{
+				RowText += " 0";
+			}
+		}
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *RowText);
 	}
 }
 

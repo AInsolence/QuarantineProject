@@ -39,6 +39,7 @@ class QUARANTINEPROJECT_API UQP_InventoryUniformGridPanel : public UUserWidget
 	void AddWidgetToGrid(UQP_InventorySlotWidget* ItemWidget, const FIntPoint SlotPoint);
 	// Returns free slot coordinates for given item size or FIntPoint(-1, -1)
 	FIntPoint FindFreeSlotForItem(const FIntPoint ItemSize) const;
+	bool bIsItemCanBePlacedStartedFromSlot(const FIntPoint FreeSlot, const FIntPoint ItemSize) const;
 	UFUNCTION(BlueprintCallable)
 	// Insert the item to the back-end grid to the given position if bIsItemInserted = true or delete if false
 	void InsertItemInContainer(const FIntPoint ItemSize, const FIntPoint StartSlot, bool bIsItemInserted);

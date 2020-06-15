@@ -37,6 +37,8 @@ public:
 	FIntPoint GetItemSizeInInventory();
 	UFUNCTION(BlueprintCallable)
 	FIntPoint GetItemPositionInInventory();
+	UFUNCTION(BlueprintCallable)
+	UQP_InventorySlotWidget* SetInventoryItemSize(FIntPoint ItemSize);
 
 private:
 	float BaseOpacity = 0.9f;

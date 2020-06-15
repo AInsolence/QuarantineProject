@@ -59,6 +59,12 @@ FIntPoint UQP_InventorySlotWidget::GetItemPositionInInventory()
 	return InventoryItemInfo.PositionInInventory;
 }
 
+UQP_InventorySlotWidget* UQP_InventorySlotWidget::SetInventoryItemSize(FIntPoint ItemSize)
+{
+	InventoryItemInfo.SizeInInventory = ItemSize;
+	return this;
+}
+
 // void UQP_InventorySlotWidget::NativeOnDragDetected(const FGeometry& InGeometry, 
 // 												   const FPointerEvent& InMouseEvent, 
 // 												   UDragDropOperation*& OutOperation)
