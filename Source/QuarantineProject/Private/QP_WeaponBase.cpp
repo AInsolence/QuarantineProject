@@ -56,7 +56,6 @@ void AQP_WeaponBase::Fire(FRotator MuzzleRotation)
 {
 	if (!TotalBulletsForThisWeapon && !CurrentBulletsInMagazine)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Out of bullets in weapon"))
 		return;
 	}
 	if (bIsWeaponReloading) return;
@@ -67,7 +66,6 @@ void AQP_WeaponBase::Fire(FRotator MuzzleRotation)
 		if (bCanFireAfterRate)
 		{
 			LastFireTime = FPlatformTime::Seconds();
-			//FireLoop(MuzzleRotation);
 		}
 	}
 
@@ -122,6 +120,8 @@ void AQP_WeaponBase::SpawnProjectile(FRotator MuzzleRotation)
 				World->SpawnActor<ARifleProjectile_01>(Projectile,
 					MuzzleLocation,
 					MuzzleRotation,
+					//GetActorRotation(),
+					//GetMuzzleRotation(),
 					ActorSpawnParams);
 				// spawn the projectiles shell
 				World->SpawnActor<ARifleProjectile_01>(Shell,

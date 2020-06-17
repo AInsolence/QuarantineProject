@@ -9,6 +9,12 @@ UQP_InventoryUniformGridPanel::UQP_InventoryUniformGridPanel(const FObjectInitia
 : Super(ObjectInitializer)
 {// set minimal inventory grid size
     GridSize = FIntPoint(2, 2);
+	// Set the grid slot texture
+	auto SlotTextureObj = ConstructorHelpers::FObjectFinder<UTexture2D>(TEXT("Texture2D'/Game/HUD/InventoryHUD/Slot.Slot'"));
+	if (SlotTextureObj.Object != nullptr)
+	{
+		SlotTexture = SlotTextureObj.Object;
+	}
 }
 
 void UQP_InventoryUniformGridPanel::NativeConstruct()
@@ -24,6 +30,11 @@ void UQP_InventoryUniformGridPanel::NativeConstruct()
             // create slot background image
             auto SlotImg = NewObject<UImage>(UImage::StaticClass());
             SlotImg->SetBrushSize(FVector2D(128, 128));
+			if (SlotTexture != nullptr)
+			{
+				SlotImg->SetBrushFromTexture(SlotTexture);
+			}
+			SlotImg->SetOpacity(0.4f);
             // add slot background image
             GridPanel->AddChildToUniformGrid(SlotImg, row, col);
         }
@@ -32,18 +43,15 @@ void UQP_InventoryUniformGridPanel::NativeConstruct()
 
 bool UQP_InventoryUniformGridPanel::AddItemToGrid(UQP_InventorySlotWidget* ItemWidget)
 {
-	UE_LOG(LogTemp, Warning, TEXT("INSIDE add item to grid"));
 	// check if item's class is valid
 	if (ItemWidget->InventoryItemInfo.ItemClassPtr)
 	{
 		// check if place in container exist
 		auto FreeSlot = FindFreeSlotForItem(ItemWidget->InventoryItemInfo.SizeInInventory);
-		UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot.X, FreeSlot.Y);
 		if (FreeSlot.X != -1)
 		{// set grid pointer to delete from grid after
 			ItemWidget->CurrentGridOwner = this;
 			// add item in container started from the found slot
-			UE_LOG(LogTemp, Warning, TEXT("Free slot %d, %d"), FreeSlot.X, FreeSlot.Y);
 			InsertItemInContainer(ItemWidget->InventoryItemInfo.SizeInInventory, FreeSlot, true);
 			ItemWidget->InventoryItemInfo.PositionInInventory = FreeSlot;
 			// add widget
@@ -52,6 +60,38 @@ bool UQP_InventoryUniformGridPanel::AddItemToGrid(UQP_InventorySlotWidget* ItemW
 		}
 		else
 		{
+			GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, "Not enough place in given container");
+			return false;
+		}
+	}
+	return false;
+}
+
+bool UQP_InventoryUniformGridPanel::AddItemToGrid(UQP_InventorySlotWidget* ItemWidget, 
+													const FIntPoint SlotPoint)
+{
+	// check if item's class is valid
+	if (ItemWidget->InventoryItemInfo.ItemClassPtr)
+	{
+		// check if place in container exist
+		bool bCanBePlacedInSlot = bIsItemCanBePlacedStartedFromSlot(SlotPoint, 
+												ItemWidget->InventoryItemInfo.SizeInInventory);
+		if (bCanBePlacedInSlot)
+		{// set grid pointer to delete from grid after
+			ItemWidget->CurrentGridOwner = this;
+			// add item in container started from the found slot
+			InsertItemInContainer(ItemWidget->InventoryItemInfo.SizeInInventory, SlotPoint, true);
+			ItemWidget->InventoryItemInfo.PositionInInventory = SlotPoint;
+			// add widget
+			AddWidgetToGrid(ItemWidget, SlotPoint);
+			return true;
+		}
+		else
+		{// if current slot is not empty try to find another one
+			if (AddItemToGrid(ItemWidget))
+			{
+				return true;
+			}
 			GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, "Not enough place in given container");
 			return false;
 		}
@@ -107,8 +147,11 @@ bool UQP_InventoryUniformGridPanel::bIsItemCanBePlacedStartedFromSlot(const FInt
 {
 	auto Row = FreeSlot.Y;
 	auto Column = FreeSlot.X;
-	UE_LOG(LogTemp, Warning, TEXT("Is Item can be placed here col: %d, row: %d"), Column, Row);
-	UE_LOG(LogTemp, Warning, TEXT("Is Item can be placed SIZE: %d, row: %d"), ItemSize.X, ItemSize.Y);
+	// check if the start pos + item size exceeds grid size
+	if ((Column + ItemSize.X) > GridSize.X || (Row + ItemSize.Y) > GridSize.Y)
+	{
+		return false;
+	}
 	for (int32 SizeRow = Row; SizeRow < Row + ItemSize.Y; ++SizeRow)
 	{
 		for (int32 SizeCol = Column; SizeCol < Column + ItemSize.X; ++SizeCol)
@@ -117,7 +160,6 @@ bool UQP_InventoryUniformGridPanel::bIsItemCanBePlacedStartedFromSlot(const FInt
 			{// one of slots is not available
 				return false;
 			}
-			UE_LOG(LogTemp, Warning, TEXT("Checked col: %d, row: %d"), Column, Row);
 		}
 	}
 	// after iterating by all possible slots for that size -> all slots are empty return first available slot
@@ -130,35 +172,28 @@ void UQP_InventoryUniformGridPanel::InsertItemInContainer(const FIntPoint ItemSi
 	{
 		for (int32 ItemRow = StartSlot.X; ItemRow < StartSlot.X + ItemSize.X; ++ItemRow)
 		{
-			if (bIsItemInserted)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("INSERT TO SLOT %d, %d"), ItemCol, ItemRow);
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("DELETE FROM SLOT %d, %d"), ItemCol, ItemRow);
-			}
-			
 			Grid[ItemCol][ItemRow] = bIsItemInserted;
 		}
 	}
-	// For debug
-	UE_LOG(LogTemp, Warning, TEXT("Grid after insert/remove item"));
-	for (auto row : Grid)
+}
+
+void UQP_InventoryUniformGridPanel::NativeOnDragEnter(const FGeometry& InGeometry, 
+														const FDragDropEvent& InDragDropEvent, 
+														UDragDropOperation* InOperation)
+{
+	if (GridPanel)
 	{
-		FString RowText = "";
-		for (auto col : row)
+		bIsItemDragged = true;
+		if (bIsItemDragged)
 		{
-			if (col == true)
-			{
-				RowText += " 1";
-			}
-			else
-			{
-				RowText += " 0";
-			}
+			UE_LOG(LogTemp, Warning, TEXT("Item DRAGGED!"));
 		}
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *RowText);
+		if (InOperation->Payload != nullptr)
+		{
+			auto const DraggedWidget = Cast<UQP_InventorySlotWidget>(InOperation->Payload);
+			auto Geometry = InDragDropEvent.GetGestureDelta();
+			UE_LOG(LogTemp, Warning, TEXT("Dragged widget gesture: %s"), *Geometry.ToString());
+		}
 	}
 }
 
@@ -168,20 +203,59 @@ bool UQP_InventoryUniformGridPanel::NativeOnDrop(const FGeometry& InGeometry,
 {
 	if (GridPanel)
 	{
+		bIsItemDragged = false;
 		if (InOperation->Payload != nullptr)
 		{
 			auto const DraggedWidget = Cast<UQP_InventorySlotWidget>(InOperation->Payload);
-			UE_LOG(LogTemp, Warning, TEXT("Try to drop item in Uniform BEFORE %d"), 
-													DraggedWidget->InventoryItemInfo.SizeInInventory.X);
-			// try to add item to grid
-			if (AddItemToGrid(DraggedWidget))
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Try to drop item in Uniform grid panel AFTER"));
-				return true;
-			}
+			auto DropPos = InDragDropEvent.GetLastScreenSpacePosition();
+			auto GridPanelPos = this->GetCachedGeometry().GetAbsolutePosition();
+			auto GridPanelSize = this->GetCachedGeometry().GetAbsoluteSize();
+			UE_LOG(LogTemp, Warning, TEXT("Drop widget position: %s"), *DropPos.ToString());
+
+			// find slot coordinates from grid position and size
+			int32 Col = (DropPos.X - GridPanelPos.X) / (GridPanelSize.X / GridSize.X);
+			int32 Row = (DropPos.Y - GridPanelPos.Y) / (GridPanelSize.Y / GridSize.Y);
+			UE_LOG(LogTemp, Warning, TEXT("Free slot FROM DRAG: %d, %d"), Col, Row);
+			auto DropSlot = FIntPoint(FMath::Clamp(Col, 0, GridSize.Y), 
+										FMath::Clamp(Row, 0, GridSize.X));
+			AddItemToGrid(DraggedWidget, DropSlot);
 			return false;
 		}
 		return false;
 	}
 	return false;
+}
+
+FReply UQP_InventoryUniformGridPanel::NativeOnMouseMove(const FGeometry& InGeometry, 
+														const FPointerEvent& InMouseEvent)
+{	
+	auto DropPos = InMouseEvent.GetScreenSpacePosition();
+	auto GridPanelPos = this->GetCachedGeometry().GetAbsolutePosition();
+	auto GridPanelSize = this->GetCachedGeometry().GetAbsoluteSize();
+	int32 Col = (DropPos.X - GridPanelPos.X) / (GridPanelSize.X / GridSize.X);
+	int32 Row = (DropPos.Y - GridPanelPos.Y) / (GridPanelSize.Y / GridSize.Y);
+	//
+	UE_LOG(LogTemp, Warning, TEXT("Panel size: %s"), *GridPanelSize.ToString());
+	UE_LOG(LogTemp, Warning, TEXT("Panel size: %s"), *GridSize.ToString());
+	UE_LOG(LogTemp, Warning, TEXT("POSITION FROM DRAG: %s, %s"), *DropPos.ToString(), *GridPanelPos.ToString());
+	UE_LOG(LogTemp, Warning, TEXT("Free slot FROM DRAG: %d, %d"), Col, Row);
+	//
+	auto FreeSlot = FIntPoint(FMath::Clamp(Col, 0, GridSize.Y),
+									FMath::Clamp(Row, 0, GridSize.X));
+	auto SlotImage = GetGridPanelSlotAsImage(FreeSlot);
+	//
+	return FReply::Handled();
+}
+
+UImage* UQP_InventoryUniformGridPanel::GetGridPanelSlotAsImage(FIntPoint SlotPosition)
+{
+	auto Slots = GridPanel->GetAllChildren();
+	int32 SlotIndex = SlotPosition.X + SlotPosition.Y * GridSize.X;
+	UE_LOG(LogTemp, Warning, TEXT("Slot to show: %d"), SlotIndex);
+	if (Slots[SlotIndex])
+	{
+		auto SlotImage = Cast<UImage>(Slots[SlotIndex]);
+		return SlotImage;
+	}
+	return nullptr;
 }

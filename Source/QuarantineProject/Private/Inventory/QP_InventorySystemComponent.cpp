@@ -252,7 +252,7 @@ FInventoryItemInfo UQP_InventorySystemComponent::NextWeapon(AActor* WeaponInHand
 		{
 			auto Weapon = EquipedItemsContainer.GetHead()->GetValue();
 			EquipedItemsContainer.RemoveNode(EquipedItemsContainer.GetHead());
-			UE_LOG(LogTemp, Warning, TEXT("TRY TO EQUIP: %s"), Weapon->InventoryItemInfo.ItemClassPtr)
+			//UE_LOG(LogTemp, Warning, TEXT("TRY TO EQUIP: %s"), Weapon->InventoryItemInfo.ItemClassPtr)
 			return Weapon->InventoryItemInfo;
 		}
 		return FInventoryItemInfo();

@@ -52,7 +52,7 @@ AQuarantineProjectCharacter::AQuarantineProjectCharacter()
 
 	// Create a follow camera
 	AimingCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("AimingCamera"));
-	AimingCamera->SetupAttachment(GetCapsuleComponent()); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
+	AimingCamera->SetupAttachment(GetCapsuleComponent());
 	AimingCamera->SetRelativeLocation(FVector(-50.f, 50.f, 90.f));
 	AimingCamera->bUsePawnControlRotation = true; // Camera does not rotate relative to arm
 	AimingCamera->SetFieldOfView(80.f);
@@ -85,10 +85,9 @@ void AQuarantineProjectCharacter::BeginPlay()
 	// Init weapon
 	if (WeaponInHandsClass)
 	{
-		UWorld* const World = GetWorld();
-		if (World != nullptr)
+		if (GetWorld())
 		{
-			WeaponInHands = World->SpawnActor<AQP_WeaponBase>(WeaponInHandsClass);
+			WeaponInHands = GetWorld()->SpawnActor<AQP_WeaponBase>(WeaponInHandsClass);
 		}
 	}
 
