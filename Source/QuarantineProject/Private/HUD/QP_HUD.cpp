@@ -136,20 +136,22 @@ void AQP_HUD::ShowInventory()
 	}
 }
 
-void AQP_HUD::AddSlotToWeaponGrid(UQP_InventorySlotWidget* ItemWidget) const
+bool AQP_HUD::AddSlotToWeaponGrid(UQP_InventorySlotWidget* ItemWidget) const
 {
 	if (InventoryWidget)
 	{
-		InventoryWidget->AddSlotToWeaponGrid(ItemWidget);
+		return InventoryWidget->AddSlotToWeaponGrid(ItemWidget);
 	}
+	return false;
 }
 
-void AQP_HUD::AddSlotToBackPackGrid(UQP_InventorySlotWidget* ItemWidget) const
+bool AQP_HUD::AddSlotToBackPackGrid(UQP_InventorySlotWidget* ItemWidget) const
 {
 	if (InventoryWidget)
 	{
-		InventoryWidget->AddSlotToBackPackGrid(ItemWidget);
+		return InventoryWidget->AddSlotToBackPackGrid(ItemWidget);
 	}
+	return false;
 }
 
 void AQP_HUD::Exit()

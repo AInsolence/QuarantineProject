@@ -227,12 +227,19 @@ bool UQP_InventoryUniformGridPanel::NativeOnDrop(const FGeometry& InGeometry,
 			int32 Row = (DropPos.Y - GridPanelPos.Y) / (GridPanelSize.Y / GridSize.Y);
 			auto DropSlot = FIntPoint(Col, Row);
 
-			AddItemToGrid(DraggedWidget, DropSlot);
-			return false;
+			if (AddItemToGrid(DraggedWidget, DropSlot))
+			{
+				return true;
+			}
+			else
+			{//return to the parent grid if drop operation was not successful
+				DraggedWidget->CurrentGridOwner->AddItemToGrid(DraggedWidget);
+				return false;
+			}
 		}
-		return false;
+		return true;
 	}
-	return false;
+	return true;
 }
 
 FReply UQP_InventoryUniformGridPanel::NativeOnMouseMove(const FGeometry& InGeometry, 

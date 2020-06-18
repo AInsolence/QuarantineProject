@@ -101,14 +101,12 @@ bool UQP_InventorySystemComponent::AddItemToInventoryContainer(TStaticArray<TSta
 					if (row == 2)
 					{
 						UE_LOG(LogTemp, Warning, TEXT("Add to equipment"));
-						Cast<AQP_HUD>(HUD)->AddSlotToWeaponGrid(ItemWidget);
-						return true;
+						return Cast<AQP_HUD>(HUD)->AddSlotToWeaponGrid(ItemWidget);
 					}
 					else
 					{
 						UE_LOG(LogTemp, Warning, TEXT("Add to inventory"));
-						Cast<AQP_HUD>(HUD)->AddSlotToBackPackGrid(ItemWidget);
-						return true;
+						return Cast<AQP_HUD>(HUD)->AddSlotToBackPackGrid(ItemWidget);
 					}
 				}
 				return false;
