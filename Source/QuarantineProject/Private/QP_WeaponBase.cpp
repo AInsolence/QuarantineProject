@@ -111,6 +111,8 @@ void AQP_WeaponBase::SpawnProjectile(FRotator MuzzleRotation)
 			if (WeaponMesh)
 			{
 				FVector MuzzleLocation = WeaponMesh->GetSocketLocation("Muzzle");
+				auto CameraRotation = UGameplayStatics::GetPlayerCameraManager(this, 0)->
+												GetActorForwardVector().ToOrientationRotator();
 				// Broadcast OnFireEvent
 				OnFireEvent.Broadcast();
 				//Set Spawn Collision Handling Override
@@ -119,9 +121,8 @@ void AQP_WeaponBase::SpawnProjectile(FRotator MuzzleRotation)
 				// spawn the projectile at the place
 				World->SpawnActor<ARifleProjectile_01>(Projectile,
 					MuzzleLocation,
-					MuzzleRotation,
-					//GetActorRotation(),
-					//GetMuzzleRotation(),
+					CameraRotation,
+					//MuzzleRotation,
 					ActorSpawnParams);
 				// spawn the projectiles shell
 				World->SpawnActor<ARifleProjectile_01>(Shell,

@@ -8,12 +8,18 @@
 UQP_InventoryUniformGridPanel::UQP_InventoryUniformGridPanel(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer)
 {// set minimal inventory grid size
-    GridSize = FIntPoint(2, 2);
+    GridSize = FIntPoint(1, 1);
 	// Set the grid slot texture
 	auto SlotTextureObj = ConstructorHelpers::FObjectFinder<UTexture2D>(TEXT("Texture2D'/Game/HUD/InventoryHUD/Slot.Slot'"));
 	if (SlotTextureObj.Object != nullptr)
 	{
 		SlotTexture = SlotTextureObj.Object;
+	}
+	// Set initial equip sound
+	auto EquipSoundAsset = ConstructorHelpers::FObjectFinder<USoundBase>(TEXT("SoundWave'/Game/Sound/item-equip__1_.item-equip__1_'"));
+	if (EquipSoundAsset.Object != nullptr)
+	{
+		EquipSound = EquipSoundAsset.Object;
 	}
 }
 
@@ -114,6 +120,11 @@ void UQP_InventoryUniformGridPanel::AddWidgetToGrid(UQP_InventorySlotWidget* Ite
             const int32 column = SlotPoint.X;
             const int32 row = SlotPoint.Y;
             auto InsertedItem = GridPanel->AddChildToUniformGrid(Content, row, column);
+			// try and play the equip sound if specified
+			if (EquipSound != NULL)
+			{
+				UGameplayStatics::PlaySound2D(this, EquipSound);
+			}
         }
     }
 }
@@ -207,17 +218,15 @@ bool UQP_InventoryUniformGridPanel::NativeOnDrop(const FGeometry& InGeometry,
 		if (InOperation->Payload != nullptr)
 		{
 			auto const DraggedWidget = Cast<UQP_InventorySlotWidget>(InOperation->Payload);
+			// find values to calculate drop position
 			auto DropPos = InDragDropEvent.GetLastScreenSpacePosition();
 			auto GridPanelPos = this->GetCachedGeometry().GetAbsolutePosition();
 			auto GridPanelSize = this->GetCachedGeometry().GetAbsoluteSize();
-			UE_LOG(LogTemp, Warning, TEXT("Drop widget position: %s"), *DropPos.ToString());
-
 			// find slot coordinates from grid position and size
 			int32 Col = (DropPos.X - GridPanelPos.X) / (GridPanelSize.X / GridSize.X);
 			int32 Row = (DropPos.Y - GridPanelPos.Y) / (GridPanelSize.Y / GridSize.Y);
-			UE_LOG(LogTemp, Warning, TEXT("Free slot FROM DRAG: %d, %d"), Col, Row);
-			auto DropSlot = FIntPoint(FMath::Clamp(Col, 0, GridSize.Y), 
-										FMath::Clamp(Row, 0, GridSize.X));
+			auto DropSlot = FIntPoint(Col, Row);
+
 			AddItemToGrid(DraggedWidget, DropSlot);
 			return false;
 		}
@@ -240,8 +249,7 @@ FReply UQP_InventoryUniformGridPanel::NativeOnMouseMove(const FGeometry& InGeome
 	UE_LOG(LogTemp, Warning, TEXT("POSITION FROM DRAG: %s, %s"), *DropPos.ToString(), *GridPanelPos.ToString());
 	UE_LOG(LogTemp, Warning, TEXT("Free slot FROM DRAG: %d, %d"), Col, Row);
 	//
-	auto FreeSlot = FIntPoint(FMath::Clamp(Col, 0, GridSize.Y),
-									FMath::Clamp(Row, 0, GridSize.X));
+	auto FreeSlot = FIntPoint(Col, Row);
 	auto SlotImage = GetGridPanelSlotAsImage(FreeSlot);
 	//
 	return FReply::Handled();
@@ -250,7 +258,10 @@ FReply UQP_InventoryUniformGridPanel::NativeOnMouseMove(const FGeometry& InGeome
 UImage* UQP_InventoryUniformGridPanel::GetGridPanelSlotAsImage(FIntPoint SlotPosition)
 {
 	auto Slots = GridPanel->GetAllChildren();
-	int32 SlotIndex = SlotPosition.X + SlotPosition.Y * GridSize.X;
+	int32 SlotIndex = SlotPosition.X + (SlotPosition.Y * GridSize.X);
+	UE_LOG(LogTemp, Warning, TEXT("SlotPosition.X: %d"), SlotPosition.X);
+	UE_LOG(LogTemp, Warning, TEXT("Slot to show: %d"), SlotPosition.Y);
+	UE_LOG(LogTemp, Warning, TEXT("GridSize.X: %d"), GridSize.X);
 	UE_LOG(LogTemp, Warning, TEXT("Slot to show: %d"), SlotIndex);
 	if (Slots[SlotIndex])
 	{

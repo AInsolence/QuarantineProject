@@ -51,8 +51,10 @@ class QUARANTINEPROJECT_API UQP_InventoryUniformGridPanel : public UUserWidget
 	void InsertItemInContainer(const FIntPoint ItemSize, const FIntPoint StartSlot, bool bIsItemInserted);
 
 private:
-	UPROPERTY(EditAnywhere, Category = "Texture")
+	UPROPERTY(EditAnywhere, Category = "Settings")
 	UTexture2D* SlotTexture;
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	class USoundBase* EquipSound = nullptr;
 
 	bool bIsItemDragged = false;
 	UImage* GetGridPanelSlotAsImage(FIntPoint SlotPosition);
