@@ -41,6 +41,9 @@ public:
     UQP_PauseGameWidget* PauseGameWidget;
     UQP_InventoryWidget* InventoryWidget;
 
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	class USoundBase* OpenInventorySound = nullptr;
+
     /// *** API *** ///
     UFUNCTION()
     void SetCrosshairVisibility(bool bIsCrosshairVisible);

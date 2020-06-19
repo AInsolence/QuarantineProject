@@ -10,7 +10,11 @@
 UQP_InventorySlotWidget::UQP_InventorySlotWidget(const FObjectInitializer& ObjectInitializer) 
 	: Super(ObjectInitializer)
 {
-
+	auto PickUpSoundAsset = ConstructorHelpers::FObjectFinder<USoundBase>(TEXT("SoundWave'/Game/Sound/pickup.pickup'"));
+	if (PickUpSoundAsset.Object != nullptr)
+	{
+		PickUpSound = PickUpSoundAsset.Object;
+	}
 }
 
 void UQP_InventorySlotWidget::NativeConstruct()
@@ -46,6 +50,10 @@ FReply UQP_InventorySlotWidget::NativeOnMouseButtonDown(const FGeometry& InGeome
 	UE_LOG(LogTemp, Warning, TEXT("Inside NativeOnMouseDown"))
 	auto Reply = UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent,
 											this, FKey("LeftMouseButton"));
+	if (PickUpSound != NULL)
+	{
+		UGameplayStatics::PlaySound2D(this, PickUpSound);
+	}
 	return Reply.NativeReply;
 }
 

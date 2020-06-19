@@ -11,7 +11,11 @@
 AQP_HUD::AQP_HUD(const FObjectInitializer& ObjectInitializer) 
 	: Super(ObjectInitializer)
 {
-	
+	auto OpenInventorySoundAsset = ConstructorHelpers::FObjectFinder<USoundBase>(TEXT("SoundWave'/Game/Sound/open_inventory.open_inventory'"));
+	if (OpenInventorySoundAsset.Object != nullptr)
+	{
+		OpenInventorySound = OpenInventorySoundAsset.Object;
+	}
 }
 
 void AQP_HUD::BeginPlay()
@@ -123,12 +127,20 @@ void AQP_HUD::ShowInventory()
 	{
 		if (InventoryWidget->GetVisibility() == ESlateVisibility::Hidden)
 		{
+			if (OpenInventorySound != NULL)
+			{
+				UGameplayStatics::PlaySound2D(this, OpenInventorySound);
+			}
 			InventoryWidget->SetVisibility(ESlateVisibility::Visible);
 			GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameAndUI());
 			GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
 		}
 		else
 		{
+			if (OpenInventorySound != NULL)
+			{
+				UGameplayStatics::PlaySound2D(this, OpenInventorySound);
+			}
 			InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
 			GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
 			GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;

@@ -39,6 +39,8 @@ public:
 	FIntPoint GetItemPositionInInventory();
 	UFUNCTION(BlueprintCallable)
 	UQP_InventorySlotWidget* SetInventoryItemSize(FIntPoint ItemSize);
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	class USoundBase* PickUpSound = nullptr;
 
 private:
 	float BaseOpacity = 0.9f;
