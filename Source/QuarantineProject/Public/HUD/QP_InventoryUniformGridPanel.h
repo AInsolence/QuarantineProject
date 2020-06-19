@@ -12,6 +12,9 @@
 /**
  * 
  */
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInventoryGridChanged);
+
 UCLASS()
 class QUARANTINEPROJECT_API UQP_InventoryUniformGridPanel : public UUserWidget
 {
@@ -49,6 +52,12 @@ class QUARANTINEPROJECT_API UQP_InventoryUniformGridPanel : public UUserWidget
 	UFUNCTION(BlueprintCallable)
 	// Insert the item to the back-end grid to the given position if bIsItemInserted = true or delete if false
 	void InsertItemInContainer(const FIntPoint ItemSize, const FIntPoint StartSlot, bool bIsItemInserted);
+	UFUNCTION()
+	TArray<UQP_InventorySlotWidget*> GetItems();
+	UFUNCTION(BlueprintCallable)
+	void ItemWasRemoved();
+	//
+	FInventoryGridChanged OnInventoryGridChanged;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Settings")

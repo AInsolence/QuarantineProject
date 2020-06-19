@@ -7,6 +7,8 @@
 #include "GameFramework/Controller.h"
 #include "DrawDebugHelpers.h"
 #include "QuarantineProject/Public/HUD/QP_HUD.h"
+#include "QuarantineProject/Public/HUD/QP_InventoryUniformGridPanel.h"
+#include "QuarantineProject/Public/HUD/QP_InventoryWidget.h"
 
 // Sets default values for this component's properties
 UQP_InventorySystemComponent::UQP_InventorySystemComponent()
@@ -20,22 +22,6 @@ UQP_InventorySystemComponent::UQP_InventorySystemComponent()
 	AmmunitionTypeArray.Add(EPickableItemType::Rifle);
 	AmmunitionTypeArray.Add(EPickableItemType::LongWeapon);
 	AmmunitionTypeArray.Add(EPickableItemType::Grenade);
-	// fill HUD representation array with empty slots
-	for (auto row : InventoryHUDRepresentation)
-	{
-		for (auto col : row)
-		{
-			col = false;
-		}
-	}
-
-	for (auto row : EquipedItemsHUDRepresentation)
-	{
-		for (auto col : row)
-		{
-			col = false;
-		}
-	}	
 }
 
 
@@ -49,6 +35,23 @@ void UQP_InventorySystemComponent::BeginPlay()
 	{
 		Owner = Cast<APawn>(GetOwner());
 	}
+	// bind inventory weapon grid change delegate
+	if (Owner)
+	{
+		auto Controller = Owner->GetController();
+		if (Controller)
+		{
+			auto HUD = Cast<APlayerController>(Controller)->GetHUD();
+			if (HUD)
+			{
+				 auto WeaponGridPanel = Cast<AQP_HUD>(HUD)->InventoryWidget->WeaponGridPanel;
+				 if (WeaponGridPanel)
+				 {
+					WeaponGridPanel->OnInventoryGridChanged.AddDynamic(this, &UQP_InventorySystemComponent::UpdateEquipedItems);
+				 }
+			}
+		}
+	}	
 }
 
 // Called every frame
@@ -140,96 +143,70 @@ void UQP_InventorySystemComponent::PickUpItem()
 
 void UQP_InventorySystemComponent::DropItem()
 {
-	ThrowItemFromInventory();
+	//ThrowItemFromInventory();
 }
+
 
 bool UQP_InventorySystemComponent::AddItemToInventory(UQP_InventorySlotWidget* ItemWidget)
 {
-	if (!ItemWidget)
+	if (Owner)
 	{
-		return false;
-	}
-	// check if item's class is valid
-	if (ItemWidget->InventoryItemInfo.ItemClassPtr)
-	{// equip if it is a weapon
-		if (AmmunitionTypeArray.Contains(ItemWidget->InventoryItemInfo.ItemType))
-		{// try to equip
-			if (EquipItem(ItemWidget))
-			{
-				GEngine->AddOnScreenDebugMessage(7, 2.f, FColor::Red, "I find weapon and equip");
-				return true;
-			}
-			// try to add to inventory if is not enough place in equipment
-			if (AddItemToInventoryContainer<10, 10>(InventoryHUDRepresentation, ItemWidget))
-			{
-				InventoryContainer.Add(ItemWidget);
-				GEngine->AddOnScreenDebugMessage(7, 2.f, FColor::Red, "I find weapon and add to inventory");
-				return true;
-			}
-			return false;
-		}
-		else
-		{// just add to inventory if it is not a weapon
-			if (AddItemToInventoryContainer<10, 10>(InventoryHUDRepresentation, ItemWidget))
-			{
-				InventoryContainer.Add(ItemWidget);
-				GEngine->AddOnScreenDebugMessage(7, 2.f, FColor::Red, "I find smth and add to inventory");
-				return true;
-			}
-			return false;
-		}
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, "I cannot add it to inventory");
-		return false;
-	}
-}
-
-bool UQP_InventorySystemComponent::EquipItem(UQP_InventorySlotWidget* ItemWidget)
-{
-	if (AddItemToInventoryContainer<12, 2>(EquipedItemsHUDRepresentation,ItemWidget))
-	{
-		EquipedItemsContainer.AddTail(ItemWidget);
-		return true;
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, "I cannot equip it");
-		return false;
-	}
-}
-
-bool UQP_InventorySystemComponent::ThrowItemFromInventory()
-{
-	if (World)
-	{
-		// Set spawn parameters
-		FVector ViewLocation;
-		FRotator ViewRotation;
-		Owner->GetController()->GetPlayerViewPoint(ViewLocation, ViewRotation);
-		FVector SpawnLocation = ViewLocation + (ViewRotation.Vector() * 400);
-		//Set spawn collision handling
-		FActorSpawnParameters ActorSpawnParams;
-		ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-		if (InventoryContainer.Num() >= 1)
-		{// try to throw(spawn) item in the world
-			if (World->SpawnActor<AActor>(InventoryContainer.Pop()->InventoryItemInfo.ItemClassPtr,
-				SpawnLocation,
-				FRotator(0, 0, 0),
-				ActorSpawnParams))
-			{
-				return true;
-			}
-			return false;
-		}
-		else
+		auto Controller = Owner->GetController();
+		if (Controller)
 		{
-			GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Red, "Inventory empty");
+			auto HUD = Cast<APlayerController>(Controller)->GetHUD();
+			if (HUD)
+			{
+				if (ItemWidget)
+				{// add item widget to HUD, in appropriate grid
+					if (AmmunitionTypeArray.Contains(ItemWidget->InventoryItemInfo.ItemType))
+					{// if weapon -> add to weapon grid
+						UE_LOG(LogTemp, Warning, TEXT("Add to equipment"));
+						if (Cast<AQP_HUD>(HUD)->AddSlotToWeaponGrid(ItemWidget))
+						{
+							UpdateEquipedItems();
+							return true;
+						}
+						else
+						{
+							return false;
+						}
+					}
+					else
+					{
+						UE_LOG(LogTemp, Warning, TEXT("Add to inventory"));
+						return Cast<AQP_HUD>(HUD)->AddSlotToBackPackGrid(ItemWidget);
+					}
+				}
+				return false;
+			}
 			return false;
 		}
+		return false;
 	}
 	return false;
+}
+
+void UQP_InventorySystemComponent::UpdateEquipedItems()
+{
+	if (Owner)
+	{
+		auto Controller = Owner->GetController();
+		if (Controller)
+		{
+			auto HUD = Cast<APlayerController>(Controller)->GetHUD();
+			if (HUD)
+			{
+				auto WeaponItems = Cast<AQP_HUD>(HUD)->GetWeaponGridItems();
+				EquipedItemsContainer.Empty();
+				for (auto Weapon : WeaponItems)
+				{
+					EquipedItemsContainer.AddTail(Weapon);
+					UE_LOG(LogTemp, Warning, TEXT("Item in GRID: %s"), *Weapon->GetClass()->GetName());
+				}
+			}
+		}
+	}
 }
 
 FInventoryItemInfo UQP_InventorySystemComponent::NextWeapon(AActor* WeaponInHand)

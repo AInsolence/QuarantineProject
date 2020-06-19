@@ -35,3 +35,8 @@ bool UQP_InventoryWidget::AddSlotToBackPackGrid(UQP_InventorySlotWidget* ItemWid
 {
 	return BackPackGridPanel->AddItemToGrid(ItemWidget);
 }
+
+TArray<UQP_InventorySlotWidget*> UQP_InventoryWidget::GetWeaponGridItems() const
+{
+	return WeaponGridPanel->GetItems();
+}

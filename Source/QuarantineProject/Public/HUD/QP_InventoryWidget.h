@@ -29,4 +29,5 @@ public:
 
 	bool AddSlotToWeaponGrid(UQP_InventorySlotWidget* ItemWidget) const;
 	bool AddSlotToBackPackGrid(UQP_InventorySlotWidget* ItemWidget) const;
+	TArray<UQP_InventorySlotWidget*> GetWeaponGridItems() const;
 };

@@ -148,6 +148,11 @@ void AQP_HUD::ShowInventory()
 	}
 }
 
+TArray<UQP_InventorySlotWidget*> AQP_HUD::GetWeaponGridItems()
+{
+	return InventoryWidget->GetWeaponGridItems();
+}
+
 bool AQP_HUD::AddSlotToWeaponGrid(UQP_InventorySlotWidget* ItemWidget) const
 {
 	if (InventoryWidget)

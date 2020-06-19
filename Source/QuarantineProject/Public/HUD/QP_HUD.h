@@ -56,6 +56,8 @@ public:
     UFUNCTION()
     void ShowInventory();
     UFUNCTION()
+    TArray<UQP_InventorySlotWidget*> GetWeaponGridItems();
+    UFUNCTION()
 	bool AddSlotToWeaponGrid(UQP_InventorySlotWidget* ItemWidget) const;
     UFUNCTION()
 	bool AddSlotToBackPackGrid(UQP_InventorySlotWidget* ItemWidget) const;

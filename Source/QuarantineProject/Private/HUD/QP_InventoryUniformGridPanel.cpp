@@ -120,6 +120,8 @@ void UQP_InventoryUniformGridPanel::AddWidgetToGrid(UQP_InventorySlotWidget* Ite
             const int32 column = SlotPoint.X;
             const int32 row = SlotPoint.Y;
             auto InsertedItem = GridPanel->AddChildToUniformGrid(Content, row, column);
+			//
+			OnInventoryGridChanged.Broadcast();
 			// try and play the equip sound if specified
 			if (EquipSound != NULL)
 			{
@@ -186,6 +188,26 @@ void UQP_InventoryUniformGridPanel::InsertItemInContainer(const FIntPoint ItemSi
 			Grid[ItemCol][ItemRow] = bIsItemInserted;
 		}
 	}
+}
+
+TArray<UQP_InventorySlotWidget*> UQP_InventoryUniformGridPanel::GetItems()
+{
+	TArray<UQP_InventorySlotWidget*> Result;
+	auto Slots = GridPanel->GetAllChildren();
+	for (auto slot : Slots)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Item in GRID: %s"), *slot->StaticClass()->GetName());
+		if (Cast<UQP_InventorySlotWidget>(slot))
+		{
+			Result.Add(Cast<UQP_InventorySlotWidget>(slot));
+		}
+	}
+	return Result;
+}
+
+void UQP_InventoryUniformGridPanel::ItemWasRemoved()
+{
+	OnInventoryGridChanged.Broadcast();
 }
 
 void UQP_InventoryUniformGridPanel::NativeOnDragEnter(const FGeometry& InGeometry, 

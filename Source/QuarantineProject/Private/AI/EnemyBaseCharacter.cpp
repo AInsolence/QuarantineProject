@@ -294,6 +294,8 @@ void AEnemyBaseCharacter::OnTakeDamage(AActor* DamagedActor,
 				CurrentController->UnPossess();
 				// destroy the controller, since it's not part of the enemy anymore
 				CurrentController->Destroy();
+				// Weapon can be picked up
+				WeaponInHands->SetMeshCollision(ECollisionResponse::ECR_Block);
 			}
 		}
 		// *** DEATH END *** //
