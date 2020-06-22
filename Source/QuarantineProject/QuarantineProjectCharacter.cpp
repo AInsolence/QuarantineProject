@@ -90,21 +90,7 @@ void AQuarantineProjectCharacter::BeginPlay()
 			WeaponInHands = GetWorld()->SpawnActor<AQP_WeaponBase>(WeaponInHandsClass);
 		}
 	}
-
-	if (WeaponInHands)
-	{
-		// Create weapon in character hands
-		FVector InHandLocation = GetMesh()->GetSocketLocation(FName("RightHandWeaponSocket"));
-		WeaponInHands->AttachToComponent(GetMesh(),
-										FAttachmentTransformRules::SnapToTargetNotIncludingScale,
-										FName("RightHandWeaponSocket"));
-		// Describe to reloading event
-		WeaponInHands->OnReloading.AddDynamic(this, &AQuarantineProjectCharacter::ShowReloadAnimation);
-		// Describe to fire event
-		WeaponInHands->OnFireEvent.AddDynamic(this, &AQuarantineProjectCharacter::ShowFireAnimation);
-
-	}
-
+	InitWeaponSettings();
 }
 
 void AQuarantineProjectCharacter::Tick(float DeltaTime)
@@ -204,40 +190,46 @@ AQP_HUD* AQuarantineProjectCharacter::GetPlayerHUD() const
 	return nullptr;
 }
 
-void AQuarantineProjectCharacter::ChangeWeapon(FInventoryItemInfo WeaponInfo)
+void AQuarantineProjectCharacter::ChangeWeapon(UQP_InventorySlotWidget* WeaponInfo)
 {
+	if (WeaponInfo == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No CLASS TO SPAWN"))
+		return;
+	}
 	if(GetWorld())
 	{
-		if (WeaponInfo.ItemClassPtr)
+		if (WeaponInfo->InventoryItemInfo.ItemClassPtr)
 		{
-			if (WeaponInHands)
+			if (WeaponInHands != nullptr)
 			{
 				WeaponInHands->Destroy();
 			}
-			WeaponInHands = GetWorld()->SpawnActor<AQP_WeaponBase>(WeaponInfo.ItemClassPtr);
+			WeaponInHands = GetWorld()->SpawnActor<AQP_WeaponBase>(WeaponInfo->InventoryItemInfo.ItemClassPtr);
 		}
 		else
 		{
 			UE_LOG(LogTemp, Warning, TEXT("No CLASS TO SPAWN"))
 		}
 	}
-	// when created
-	if (WeaponInHands)
+	InitWeaponSettings();
+}
+
+void AQuarantineProjectCharacter::InitWeaponSettings()
+{
+	if (WeaponInHands != nullptr)
 	{
 		// Set weapon location as character hands
 		FVector InHandLocation = GetMesh()->GetSocketLocation(FName("RightHandWeaponSocket"));
 		WeaponInHands->AttachToComponent(GetMesh(),
-										FAttachmentTransformRules::SnapToTargetNotIncludingScale,
-										FName("RightHandWeaponSocket"));
+			FAttachmentTransformRules::SnapToTargetNotIncludingScale,
+			FName("RightHandWeaponSocket"));
 		// Describe to reloading event
 		WeaponInHands->OnReloading.AddDynamic(this, &AQuarantineProjectCharacter::ShowReloadAnimation);
 		// Describe to fire event
 		WeaponInHands->OnFireEvent.AddDynamic(this, &AQuarantineProjectCharacter::ShowFireAnimation);
 		// set appropriate collision settings to avoid collision with player
-		if (WeaponInHands)
-		{
-			WeaponInHands->SetMeshCollision(ECollisionResponse::ECR_Overlap);
-		}
+		WeaponInHands->SetMeshCollision(ECollisionResponse::ECR_Overlap);
 		// set aiming camera field of view depends on weapon
 		AimingCamera->FieldOfView = WeaponInHands->GetAimingFieldOfView();
 	}
@@ -265,10 +257,7 @@ void AQuarantineProjectCharacter::NextWeapon()
 {
 	if (InventorySystemComponent)
 	{
-		if (WeaponInHands)
-		{
-			ChangeWeapon(InventorySystemComponent->NextWeapon(WeaponInHands));
-		}
+		ChangeWeapon(InventorySystemComponent->NextWeapon());
 	}
 }
 
@@ -276,10 +265,7 @@ void AQuarantineProjectCharacter::PreviousWeapon()
 {
 	if (InventorySystemComponent)
 	{
-		if (WeaponInHands)
-		{
-			ChangeWeapon(InventorySystemComponent->PreviousWeapon(WeaponInHands));
-		}
+		ChangeWeapon(InventorySystemComponent->PreviousWeapon());
 	}
 }
 

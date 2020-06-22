@@ -201,7 +201,7 @@ void UQP_InventorySystemComponent::UpdateEquipedItems()
 				EquipedItemsContainer.Empty();
 				for (auto Weapon : WeaponItems)
 				{
-					EquipedItemsContainer.AddTail(Weapon);
+					EquipedItemsContainer.Push(Weapon);
 					UE_LOG(LogTemp, Warning, TEXT("Item in GRID: %s"), *Weapon->GetClass()->GetName());
 				}
 			}
@@ -209,57 +209,52 @@ void UQP_InventorySystemComponent::UpdateEquipedItems()
 	}
 }
 
-FInventoryItemInfo UQP_InventorySystemComponent::NextWeapon(AActor* WeaponInHand)
+UQP_InventorySlotWidget* UQP_InventorySystemComponent::NextWeapon()
 {
 	// check if any weapons equipped
-	if (EquipedItemsContainer.Num() <= 0) return FInventoryItemInfo();
-	// return first element and add WeaponInHand to equipment
-	if (WeaponInHand)
+	if (EquipedItemsContainer.Num() <= 0) return nullptr;
+	// check active weapon
+	if (!ActiveWeapon || !EquipedItemsContainer.Contains(ActiveWeapon))
+	{// if active weapon not exist or has been deleted from weapon grid
+		ActiveWeapon = EquipedItemsContainer[0];
+	}
+	else
 	{
-		auto PickableComp = WeaponInHand->FindComponentByClass<UQP_PickableComponent>();
-		if (PickableComp)
-		{// move weapon from hands to equipment
-			EquipedItemsContainer.AddTail(PickableComp->InventoryItemWidget);
+		int32 CurrentItemIndex = EquipedItemsContainer.IndexOfByKey(ActiveWeapon);
+		if (CurrentItemIndex == EquipedItemsContainer.Num() - 1)
+		{
+			ActiveWeapon = EquipedItemsContainer[0];
+		}
+		else
+		{
+			ActiveWeapon = EquipedItemsContainer[CurrentItemIndex + 1];
 		}
 	}
 	// get new weapon from equipment
-	if (EquipedItemsContainer.GetHead())
-	{
-		if (EquipedItemsContainer.GetHead()->GetValue())
-		{
-			auto Weapon = EquipedItemsContainer.GetHead()->GetValue();
-			EquipedItemsContainer.RemoveNode(EquipedItemsContainer.GetHead());
-			//UE_LOG(LogTemp, Warning, TEXT("TRY TO EQUIP: %s"), Weapon->InventoryItemInfo.ItemClassPtr)
-			return Weapon->InventoryItemInfo;
-		}
-		return FInventoryItemInfo();
-	}
-	return FInventoryItemInfo();
+	return ActiveWeapon;
 }
 
-FInventoryItemInfo UQP_InventorySystemComponent::PreviousWeapon(AActor* WeaponInHand)
+UQP_InventorySlotWidget* UQP_InventorySystemComponent::PreviousWeapon()
 {
 	// check if any weapons equipped
-	if (EquipedItemsContainer.Num() <= 0) return FInventoryItemInfo();
-	// return first element and add WeaponInHand to equipment
-	if (WeaponInHand)
+	if (EquipedItemsContainer.Num() <= 0) return nullptr;
+	// check active weapon
+	if (!ActiveWeapon || !EquipedItemsContainer.Contains(ActiveWeapon))
+	{// if active weapon not exist or has been deleted from weapon grid
+		ActiveWeapon = EquipedItemsContainer[0];
+	}
+	else
 	{
-		auto PickableComp = WeaponInHand->FindComponentByClass<UQP_PickableComponent>();
-		if (PickableComp)
-		{// move weapon from hands to equipment
-			EquipedItemsContainer.AddHead(PickableComp->InventoryItemWidget);
+		int32 CurrentItemIndex = EquipedItemsContainer.IndexOfByKey(ActiveWeapon);
+		if (CurrentItemIndex == 0)
+		{
+			ActiveWeapon = EquipedItemsContainer.Last();
+		}
+		else
+		{
+			ActiveWeapon = EquipedItemsContainer[CurrentItemIndex - 1];
 		}
 	}
 	// get new weapon from equipment
-	if (EquipedItemsContainer.GetHead())
-	{
-		if (EquipedItemsContainer.GetHead()->GetValue())
-		{
-			auto Weapon = EquipedItemsContainer.GetTail()->GetValue();
-			EquipedItemsContainer.RemoveNode(EquipedItemsContainer.GetTail());
-			return Weapon->InventoryItemInfo;
-		}
-		return FInventoryItemInfo();
-	}
-	return FInventoryItemInfo();
+	return ActiveWeapon;
 }

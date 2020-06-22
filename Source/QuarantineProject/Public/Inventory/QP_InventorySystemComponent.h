@@ -31,7 +31,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	//UPROPERTY(EditAnywhere, Category = "Inventory")
-	TDoubleLinkedList<UQP_InventorySlotWidget*> EquipedItemsContainer;
+	TArray<UQP_InventorySlotWidget*> EquipedItemsContainer;
 
 	UFUNCTION()
 	bool AddItemToInventory(UQP_InventorySlotWidget* ItemWidget);
@@ -58,10 +58,12 @@ public:
 	UFUNCTION()
 	void DropItem();
 	UFUNCTION()
-	FInventoryItemInfo NextWeapon(AActor* WeaponInHand);
+	UQP_InventorySlotWidget* NextWeapon();
 	UFUNCTION()
-	FInventoryItemInfo PreviousWeapon(AActor* WeaponInHand);
+	UQP_InventorySlotWidget* PreviousWeapon();
 
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	TArray<EPickableItemType> AmmunitionTypeArray;
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	UQP_InventorySlotWidget* ActiveWeapon;
 };

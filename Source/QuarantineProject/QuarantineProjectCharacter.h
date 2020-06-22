@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "QuarantineProject/Public/Inventory/QP_InventoryItem.h"
+#include "QuarantineProject/Public/HUD/QP_InventorySlotWidget.h"
 #include "QuarantineProjectCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameOverByPlayersDeath);
@@ -58,7 +58,9 @@ protected:
 
 
 	class AQP_HUD* GetPlayerHUD() const;
-	void ChangeWeapon(FInventoryItemInfo WeaponInfo);
+	void ChangeWeapon(UQP_InventorySlotWidget* WeaponInfo);
+
+	void InitWeaponSettings();
 
 public:
 	/** Inventory system component */
@@ -152,4 +154,3 @@ public:
 	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
 	FGameOverByPlayersDeath OnGameOverByPlayersDeath;
 };
-
