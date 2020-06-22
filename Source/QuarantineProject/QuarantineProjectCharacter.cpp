@@ -237,6 +237,11 @@ void AQuarantineProjectCharacter::InitWeaponSettings()
 		WeaponInHands->SetMeshCollision(ECollisionResponse::ECR_Overlap);
 		// set aiming camera field of view depends on weapon
 		AimingCamera->FieldOfView = WeaponInHands->GetAimingFieldOfView();
+		// disable aiming for new weapon if it exists
+		if (bIsAiming)
+		{
+			AimToTarget();
+		}
 	}
 }
 
