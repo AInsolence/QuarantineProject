@@ -71,6 +71,11 @@ void AQuarantineProjectCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	/*AimingCamera->AttachToComponent(GetMesh(),
+		FAttachmentTransformRules::SnapToTargetNotIncludingScale,
+		FName("headSocket"));*/
+	//AimingCamera->SetupAttachment(GetCapsuleComponent());
+	//AimingCamera->SetRelativeLocation(FVector(-50.f, 50.f, 90.f));
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = true; // allow to move camera up and down TRUE
@@ -363,6 +368,11 @@ void AQuarantineProjectCharacter::SprintStart()
 void AQuarantineProjectCharacter::SprintEnd()
 {
 	bIsSprinting = false;
+}
+
+void AQuarantineProjectCharacter::HideWeapon()
+{
+	WeaponInHands->Destroy();
 }
 
 void AQuarantineProjectCharacter::AimToTarget()

@@ -123,6 +123,7 @@ void AQP_WeaponBase::SpawnProjectile(FRotator MuzzleRotation)
 					MuzzleLocation,
 					//CameraRotation,
 					MuzzleRotation,
+					//GetMuzzleRotation(),
 					ActorSpawnParams);
 				// spawn the projectiles shell
 				World->SpawnActor<ARifleProjectile_01>(Shell,

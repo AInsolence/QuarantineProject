@@ -125,6 +125,7 @@ public:
 	void SprintStart();
 	void SprintEnd();
 	/** Aiming */
+	void HideWeapon();
 	void AimToTarget();
 	/** Firing */
 	void OnFire();

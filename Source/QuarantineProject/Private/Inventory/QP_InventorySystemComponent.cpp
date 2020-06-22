@@ -9,6 +9,7 @@
 #include "QuarantineProject/Public/HUD/QP_HUD.h"
 #include "QuarantineProject/Public/HUD/QP_InventoryUniformGridPanel.h"
 #include "QuarantineProject/Public/HUD/QP_InventoryWidget.h"
+#include "QuarantineProject/QuarantineProjectCharacter.h"
 
 // Sets default values for this component's properties
 UQP_InventorySystemComponent::UQP_InventorySystemComponent()
@@ -77,9 +78,20 @@ AActor* UQP_InventorySystemComponent::RaycastToFindPickableItem()
 		// hit
 		FHitResult HitResult;
 		bool bHasHitSmth = GetWorld()->LineTraceSingleByChannel(HitResult,
-													RayStart,
+													RayStart + RayDirection*100,
 													RayEnd,
 													ECollisionChannel::ECC_WorldDynamic);
+		/*DrawDebugLine
+		(
+			GetWorld(),
+			RayStart,
+			RayEnd,
+			FColor::Red,
+			false,
+			0.2,
+			1,
+			10
+		);*/
 		// if hit smth check if an item is pickable
 		if (bHasHitSmth)
 		{
@@ -203,6 +215,22 @@ void UQP_InventorySystemComponent::UpdateEquipedItems()
 				{
 					EquipedItemsContainer.Push(Weapon);
 					UE_LOG(LogTemp, Warning, TEXT("Item in GRID: %s"), *Weapon->GetClass()->GetName());
+				}
+				// change weapon if current weapon was deleted from weapon grid
+				if (!EquipedItemsContainer.Contains(ActiveWeapon))
+				{
+					auto Player = Cast<AQuarantineProjectCharacter>(Owner);
+					if (Player)
+					{
+						if (NextWeapon())
+						{
+							Player->NextWeapon();
+						}
+						else
+						{
+							Player->HideWeapon();
+						}
+					}
 				}
 			}
 		}
