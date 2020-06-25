@@ -29,10 +29,7 @@ AQP_FirstAidKit::AQP_FirstAidKit()
 void AQP_FirstAidKit::BeginPlay()
 {
 	Super::BeginPlay();
-	if (BoxCollision)
-	{
-		BoxCollision->OnComponentBeginOverlap.AddDynamic(this, &AQP_FirstAidKit::OnPickedUp);
-	}
+	BoxCollision->OnComponentBeginOverlap.AddDynamic(this, &AQP_FirstAidKit::OnPickedUp);
 }
 
 void AQP_FirstAidKit::OnPickedUp(UPrimitiveComponent* OverlappedComponent, 
