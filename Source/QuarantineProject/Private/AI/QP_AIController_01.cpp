@@ -72,12 +72,12 @@ void AQP_AIController_01::StopJumping()
 
 void AQP_AIController_01::Crouch()
 {
-	Cast<AEnemyBaseCharacter>(GetControlledCharacter())->Crouch();
+	Cast<AEnemyBaseCharacter>(GetControlledCharacter())->StartCrouching();
 }
 
 void AQP_AIController_01::UnCrouch()
 {
-	Cast<AEnemyBaseCharacter>(GetControlledCharacter())->UnCrouch();
+	Cast<AEnemyBaseCharacter>(GetControlledCharacter())->StopCrouching();
 }
 
 void AQP_AIController_01::SprintStart()

@@ -112,15 +112,12 @@ public:
 	void MoveForward(float Value);
 	/** Called for side to side input */
 	void MoveRight(float Value);
-	/** This overrides the Jump() in character */
-	void Jump();
-	void StopJumping();
 	/** Camera control input override*/
 	void AddControllerYawInput(float Value);
 	void AddControllerPitchInput(float Value);
-	/** This overrides the Crouch() in character */
-	void Crouch();
-	void UnCrouch();
+	/** Crouching */
+	void StartCrouching();
+	void StopCrouching();
 	/** Sprinting */
 	void SprintStart();
 	void SprintEnd();

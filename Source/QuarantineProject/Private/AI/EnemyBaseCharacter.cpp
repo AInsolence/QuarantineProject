@@ -194,16 +194,6 @@ void AEnemyBaseCharacter::MoveRight(float Value)
 	}
 }
 
-void AEnemyBaseCharacter::Jump()
-{
-	Super::Jump();
-}
-
-void AEnemyBaseCharacter::StopJumping()
-{
-	Super::StopJumping();
-}
-
 void AEnemyBaseCharacter::AddControllerYawInput(float Value)
 {
 	Super::AddControllerYawInput(Value);
@@ -214,12 +204,12 @@ void AEnemyBaseCharacter::AddControllerPitchInput(float Value)
 	Super::AddControllerPitchInput(Value);
 }
 
-void AEnemyBaseCharacter::Crouch()
+void AEnemyBaseCharacter::StartCrouching()
 {
 	Super::Crouch();
 }
 
-void AEnemyBaseCharacter::UnCrouch()
+void AEnemyBaseCharacter::StopCrouching()
 {
 	Super::UnCrouch();
 }

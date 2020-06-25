@@ -335,16 +335,6 @@ void AQuarantineProjectCharacter::MoveRight(float Value)
 	}
 }
 
-void AQuarantineProjectCharacter::Jump()
-{
-	Super::Jump();
-}
-
-void AQuarantineProjectCharacter::StopJumping()
-{
-	Super::StopJumping();
-}
-
 void AQuarantineProjectCharacter::AddControllerYawInput(float Value)
 {
 	Super::AddControllerYawInput(Value);
@@ -355,12 +345,12 @@ void AQuarantineProjectCharacter::AddControllerPitchInput(float Value)
 	Super::AddControllerPitchInput(Value);
 }
 
-void AQuarantineProjectCharacter::Crouch()
+void AQuarantineProjectCharacter::StartCrouching()
 {
 	Super::Crouch();
 }
 
-void AQuarantineProjectCharacter::UnCrouch()
+void AQuarantineProjectCharacter::StopCrouching()
 {
 	Super::UnCrouch();
 }

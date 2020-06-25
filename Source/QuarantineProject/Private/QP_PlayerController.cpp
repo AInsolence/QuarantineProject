@@ -113,12 +113,12 @@ void AQP_PlayerController::StopJumping()
 
 void AQP_PlayerController::Crouch()
 {
-	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->Crouch();
+	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->StartCrouching();
 }
 
 void AQP_PlayerController::UnCrouch()
 {
-	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->UnCrouch();
+	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->StopCrouching();
 }
 
 void AQP_PlayerController::SprintStart()
