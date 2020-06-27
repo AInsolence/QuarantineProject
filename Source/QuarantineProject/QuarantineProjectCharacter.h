@@ -56,7 +56,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Sprint")
 	float TimeToMaxSprintSpeed = 2.0f;
 
-
 	class AQP_HUD* GetPlayerHUD() const;
 	void ChangeWeapon(UQP_InventorySlotWidget* WeaponInfo);
 
@@ -70,7 +69,7 @@ public:
 	/** Weapon component */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Weapon, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AQP_WeaponBase> WeaponInHandsClass;
-	UPROPERTY(meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	AQP_WeaponBase* WeaponInHands;
 
 	/** Aiming to target */
