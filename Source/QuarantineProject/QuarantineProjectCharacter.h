@@ -104,7 +104,6 @@ public:
 	UFUNCTION()
 	void PreviousWeapon();
 
-
 	/** Resets HMD orientation in VR. */
 	void OnResetVR();
 	/** Called for forwards/backward input */
