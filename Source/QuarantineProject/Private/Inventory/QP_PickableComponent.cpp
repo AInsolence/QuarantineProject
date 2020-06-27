@@ -15,13 +15,6 @@ UQP_PickableComponent::UQP_PickableComponent()
 
 void UQP_PickableComponent::BeginPlay()
 {
-	if (GetOwner())
-	{
-		if (InventoryItemWidget)
-		{
-			InventoryItemWidget->InventoryItemInfo.ItemClassPtr = GetOwner()->GetClass();
-		}
-	}
 }
 
 

@@ -16,7 +16,7 @@ AQP_FirstAidKit::AQP_FirstAidKit()
 
 	BoxCollision = CreateDefaultSubobject<UBoxComponent>("BoxCollision");
 	RootComponent = BoxCollision;
-	BoxCollision->SetSimulatePhysics(true);
+	BoxCollision->SetSimulatePhysics(false);
 	
 	AidMesh = CreateDefaultSubobject<UStaticMeshComponent>("AidMesh");
 	if (AidMesh)

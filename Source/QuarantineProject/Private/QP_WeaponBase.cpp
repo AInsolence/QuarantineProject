@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "QuarantineProject/Public/RifleProjectile_01.h"
+#include "QuarantineProject/Public/Inventory/QP_PickableComponent.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
@@ -18,6 +19,7 @@ AQP_WeaponBase::AQP_WeaponBase()
 	PrimaryActorTick.bCanEverTick = false;
 
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
+	PickableComponent = CreateDefaultSubobject<UQP_PickableComponent>(TEXT("PickableComponent"));
 
 	SetRootComponent(WeaponMesh);
 }

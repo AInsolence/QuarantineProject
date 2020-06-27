@@ -56,6 +56,8 @@ public:
 	UFUNCTION()
 	void PickUpItem();
 	UFUNCTION()
+	UQP_InventorySlotWidget* CreateInventoryWidget(TSubclassOf<UQP_InventorySlotWidget> WidgetClass);
+	UFUNCTION()
 	void DropItem();
 	UFUNCTION()
 	UQP_InventorySlotWidget* NextWeapon();

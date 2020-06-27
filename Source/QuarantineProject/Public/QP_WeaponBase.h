@@ -56,6 +56,8 @@ protected:
 	class UBoxComponent* BoxCollision = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "WeaponComponents")
 	class USkeletalMeshComponent* WeaponMesh = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "WeaponComponents")
+	class UQP_PickableComponent* PickableComponent = nullptr;
 
 	/** Sound to play each time we fire */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "WeaponProperties")

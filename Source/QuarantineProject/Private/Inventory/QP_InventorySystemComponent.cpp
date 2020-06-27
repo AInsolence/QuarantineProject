@@ -45,14 +45,14 @@ void UQP_InventorySystemComponent::BeginPlay()
 			auto HUD = Cast<APlayerController>(Controller)->GetHUD();
 			if (HUD)
 			{
-				 auto WeaponGridPanel = Cast<AQP_HUD>(HUD)->InventoryWidget->WeaponGridPanel;
-				 if (WeaponGridPanel)
-				 {
+				auto WeaponGridPanel = Cast<AQP_HUD>(HUD)->InventoryWidget->WeaponGridPanel;
+				if (WeaponGridPanel)
+				{
 					WeaponGridPanel->OnInventoryGridChanged.AddDynamic(this, &UQP_InventorySystemComponent::UpdateEquipedItems);
-				 }
+				}
 			}
 		}
-	}	
+	}
 }
 
 // Called every frame
@@ -78,9 +78,9 @@ AActor* UQP_InventorySystemComponent::RaycastToFindPickableItem()
 		// hit
 		FHitResult HitResult;
 		bool bHasHitSmth = GetWorld()->LineTraceSingleByChannel(HitResult,
-													RayStart + RayDirection*100,
-													RayEnd,
-													ECollisionChannel::ECC_WorldDynamic);
+			RayStart + RayDirection * 100,
+			RayEnd,
+			ECollisionChannel::ECC_WorldDynamic);
 		/*DrawDebugLine
 		(
 			GetWorld(),
@@ -119,6 +119,21 @@ AActor* UQP_InventorySystemComponent::RaycastToFindPickableItem()
 	return nullptr;
 }
 
+UQP_InventorySlotWidget* UQP_InventorySystemComponent::CreateInventoryWidget(TSubclassOf<UQP_InventorySlotWidget> WidgetClass)
+{
+	auto ItemUserWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
+	if (ItemUserWidget == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Item User widget created"));
+	}
+	auto ItemWidget = Cast<UQP_InventorySlotWidget>(ItemUserWidget);
+	if (ItemWidget)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Item widget created"));
+	}
+	return ItemWidget;
+}
+
 void UQP_InventorySystemComponent::PickUpItem()
 {
 	// get hitted actor
@@ -127,12 +142,18 @@ void UQP_InventorySystemComponent::PickUpItem()
 	{
 		// try to get pickable component
 		auto HittedItemPickableComp = HittedActor->FindComponentByClass<UQP_PickableComponent>();
+		UE_LOG(LogTemp, Warning, TEXT("Created widget - 1"));
 		if (HittedItemPickableComp)
 		{// try to add item in inventory
-			if (HittedItemPickableComp->InventoryItemWidget)
+			UE_LOG(LogTemp, Warning, TEXT("Created widget - 2"));
+			if (HittedItemPickableComp->InventoryItemWidgetClass)
 			{
-				if (AddItemToInventory(HittedItemPickableComp->InventoryItemWidget))
+				auto ItemWidget = CreateInventoryWidget(
+					HittedItemPickableComp->InventoryItemWidgetClass);
+				UE_LOG(LogTemp, Warning, TEXT("Created widget!!"));
+				if (AddItemToInventory(ItemWidget))
 				{
+					UE_LOG(LogTemp, Warning, TEXT("Created widget: %s"), *ItemWidget->GetClass()->GetName());
 					HittedItemPickableComp->PickUp();
 					return;
 				}

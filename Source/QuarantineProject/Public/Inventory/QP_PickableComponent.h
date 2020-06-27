@@ -27,5 +27,5 @@ public:
 	void PickUp();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PickableItemProperties")
-	UQP_InventorySlotWidget* InventoryItemWidget;
+	TSubclassOf<UQP_InventorySlotWidget> InventoryItemWidgetClass;
 };
