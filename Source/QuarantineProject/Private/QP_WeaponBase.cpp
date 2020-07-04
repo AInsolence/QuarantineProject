@@ -213,6 +213,10 @@ void AQP_WeaponBase::Reload()
 
 void AQP_WeaponBase::Reloading()
 {
+	if (bIsWeaponReloading)
+	{
+		return;
+	}
 	if (CurrentBulletsInMagazine != BulletsInMagazine)
 	{
 		StartReload();
