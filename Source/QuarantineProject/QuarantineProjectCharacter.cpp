@@ -248,6 +248,10 @@ void AQuarantineProjectCharacter::InitWeaponSettings()
 		{
 			AimToTarget();
 		}
+		if (!bIsWeaponInHands)
+		{
+			bIsWeaponInHands = true;
+		}
 	}
 }
 
@@ -273,12 +277,20 @@ void AQuarantineProjectCharacter::NextWeapon()
 {
 	if (InventorySystemComponent)
 	{
+		if (bIsWeaponInHands && !InventorySystemComponent->CanWeaponBeChanged())
+		{
+			return;
+		}
 		ChangeWeapon(InventorySystemComponent->NextWeapon());
 	}
 }
 
 void AQuarantineProjectCharacter::PreviousWeapon()
 {
+	if (bIsWeaponInHands && !InventorySystemComponent->CanWeaponBeChanged())
+	{
+		return;
+	}
 	if (InventorySystemComponent)
 	{
 		ChangeWeapon(InventorySystemComponent->PreviousWeapon());
@@ -374,6 +386,7 @@ void AQuarantineProjectCharacter::SprintEnd()
 void AQuarantineProjectCharacter::HideWeapon()
 {
 	WeaponInHands->Destroy();
+	bIsWeaponInHands = false;
 }
 
 void AQuarantineProjectCharacter::AimToTarget()

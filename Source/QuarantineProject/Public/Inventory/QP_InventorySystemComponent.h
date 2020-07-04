@@ -60,6 +60,8 @@ public:
 	UFUNCTION()
 	void DropItem();
 	UFUNCTION()
+	bool CanWeaponBeChanged();
+	UFUNCTION()
 	UQP_InventorySlotWidget* NextWeapon();
 	UFUNCTION()
 	UQP_InventorySlotWidget* PreviousWeapon();

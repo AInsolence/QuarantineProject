@@ -121,6 +121,7 @@ void UQP_InventoryUniformGridPanel::AddWidgetToGrid(UQP_InventorySlotWidget* Ite
             const int32 row = SlotPoint.Y;
             auto InsertedItem = GridPanel->AddChildToUniformGrid(Content, row, column);
 			//
+			UE_LOG(LogTemp, Warning, TEXT("BROADCASTED"));
 			OnInventoryGridChanged.Broadcast();
 			// try and play the equip sound if specified
 			if (EquipSound != NULL)

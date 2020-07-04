@@ -122,6 +122,8 @@ public:
 	/** Aiming */
 	void HideWeapon();
 	void AimToTarget();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	bool bIsWeaponInHands = false;
 	/** Firing */
 	void OnFire();
 	void OnStopFiring();

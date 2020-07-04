@@ -48,6 +48,7 @@ void UQP_InventorySystemComponent::BeginPlay()
 				auto WeaponGridPanel = Cast<AQP_HUD>(HUD)->InventoryWidget->WeaponGridPanel;
 				if (WeaponGridPanel)
 				{
+					UE_LOG(LogTemp, Warning, TEXT("CONNECTED"));
 					WeaponGridPanel->OnInventoryGridChanged.AddDynamic(this, &UQP_InventorySystemComponent::UpdateEquipedItems);
 				}
 			}
@@ -180,6 +181,15 @@ void UQP_InventorySystemComponent::DropItem()
 }
 
 
+bool UQP_InventorySystemComponent::CanWeaponBeChanged()
+{
+	if (EquipedItemsContainer.Num() < 2)
+	{
+		return false;
+	}
+	return true;
+}
+
 bool UQP_InventorySystemComponent::AddItemToInventory(UQP_InventorySlotWidget* ItemWidget)
 {
 	if (Owner)
@@ -236,6 +246,15 @@ void UQP_InventorySystemComponent::UpdateEquipedItems()
 				{
 					EquipedItemsContainer.Push(Weapon);
 					UE_LOG(LogTemp, Warning, TEXT("Item in GRID: %s"), *Weapon->GetClass()->GetName());
+				}
+				// if equipment container is empty
+				if (EquipedItemsContainer.Num() <= 0)
+				{
+					auto Player = Cast<AQuarantineProjectCharacter>(Owner);
+					if (Player)
+					{
+						Player->HideWeapon();
+					}
 				}
 				// change weapon if current weapon was deleted from weapon grid
 				if (!EquipedItemsContainer.Contains(ActiveWeapon))
