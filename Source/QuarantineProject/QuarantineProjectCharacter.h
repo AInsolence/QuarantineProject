@@ -57,9 +57,6 @@ protected:
 	float TimeToMaxSprintSpeed = 2.0f;
 
 	class AQP_HUD* GetPlayerHUD() const;
-	void ChangeWeapon(UQP_InventorySlotWidget* WeaponInfo);
-
-	void InitWeaponSettings();
 
 public:
 	/** Inventory system component */
@@ -86,7 +83,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	class UAnimMontage* ReloadHitAnimation;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	class UAnimMontage* EquipWeaponAnimation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	class UAnimMontage* InjuredAnimation;
+
 
 	/** Play anim montages functions */
 	UFUNCTION()
@@ -95,6 +95,13 @@ public:
 	void ShowFireAnimation();
 
 	/** Inventory component */
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = "Gameplay")
+	bool bIsWeaponEquipping = false;
+	class UQP_InventorySlotWidget* NextWeaponInfo = nullptr;
+	UFUNCTION(BlueprintCallable)
+	void ChangeWeapon();
+	UFUNCTION()
+	void InitWeaponSettings();
 	UFUNCTION()
 	void PickUpItem();
 	UFUNCTION()

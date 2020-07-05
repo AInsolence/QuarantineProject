@@ -183,7 +183,7 @@ void UQP_InventorySystemComponent::DropItem()
 
 bool UQP_InventorySystemComponent::CanWeaponBeChanged()
 {
-	if (EquipedItemsContainer.Num() < 2)
+	if (EquipedItemsContainer.Num() == 1)
 	{
 		return false;
 	}

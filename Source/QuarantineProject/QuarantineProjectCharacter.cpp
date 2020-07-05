@@ -200,22 +200,94 @@ AQP_HUD* AQuarantineProjectCharacter::GetPlayerHUD() const
 	return nullptr;
 }
 
-void AQuarantineProjectCharacter::ChangeWeapon(UQP_InventorySlotWidget* WeaponInfo)
+//*****            INPUT LOGIC                *****//
+
+void AQuarantineProjectCharacter::PickUpItem()
 {
-	if (WeaponInfo == nullptr)
+	if (InventorySystemComponent)
+	{
+		InventorySystemComponent->PickUpItem();
+	}
+}
+
+void AQuarantineProjectCharacter::DropItem()
+{
+	if (InventorySystemComponent)
+	{
+		InventorySystemComponent->DropItem();
+	}
+}
+
+void AQuarantineProjectCharacter::NextWeapon()
+{
+	if (bIsWeaponEquipping)
+	{
+		return;
+	}
+	if (InventorySystemComponent)
+	{
+		if (bIsWeaponInHands && !InventorySystemComponent->CanWeaponBeChanged())
+		{
+			return;
+		}
+		NextWeaponInfo = InventorySystemComponent->NextWeapon();
+		// try and play equip animation if specified
+		if (EquipWeaponAnimation)
+		{
+			// Get the animation object for the mesh
+			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+			if (AnimInstance != NULL)
+			{// start equipping process
+				bIsWeaponEquipping = true;
+				AnimInstance->Montage_Play(EquipWeaponAnimation, 1.0f);
+			}
+		}
+	}
+}
+
+void AQuarantineProjectCharacter::PreviousWeapon()
+{
+	if (bIsWeaponEquipping)
+	{
+		return;
+	}
+	if (InventorySystemComponent)
+	{
+		if (bIsWeaponInHands && !InventorySystemComponent->CanWeaponBeChanged())
+		{
+			return;
+		}
+		NextWeaponInfo = InventorySystemComponent->PreviousWeapon();
+		// try and play equip animation if specified
+		if (EquipWeaponAnimation)
+		{
+			// Get the animation object for the mesh
+			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+			if (AnimInstance != NULL)
+			{// start equipping process
+				bIsWeaponEquipping = true;
+				AnimInstance->Montage_Play(EquipWeaponAnimation, 1.0f);
+			}
+		}
+	}
+}
+
+void AQuarantineProjectCharacter::ChangeWeapon()
+{
+	if (NextWeaponInfo == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("No CLASS TO SPAWN"))
 		return;
 	}
-	if(GetWorld())
+	if (GetWorld())
 	{
-		if (WeaponInfo->InventoryItemInfo.ItemClassPtr)
+		if (NextWeaponInfo->InventoryItemInfo.ItemClassPtr)
 		{
 			if (WeaponInHands != nullptr)
 			{
 				WeaponInHands->Destroy();
-			}
-			WeaponInHands = GetWorld()->SpawnActor<AQP_WeaponBase>(WeaponInfo->InventoryItemInfo.ItemClassPtr);
+			}// create new weapon in hands
+			WeaponInHands = GetWorld()->SpawnActor<AQP_WeaponBase>(NextWeaponInfo->InventoryItemInfo.ItemClassPtr);
 		}
 		else
 		{
@@ -252,48 +324,6 @@ void AQuarantineProjectCharacter::InitWeaponSettings()
 		{
 			bIsWeaponInHands = true;
 		}
-	}
-}
-
-//*****            INPUT LOGIC                *****//
-
-void AQuarantineProjectCharacter::PickUpItem()
-{
-	if (InventorySystemComponent)
-	{
-		InventorySystemComponent->PickUpItem();
-	}
-}
-
-void AQuarantineProjectCharacter::DropItem()
-{
-	if (InventorySystemComponent)
-	{
-		InventorySystemComponent->DropItem();
-	}
-}
-
-void AQuarantineProjectCharacter::NextWeapon()
-{
-	if (InventorySystemComponent)
-	{
-		if (bIsWeaponInHands && !InventorySystemComponent->CanWeaponBeChanged())
-		{
-			return;
-		}
-		ChangeWeapon(InventorySystemComponent->NextWeapon());
-	}
-}
-
-void AQuarantineProjectCharacter::PreviousWeapon()
-{
-	if (bIsWeaponInHands && !InventorySystemComponent->CanWeaponBeChanged())
-	{
-		return;
-	}
-	if (InventorySystemComponent)
-	{
-		ChangeWeapon(InventorySystemComponent->PreviousWeapon());
 	}
 }
 
@@ -447,7 +477,6 @@ void AQuarantineProjectCharacter::OnTakeDamage(AActor* DamagedActor,
 {
 	if (HealthComponent) 
 	{
-
 		// try and play injured animation if specified
 		if (InjuredAnimation)
 		{
