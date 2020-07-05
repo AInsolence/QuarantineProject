@@ -91,13 +91,14 @@ void AQP_WeaponBase::Fire(FRotator MuzzleRotation)
 
 void AQP_WeaponBase::FireLoop(FRotator MuzzleRotation)
 {// check bullets in magazine before spawning projectile
-	if (CurrentBulletsInMagazine)
+	if (CurrentBulletsInMagazine > 0)
 	{
 		SpawnProjectile(MuzzleRotation);
 		CurrentBulletsInMagazine -= 1;
 	}
 	else // try to reload
 	{
+		StopFiring();
 		StartReload();
 	}
 	GEngine->AddOnScreenDebugMessage(3, 5.0f, FColor::Red, TEXT("Bullets: %f") + FString::FromInt(CurrentBulletsInMagazine), false);

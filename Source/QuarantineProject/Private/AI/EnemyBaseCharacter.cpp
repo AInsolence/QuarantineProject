@@ -72,6 +72,7 @@ void AEnemyBaseCharacter::BeginPlay()
 		// Describe to reloading event
 		WeaponInHands->OnReloading.AddDynamic(this, &AEnemyBaseCharacter::ShowReloadAnimation);
 		WeaponInHands->OnFireEvent.AddDynamic(this, &AEnemyBaseCharacter::ShowFireAnimation);
+		WeaponInHands->SetMeshCollision(ECollisionResponse::ECR_Ignore);
 	}
 
 }
@@ -285,6 +286,7 @@ void AEnemyBaseCharacter::OnTakeDamage(AActor* DamagedActor,
 				// destroy the controller, since it's not part of the enemy anymore
 				CurrentController->Destroy();
 				// Weapon can be picked up
+				UE_LOG(LogTemp, Warning, TEXT("Weapon can be picked(FROM AI CHAR)"));
 				WeaponInHands->SetMeshCollision(ECollisionResponse::ECR_Block);
 			}
 		}

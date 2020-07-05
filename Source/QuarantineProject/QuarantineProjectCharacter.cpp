@@ -138,22 +138,17 @@ void AQuarantineProjectCharacter::Tick(float DeltaTime)
 
 void AQuarantineProjectCharacter::ShowReloadAnimation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("IN RELOADING 1"))
 	if (ReloadIronsightAnimation && ReloadHitAnimation)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("IN RELOADING 2"))
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if (AnimInstance != NULL)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("IN RELOADING 3"))
 			if (bIsAiming)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("IN RELOADING 4"))
 				AnimInstance->Montage_Play(ReloadIronsightAnimation, 1.0f);
 			}
 			else
 			{
-				UE_LOG(LogTemp, Warning, TEXT("IN RELOADING 5"))
 				AnimInstance->Montage_Play(ReloadHitAnimation, 1.0f);
 			}
 		}
@@ -304,7 +299,6 @@ void AQuarantineProjectCharacter::InitWeaponSettings()
 {
 	if (WeaponInHands != nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("WEAPON AND ANIMATIONS INITIALIZED"));
 		// Set weapon location as character hands
 		FVector InHandLocation = GetMesh()->GetSocketLocation(FName("RightHandWeaponSocket"));
 		WeaponInHands->AttachToComponent(GetMesh(),
