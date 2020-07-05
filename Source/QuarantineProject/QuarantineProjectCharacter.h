@@ -56,6 +56,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Sprint")
 	float TimeToMaxSprintSpeed = 2.0f;
 
+	// Weapon equipping helper info and methods
+	class UQP_InventorySlotWidget* NextWeaponInfo = nullptr;
+	void ShowEquipingAnimation();
+	bool IsWeaponCanBeChanged() const;
+
 	class AQP_HUD* GetPlayerHUD() const;
 
 public:
@@ -96,8 +101,7 @@ public:
 
 	/** Inventory component */
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = "Gameplay")
-	bool bIsWeaponEquipping = false;
-	class UQP_InventorySlotWidget* NextWeaponInfo = nullptr;
+	bool bIsWeaponEquipping = false; // control multiple tapping
 	UFUNCTION(BlueprintCallable)
 	void ChangeWeapon();
 	UFUNCTION()

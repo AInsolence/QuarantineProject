@@ -220,54 +220,57 @@ void AQuarantineProjectCharacter::DropItem()
 
 void AQuarantineProjectCharacter::NextWeapon()
 {
-	if (bIsWeaponEquipping)
-	{
-		return;
-	}
-	if (InventorySystemComponent)
-	{
-		if (bIsWeaponInHands && !InventorySystemComponent->CanWeaponBeChanged())
-		{
-			return;
-		}
-		NextWeaponInfo = InventorySystemComponent->NextWeapon();
-		// try and play equip animation if specified
-		if (EquipWeaponAnimation)
-		{
-			// Get the animation object for the mesh
-			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-			if (AnimInstance != NULL)
-			{// start equipping process
-				bIsWeaponEquipping = true;
-				AnimInstance->Montage_Play(EquipWeaponAnimation, 1.0f);
-			}
-		}
-	}
+	if (!IsWeaponCanBeChanged()) return;
+	// set weapon to equip
+	NextWeaponInfo = InventorySystemComponent->NextWeapon();
+	// play equipping animation
+	ShowEquipingAnimation();
 }
 
 void AQuarantineProjectCharacter::PreviousWeapon()
 {
+	if (!IsWeaponCanBeChanged()) return;
+	// set weapon to equip
+	NextWeaponInfo = InventorySystemComponent->PreviousWeapon();
+	// play equipping animation
+	ShowEquipingAnimation();
+}
+
+bool AQuarantineProjectCharacter::IsWeaponCanBeChanged() const
+{
+	if (!InventorySystemComponent)
+	{
+		return false;
+	}
 	if (bIsWeaponEquipping)
 	{
-		return;
+		return false;
 	}
-	if (InventorySystemComponent)
-	{
-		if (bIsWeaponInHands && !InventorySystemComponent->CanWeaponBeChanged())
+	if (WeaponInHands && InventorySystemComponent->ActiveWeapon)
+	{// check the inventory item and weapon in hand are the same
+		auto InHandsClass = WeaponInHands->GetClass()->GetName();
+		auto InventoryItemClass = InventorySystemComponent->ActiveWeapon->
+			InventoryItemInfo.ItemClassPtr->GetName();
+		if (bIsWeaponInHands && !InventorySystemComponent->CanWeaponBeChanged()
+			&& InHandsClass == InventoryItemClass)
 		{
-			return;
+			return false;
 		}
-		NextWeaponInfo = InventorySystemComponent->PreviousWeapon();
-		// try and play equip animation if specified
-		if (EquipWeaponAnimation)
-		{
-			// Get the animation object for the mesh
-			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-			if (AnimInstance != NULL)
-			{// start equipping process
-				bIsWeaponEquipping = true;
-				AnimInstance->Montage_Play(EquipWeaponAnimation, 1.0f);
-			}
+	}
+	return true;
+}
+
+void AQuarantineProjectCharacter::ShowEquipingAnimation()
+{
+	// try and play equip animation if specified
+	if (EquipWeaponAnimation)
+	{
+		// Get the animation object for the mesh
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance != NULL)
+		{// start equipping process
+			bIsWeaponEquipping = true;
+			AnimInstance->Montage_Play(EquipWeaponAnimation, 1.0f);
 		}
 	}
 }

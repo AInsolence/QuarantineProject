@@ -48,7 +48,6 @@ void UQP_InventorySystemComponent::BeginPlay()
 				auto WeaponGridPanel = Cast<AQP_HUD>(HUD)->InventoryWidget->WeaponGridPanel;
 				if (WeaponGridPanel)
 				{
-					UE_LOG(LogTemp, Warning, TEXT("CONNECTED"));
 					WeaponGridPanel->OnInventoryGridChanged.AddDynamic(this, &UQP_InventorySystemComponent::UpdateEquipedItems);
 				}
 			}
@@ -123,15 +122,7 @@ AActor* UQP_InventorySystemComponent::RaycastToFindPickableItem()
 UQP_InventorySlotWidget* UQP_InventorySystemComponent::CreateInventoryWidget(TSubclassOf<UQP_InventorySlotWidget> WidgetClass)
 {
 	auto ItemUserWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
-	if (ItemUserWidget == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Item User widget created"));
-	}
 	auto ItemWidget = Cast<UQP_InventorySlotWidget>(ItemUserWidget);
-	if (ItemWidget)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Item widget created"));
-	}
 	return ItemWidget;
 }
 
@@ -143,18 +134,14 @@ void UQP_InventorySystemComponent::PickUpItem()
 	{
 		// try to get pickable component
 		auto HittedItemPickableComp = HittedActor->FindComponentByClass<UQP_PickableComponent>();
-		UE_LOG(LogTemp, Warning, TEXT("Created widget - 1"));
 		if (HittedItemPickableComp)
 		{// try to add item in inventory
-			UE_LOG(LogTemp, Warning, TEXT("Created widget - 2"));
 			if (HittedItemPickableComp->InventoryItemWidgetClass)
 			{
 				auto ItemWidget = CreateInventoryWidget(
 					HittedItemPickableComp->InventoryItemWidgetClass);
-				UE_LOG(LogTemp, Warning, TEXT("Created widget!!"));
 				if (AddItemToInventory(ItemWidget))
 				{
-					UE_LOG(LogTemp, Warning, TEXT("Created widget: %s"), *ItemWidget->GetClass()->GetName());
 					HittedItemPickableComp->PickUp();
 					return;
 				}
@@ -179,7 +166,6 @@ void UQP_InventorySystemComponent::DropItem()
 {
 	//ThrowItemFromInventory();
 }
-
 
 bool UQP_InventorySystemComponent::CanWeaponBeChanged()
 {
@@ -245,7 +231,6 @@ void UQP_InventorySystemComponent::UpdateEquipedItems()
 				for (auto Weapon : WeaponItems)
 				{
 					EquipedItemsContainer.Push(Weapon);
-					UE_LOG(LogTemp, Warning, TEXT("Item in GRID: %s"), *Weapon->GetClass()->GetName());
 				}
 				// if equipment container is empty
 				if (EquipedItemsContainer.Num() <= 0)
@@ -262,8 +247,10 @@ void UQP_InventorySystemComponent::UpdateEquipedItems()
 					auto Player = Cast<AQuarantineProjectCharacter>(Owner);
 					if (Player)
 					{
-						if (NextWeapon())
+						auto WeaponToEquip = NextWeapon();
+						if (WeaponToEquip)
 						{
+							ActiveWeapon = WeaponToEquip;
 							Player->NextWeapon();
 						}
 						else
@@ -280,7 +267,11 @@ void UQP_InventorySystemComponent::UpdateEquipedItems()
 UQP_InventorySlotWidget* UQP_InventorySystemComponent::NextWeapon()
 {
 	// check if any weapons equipped
-	if (EquipedItemsContainer.Num() <= 0) return nullptr;
+	if (EquipedItemsContainer.Num() == 0) 
+	{
+		ActiveWeapon = nullptr;
+		return nullptr;
+	}
 	// check active weapon
 	if (!ActiveWeapon || !EquipedItemsContainer.Contains(ActiveWeapon))
 	{// if active weapon not exist or has been deleted from weapon grid

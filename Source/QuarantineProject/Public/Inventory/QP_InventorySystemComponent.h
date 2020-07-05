@@ -60,6 +60,7 @@ public:
 	UFUNCTION()
 	void DropItem();
 	UFUNCTION()
+	// check if only one weapon are equipped to avoid itself changing
 	bool CanWeaponBeChanged();
 	UFUNCTION()
 	UQP_InventorySlotWidget* NextWeapon();

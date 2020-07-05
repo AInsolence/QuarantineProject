@@ -121,7 +121,6 @@ void UQP_InventoryUniformGridPanel::AddWidgetToGrid(UQP_InventorySlotWidget* Ite
             const int32 row = SlotPoint.Y;
             auto InsertedItem = GridPanel->AddChildToUniformGrid(Content, row, column);
 			//
-			UE_LOG(LogTemp, Warning, TEXT("BROADCASTED"));
 			OnInventoryGridChanged.Broadcast();
 			// try and play the equip sound if specified
 			if (EquipSound != NULL)
@@ -197,7 +196,6 @@ TArray<UQP_InventorySlotWidget*> UQP_InventoryUniformGridPanel::GetItems()
 	auto Slots = GridPanel->GetAllChildren();
 	for (auto slot : Slots)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Item in GRID: %s"), *slot->StaticClass()->GetName());
 		if (Cast<UQP_InventorySlotWidget>(slot))
 		{
 			Result.Add(Cast<UQP_InventorySlotWidget>(slot));
@@ -218,15 +216,10 @@ void UQP_InventoryUniformGridPanel::NativeOnDragEnter(const FGeometry& InGeometr
 	if (GridPanel)
 	{
 		bIsItemDragged = true;
-		if (bIsItemDragged)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Item DRAGGED!"));
-		}
 		if (InOperation->Payload != nullptr)
 		{
 			auto const DraggedWidget = Cast<UQP_InventorySlotWidget>(InOperation->Payload);
 			auto Geometry = InDragDropEvent.GetGestureDelta();
-			UE_LOG(LogTemp, Warning, TEXT("Dragged widget gesture: %s"), *Geometry.ToString());
 		}
 	}
 }
@@ -274,11 +267,6 @@ FReply UQP_InventoryUniformGridPanel::NativeOnMouseMove(const FGeometry& InGeome
 	int32 Col = (DropPos.X - GridPanelPos.X) / (GridPanelSize.X / GridSize.X);
 	int32 Row = (DropPos.Y - GridPanelPos.Y) / (GridPanelSize.Y / GridSize.Y);
 	//
-	UE_LOG(LogTemp, Warning, TEXT("Panel size: %s"), *GridPanelSize.ToString());
-	UE_LOG(LogTemp, Warning, TEXT("Panel size: %s"), *GridSize.ToString());
-	UE_LOG(LogTemp, Warning, TEXT("POSITION FROM DRAG: %s, %s"), *DropPos.ToString(), *GridPanelPos.ToString());
-	UE_LOG(LogTemp, Warning, TEXT("Free slot FROM DRAG: %d, %d"), Col, Row);
-	//
 	auto FreeSlot = FIntPoint(Col, Row);
 	auto SlotImage = GetGridPanelSlotAsImage(FreeSlot);
 	//
@@ -289,10 +277,6 @@ UImage* UQP_InventoryUniformGridPanel::GetGridPanelSlotAsImage(FIntPoint SlotPos
 {
 	auto Slots = GridPanel->GetAllChildren();
 	int32 SlotIndex = SlotPosition.X + (SlotPosition.Y * GridSize.X);
-	UE_LOG(LogTemp, Warning, TEXT("SlotPosition.X: %d"), SlotPosition.X);
-	UE_LOG(LogTemp, Warning, TEXT("Slot to show: %d"), SlotPosition.Y);
-	UE_LOG(LogTemp, Warning, TEXT("GridSize.X: %d"), GridSize.X);
-	UE_LOG(LogTemp, Warning, TEXT("Slot to show: %d"), SlotIndex);
 	if (Slots[SlotIndex])
 	{
 		auto SlotImage = Cast<UImage>(Slots[SlotIndex]);
