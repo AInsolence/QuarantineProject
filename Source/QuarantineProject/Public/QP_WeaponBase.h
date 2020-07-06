@@ -99,7 +99,7 @@ private:
 	void SpawnProjectile(FRotator MuzzleRotation);
 	FTimerHandle ReloadTimer;
 	FTimerHandle FireRateTimer;
-	bool bCanFireAfterRate = true;
+	bool bCanFireAfterRate = false;
 	double LastFireTime = 0.0;
 	bool bIsWeaponReloading = false;
 	void StartReload();
