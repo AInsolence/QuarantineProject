@@ -43,8 +43,7 @@ void AQP_HUD::BeginPlay()
 			auto LevelName = GetWorld()->GetName();
 			if (LevelName == "MainMenu")
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Try to hid %s"), *LevelName)
-					PlayerStateInfoWidget->SetVisibility(ESlateVisibility::Hidden);
+				PlayerStateInfoWidget->SetVisibility(ESlateVisibility::Hidden);
 			}
 			else // show in the game
 			{

@@ -104,7 +104,9 @@ void AQuarantineProjectCharacter::Tick(float DeltaTime)
 
 	/**  Sprint logic */
 	float RampThisFrame = (DeltaTime / TimeToMaxSprintSpeed) * MaxSprintMultiplier;
-	if (bIsSprinting && HealthComponent->GetCurrentStamina() > 0.5f)
+	// check if sprint input pressed, is character has enough stamina and is he moves
+	if (bIsSprinting && !this->GetVelocity().IsZero() &&
+		HealthComponent->GetCurrentStamina() > 0.5f)	
 	{
 		BaseSprintMultiplier += RampThisFrame;
 		// change stamina bar percentage
@@ -113,7 +115,8 @@ void AQuarantineProjectCharacter::Tick(float DeltaTime)
 			HealthComponent->ChangeCurrentStaminaTo(-0.5f);
 			if (GetPlayerHUD() != nullptr)
 			{
-				GetPlayerHUD()->UpdateStaminaState(HealthComponent->GetCurrentStamina() / 100);
+				GetPlayerHUD()->UpdateStaminaState(HealthComponent->GetCurrentStamina() / 
+														HealthComponent->GetDefaultStamina());
 			}
 		}
 
@@ -127,7 +130,8 @@ void AQuarantineProjectCharacter::Tick(float DeltaTime)
 			HealthComponent->ChangeCurrentStaminaTo(0.1f);
 			if (GetPlayerHUD() != nullptr)
 			{
-				GetPlayerHUD()->UpdateStaminaState(HealthComponent->GetCurrentStamina() / 100);
+				GetPlayerHUD()->UpdateStaminaState(HealthComponent->GetCurrentStamina() / 
+														HealthComponent->GetDefaultStamina());
 			}
 		}
 	}
@@ -487,7 +491,8 @@ void AQuarantineProjectCharacter::OnTakeDamage(AActor* DamagedActor,
 		//Update HUD health status
 		if (GetPlayerHUD())
 		{
-			GetPlayerHUD()->UpdateHealthState(HealthComponent->GetCurrentHealth() / 100);
+			GetPlayerHUD()->UpdateHealthState(HealthComponent->GetCurrentHealth() / 
+												HealthComponent->GetDefaultHealth());
 		}
 		//*** DEATH ***//
 		if (HealthComponent->GetCurrentHealth() <= 0)
