@@ -28,7 +28,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 		float DefaultHealth = 100.f;
-	UPROPERTY(BlueprintReadWrite, Category = "Health")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 		float CurrentHealth;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 		float DefaultStamina = 100.f;

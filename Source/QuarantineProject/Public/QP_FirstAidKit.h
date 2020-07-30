@@ -26,12 +26,4 @@ protected:
 	// how mush health player get after picking up aid kit
 	UPROPERTY(EditAnywhere, Category = "Aid Properties")
 	float HealthValue = 10.0;
-
-	UFUNCTION()
-		void OnPickedUp(UPrimitiveComponent* OverlappedComponent,
-						AActor* OtherActor,
-						UPrimitiveComponent* OtherComp,
-						int32 OtherBodyIndex,
-						bool bFromSweep,
-						const FHitResult& SweepResult);
 };

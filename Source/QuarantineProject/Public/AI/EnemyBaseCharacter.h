@@ -29,7 +29,7 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 
 	/** Health component */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Health, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Health, meta = (AllowPrivateAccess = "true"))
 	class UQP_HealthComponent* HealthComponent;
 
 	/** AI perception component */

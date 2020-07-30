@@ -416,8 +416,11 @@ void AQuarantineProjectCharacter::SprintEnd()
 
 void AQuarantineProjectCharacter::HideWeapon()
 {
-	WeaponInHands->Destroy();
-	bIsWeaponInHands = false;
+	if (WeaponInHands)
+	{
+		WeaponInHands->Destroy();
+		bIsWeaponInHands = false;
+	}
 }
 
 void AQuarantineProjectCharacter::AimToTarget()
@@ -435,7 +438,7 @@ void AQuarantineProjectCharacter::OnFire()
 	UWorld* const World = GetWorld();
 	if (World != nullptr)
 	{
-		if (WeaponInHands)
+		if (WeaponInHands && bIsWeaponInHands)
 		{
 			FRotator MuzzleRotation;
 			if (bIsAiming && !bIsSprinting)

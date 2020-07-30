@@ -29,27 +29,4 @@ AQP_FirstAidKit::AQP_FirstAidKit()
 void AQP_FirstAidKit::BeginPlay()
 {
 	Super::BeginPlay();
-	BoxCollision->OnComponentBeginOverlap.AddDynamic(this, &AQP_FirstAidKit::OnPickedUp);
-}
-
-void AQP_FirstAidKit::OnPickedUp(UPrimitiveComponent* OverlappedComponent, 
-								AActor* OtherActor, 
-								UPrimitiveComponent* OtherComp, 
-								int32 OtherBodyIndex, 
-								bool bFromSweep, 
-								const FHitResult& SweepResult)
-{
-	if (OtherActor == //if overlapped with player
-		UGameplayStatics::GetPlayerPawn(GetWorld(), 0))
-	{
-		// Create a damage event  
-		TSubclassOf<UDamageType> const ValidDamageTypeClass = TSubclassOf<UDamageType>(UDamageType::StaticClass());
-		FDamageEvent DamageEvent(ValidDamageTypeClass);
-		// Take negative damage to heal
-		OtherActor->TakeDamage(HealthValue * (-1),
-								DamageEvent,
-								GetWorld()->GetFirstPlayerController(),
-								this);
-		Destroy();
-	}
 }
