@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "QuarantineProject/Public/Inventory/QP_InventoryItem.h"
+#include "Inventory/QP_InventoryItem.h"
 #include "QP_InventorySlotWidget.generated.h"
 
 /**

@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "QuarantineProject/Public/HUD/SettingsOptionWidget.h"
+#include "HUD/SettingsOptionWidget.h"
 #include "Components/TextBlock.h"
 #include "Components/ComboBoxString.h"
 #include "Engine.h"

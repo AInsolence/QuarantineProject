@@ -1,14 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "QuarantineProject/Public/Inventory/QP_InventorySystemComponent.h"
+#include "Inventory/QP_InventorySystemComponent.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "GameFramework/Controller.h"
 #include "DrawDebugHelpers.h"
-#include "QuarantineProject/Public/HUD/QP_HUD.h"
-#include "QuarantineProject/Public/HUD/QP_InventoryUniformGridPanel.h"
-#include "QuarantineProject/Public/HUD/QP_InventoryWidget.h"
+#include "HUD/QP_HUD.h"
+#include "HUD/QP_InventoryUniformGridPanel.h"
+#include "HUD/QP_InventoryWidget.h"
 #include "QuarantineProject/QuarantineProjectCharacter.h"
 
 // Sets default values for this component's properties

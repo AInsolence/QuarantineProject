@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "QuarantineProject/Public/HUD/AimingWidget.h"
+#include "HUD/AimingWidget.h"
 #include "Runtime/UMG/Public/UMG.h"
 
 UAimingWidget::UAimingWidget(const FObjectInitializer& ObjectInitializer) : 

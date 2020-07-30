@@ -7,7 +7,7 @@
 #include "QP_PickableComponent.h"
 #include "Containers/List.h"
 #include "Containers/StaticArray.h"
-#include "QuarantineProject/Public/HUD/QP_InventorySlotWidget.h"
+#include "HUD/QP_InventorySlotWidget.h"
 #include "QP_InventorySystemComponent.generated.h"
 
 /*

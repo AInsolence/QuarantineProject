@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
-#include "QuarantineProject/Public/HUD/QP_InventorySlotWidget.h"
+#include "HUD/QP_InventorySlotWidget.h"
 #include "QP_HUD.generated.h"
 
 /**

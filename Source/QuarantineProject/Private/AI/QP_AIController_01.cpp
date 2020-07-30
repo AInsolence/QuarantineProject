@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "QuarantineProject/Public/AI/QP_AIController_01.h"
-#include "QuarantineProject/Public/AI/EnemyBaseCharacter.h"
+#include "AI/QP_AIController_01.h"
+#include "AI/EnemyBaseCharacter.h"
 #include "TimerManager.h"
 #include "Engine/World.h"
 

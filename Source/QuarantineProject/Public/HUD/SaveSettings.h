@@ -22,7 +22,7 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "SaveSettings")
 	uint32 UserIndex = 0;
 	UPROPERTY(VisibleAnywhere, Category = "SaveSettings")
-	FString VideoSettingsSlot;
+	FString SettingsSlot;
 	UPROPERTY(VisibleAnywhere, Category = "SaveSettings")
-	TMap<FString, FString> VideoSettingsValues;
+	TMap<FString, FString> SettingsValues;
 };

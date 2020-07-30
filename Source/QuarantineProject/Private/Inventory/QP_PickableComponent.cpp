@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "QuarantineProject/Public/Inventory/QP_PickableComponent.h"
+#include "Inventory/QP_PickableComponent.h"
 #include "GameFramework/Actor.h"
 #include "UObject/UObjectGlobals.h"
 

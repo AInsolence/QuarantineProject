@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "QuarantineProject/Public/HUD/QP_PlayerStateInfoWidget.h"
+#include "HUD/QP_PlayerStateInfoWidget.h"
 
 #include "Runtime/UMG/Public/UMG.h"
 

@@ -62,5 +62,5 @@ public:
     UFUNCTION(BlueprintCallable)
     void SaveSettingsValues();
     UFUNCTION(BlueprintCallable)
-    void LoadSettingsValues();
+    bool LoadSettingsValues();
 };

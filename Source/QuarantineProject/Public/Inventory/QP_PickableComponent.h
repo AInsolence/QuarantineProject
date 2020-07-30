@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "QuarantineProject/Public/HUD/QP_InventorySlotWidget.h"
+#include "HUD/QP_InventorySlotWidget.h"
 #include "QP_PickableComponent.generated.h"
 
 /*

@@ -3,8 +3,8 @@
 
 #include "QP_PlayerController.h"
 #include "QuarantineProject/QuarantineProjectCharacter.h"
-#include "QuarantineProject/Public/HUD/QP_HUD.h"
-#include "QuarantineProject/Public/Inventory/QP_InventorySystemComponent.h"
+#include "HUD/QP_HUD.h"
+#include "Inventory/QP_InventorySystemComponent.h"
 
 void AQP_PlayerController::BeginPlay()
 {

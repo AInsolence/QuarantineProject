@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "QuarantineProject/Public/HUD/QP_InventorySlotWidget.h"
+#include "HUD/QP_InventorySlotWidget.h"
 #include "QuarantineProjectCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameOverByPlayersDeath);

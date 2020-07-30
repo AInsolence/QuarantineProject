@@ -13,10 +13,10 @@
 #include "Kismet/GameplayStatics.h"
 #include "Math/UnrealMathUtility.h"
 #include "GameFramework/PlayerController.h"
-#include "QuarantineProject/Public/HUD/QP_HUD.h"
+#include "HUD/QP_HUD.h"
 #include "QP_HealthComponent.h"
-#include "QuarantineProject/Public/QP_WeaponBase.h"
-#include "QuarantineProject/Public/Inventory/QP_InventorySystemComponent.h"
+#include "QP_WeaponBase.h"
+#include "Inventory/QP_InventorySystemComponent.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AQuarantineProjectCharacter

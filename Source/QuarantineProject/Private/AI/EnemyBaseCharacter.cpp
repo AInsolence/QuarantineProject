@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "QuarantineProject/Public/AI/EnemyBaseCharacter.h"
+#include "AI/EnemyBaseCharacter.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -11,7 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Math/UnrealMathUtility.h"
 #include "QP_HealthComponent.h"
-#include "QuarantineProject/Public/QP_WeaponBase.h"
+#include "QP_WeaponBase.h"
 #include "Perception/AIPerceptionComponent.h"
 
 AEnemyBaseCharacter::AEnemyBaseCharacter()

@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "QuarantineProject/Public/HUD/SettingsWidget.h"
+#include "HUD/SettingsWidget.h"
 #include "Runtime/UMG/Public/UMG.h"
-#include "QuarantineProject/Public/HUD/SettingsOptionWidget.h"
-#include "QuarantineProject/Public/HUD/SaveSettings.h"
+#include "HUD/SettingsOptionWidget.h"
+#include "HUD/SaveSettings.h"
 #include "Engine.h"
 
 USettingsWidget::USettingsWidget(const FObjectInitializer& ObjectInitializer) :
@@ -37,25 +37,6 @@ void USettingsWidget::InitOptions()
 					{
 						Option->SetValues(OptionInfo.Value.ConsoleCommandValues);
 					}
-					//// set default values from config file
-					//auto CVar = IConsoleManager::Get().
-					//	FindConsoleVariable(*OptionInfo.Value.ConsoleCommandPrefix);
-					//UE_LOG(LogTemp, Warning, TEXT("!Before CVar, console command %s"), *OptionInfo.Value.ConsoleCommandPrefix)
-					//if (CVar)
-					//{
-					//	UE_LOG(LogTemp, Warning, TEXT("!In CVar"))
-					//	FString Value = "";
-					//	Value = CVar->GetString();
-					//	if (!Value.IsEmpty())
-					//	{
-					//		UE_LOG(LogTemp, Warning, TEXT("!In CVar String, %s"), *Value)
-					//		auto OptionValueNameInComboBox = Option->ConsoleCommandsMap.FindKey(Value);
-					//		if (OptionValueNameInComboBox)
-					//		{
-					//			Option->SetValue(*OptionValueNameInComboBox);
-					//		}
-					//	}
-					//}
 					VButtonsContainer->AddChildToVerticalBox(Option);
 				}
 			}
@@ -106,9 +87,9 @@ void USettingsWidget::SaveSettingsValues()
 	if (USaveSettings* SaveSettingsInstance = Cast<USaveSettings>(UGameplayStatics::CreateSaveGameObject(USaveSettings::StaticClass())))
 	{
 		// Set data on the savegame object.
-		SaveSettingsInstance->VideoSettingsValues = CurrentSettingsValues;
+		SaveSettingsInstance->SettingsValues = CurrentSettingsValues;
 		// Save the data immediately.
-		if (UGameplayStatics::SaveGameToSlot(SaveSettingsInstance, "VideoSettingsSlot", 0))
+		if (UGameplayStatics::SaveGameToSlot(SaveSettingsInstance, "SettingsSlot", 0))
 		{
 			// Save succeeded.
 			UE_LOG(LogTemp, Warning, TEXT("Save settings successfully"));
@@ -116,12 +97,13 @@ void USettingsWidget::SaveSettingsValues()
 	}
 }
 
-void USettingsWidget::LoadSettingsValues()
+bool USettingsWidget::LoadSettingsValues()
 {
-	if (USaveSettings* LoadedVideoSettings = Cast<USaveSettings>(UGameplayStatics::LoadGameFromSlot("VideoSettingsSlot", 0)))
+	if (USaveSettings* LoadedSettings = Cast<USaveSettings>(UGameplayStatics::LoadGameFromSlot("SettingsSlot", 0)))
 	{
 		// The operation was successful, so LoadedGame now contains the data we saved earlier.
-		UE_LOG(LogTemp, Warning, TEXT("Load settings successfully"));
-		CurrentSettingsValues = LoadedVideoSettings->VideoSettingsValues;
+		CurrentSettingsValues = LoadedSettings->SettingsValues;
+		return true;
 	}
+	return false;
 }

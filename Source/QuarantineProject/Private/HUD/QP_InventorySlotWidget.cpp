@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "QuarantineProject/Public/HUD/QP_InventorySlotWidget.h"
+#include "HUD/QP_InventorySlotWidget.h"
 #include "Runtime/UMG/Public/UMG.h"
 #include "Components/Image.h"
 #include "Runtime/UMG/Public/Blueprint/WidgetBlueprintLibrary.h"
-#include "QuarantineProject/Public/HUD/MyDragDropOperation.h"
+#include "HUD/MyDragDropOperation.h"
 
 UQP_InventorySlotWidget::UQP_InventorySlotWidget(const FObjectInitializer& ObjectInitializer) 
 	: Super(ObjectInitializer)

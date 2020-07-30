@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/UniformGridPanel.h"
 #include "Blueprint/UserWidget.h"
-#include "QuarantineProject/Public/HUD/QP_InventorySlotWidget.h"
+#include "HUD/QP_InventorySlotWidget.h"
 #include "Containers/Array.h"
 #include "QP_InventoryUniformGridPanel.generated.h"
 
