@@ -15,6 +15,7 @@ UQP_PickableComponent::UQP_PickableComponent()
 
 void UQP_PickableComponent::BeginPlay()
 {
+	Super::BeginPlay();
 }
 
 

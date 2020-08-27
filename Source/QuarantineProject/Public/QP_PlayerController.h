@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "QP_PlayerController.generated.h"
 
 /**
@@ -20,7 +21,6 @@ public:
 	/** Called every frame */
 	virtual void Tick(float DeltaTime) override;
 
-protected:
 	UFUNCTION(BlueprintCallable, Category = Setup)
 	ACharacter* GetControlledCharacter() const;
 	virtual void SetupInputComponent() override;

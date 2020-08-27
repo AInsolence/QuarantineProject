@@ -94,22 +94,22 @@ void AQP_PlayerController::MoveRight(float Value)
 
 void AQP_PlayerController::AddControllerYawInput(float Value)
 {
-	GetControlledCharacter()->AddControllerYawInput(Value);
+	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->AddControllerYawInput(Value);
 }
 
 void AQP_PlayerController::AddControllerPitchInput(float Value)
 {
-	GetControlledCharacter()->AddControllerPitchInput(Value);
+	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->AddControllerPitchInput(Value);
 }
 
 void AQP_PlayerController::Jump()
 {
-	GetControlledCharacter()->Jump();
+	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->Jump();
 }
 
 void AQP_PlayerController::StopJumping()
 {
-	GetControlledCharacter()->StopJumping();
+	Cast<AQuarantineProjectCharacter>(GetControlledCharacter())->StopJumping();
 }
 
 void AQP_PlayerController::Crouch()

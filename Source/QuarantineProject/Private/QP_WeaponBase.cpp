@@ -113,9 +113,30 @@ void AQP_WeaponBase::SpawnProjectile(FRotator MuzzleRotation)
 		{
 			if (WeaponMesh)
 			{
+				FRotator FireRotator;
 				FVector MuzzleLocation = WeaponMesh->GetSocketLocation("Muzzle");
-				auto CameraRotation = UGameplayStatics::GetPlayerCameraManager(this, 0)->
-												GetActorForwardVector().ToOrientationRotator();
+				//auto CameraRotation = UGameplayStatics::GetPlayerCameraManager(this, 0)->
+				//								GetActorForwardVector().ToOrientationRotator();
+				//// Deproject aim to world point
+				//auto PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+				//if (PlayerController)
+				//{
+				//	FIntPoint ScreenSize;
+				//	PlayerController->GetViewportSize(ScreenSize.X, ScreenSize.Y);
+				//	FVector2D ScreenCenter = (ScreenSize.X/2.0f, ScreenSize.Y / 2.0f);
+				//	UE_LOG(LogTemp, Warning, TEXT("Direction deproject point: %s"), *ScreenCenter.ToString());
+				//	FVector OutWorldLocation;
+				//	FVector OutWorldDirection;
+				//	// Find world point
+				//	PlayerController->DeprojectScreenPositionToWorld(ScreenCenter.X, 
+				//														ScreenCenter.Y, 
+				//														OutWorldLocation, 
+				//														OutWorldDirection);
+				auto CameraManager = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
+				if (CameraManager)
+				{
+					MuzzleRotation = CameraManager->GetActorForwardVector().Rotation();
+				}
 				// Broadcast OnFireEvent
 				OnFireEvent.Broadcast();
 				//Set Spawn Collision Handling Override
@@ -124,9 +145,7 @@ void AQP_WeaponBase::SpawnProjectile(FRotator MuzzleRotation)
 				// spawn the projectile at the place
 				World->SpawnActor<ARifleProjectile_01>(Projectile,
 					MuzzleLocation,
-					//CameraRotation,
 					MuzzleRotation,
-					//GetMuzzleRotation(),
 					ActorSpawnParams);
 				// spawn the projectiles shell
 				World->SpawnActor<ARifleProjectile_01>(Shell,
@@ -141,7 +160,6 @@ void AQP_WeaponBase::SpawnProjectile(FRotator MuzzleRotation)
 						MuzzleLocation,
 						MuzzleRotation);
 				}
-
 			}
 		}
 	}

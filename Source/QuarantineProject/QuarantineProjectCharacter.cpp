@@ -357,7 +357,7 @@ void AQuarantineProjectCharacter::LookUpAtRate(float Rate)
 
 void AQuarantineProjectCharacter::MoveForward(float Value)
 {
-	if ((Controller != NULL) && (Value != 0.0f))
+	if (true && (Value != 0.0f))//(Controller != NULL) 
 	{
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -371,7 +371,7 @@ void AQuarantineProjectCharacter::MoveForward(float Value)
 
 void AQuarantineProjectCharacter::MoveRight(float Value)
 {
-	if ( (Controller != NULL) && (Value != 0.0f) )
+	if (true  && (Value != 0.0f) )//(Controller != NULL)
 	{
 		// find out which way is right
 		const FRotator Rotation = Controller->GetControlRotation();

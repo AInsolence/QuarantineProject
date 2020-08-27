@@ -70,17 +70,20 @@ AActor* UQP_InventorySystemComponent::RaycastToFindPickableItem()
 	{// get camera location and forward vector
 		FVector RayStart;
 		FRotator RayRotation;
-		Owner->GetController()->GetPlayerViewPoint(RayStart, RayRotation);
-		// set ray direction and distance
-		FVector RayDirection = RayRotation.Vector();
-		float RayDistance = 400.f;
-		FVector RayEnd = RayStart + (RayDirection * RayDistance);
-		// hit
-		FHitResult HitResult;
-		bool bHasHitSmth = GetWorld()->LineTraceSingleByChannel(HitResult,
-			RayStart + RayDirection * 100,
-			RayEnd,
-			ECollisionChannel::ECC_WorldDynamic);
+		auto CharacterController = Owner->GetController();
+		if(CharacterController)
+		{
+			CharacterController->GetPlayerViewPoint(RayStart, RayRotation);
+			// set ray direction and distance
+			FVector RayDirection = RayRotation.Vector();
+			float RayDistance = 400.f;
+			FVector RayEnd = RayStart + (RayDirection * RayDistance);
+			// hit
+			FHitResult HitResult;
+			bool bHasHitSmth = GetWorld()->LineTraceSingleByChannel(HitResult,
+				RayStart + RayDirection * 100,
+				RayEnd,
+				ECollisionChannel::ECC_WorldDynamic);
 		/*DrawDebugLine
 		(
 			GetWorld(),
@@ -93,21 +96,29 @@ AActor* UQP_InventorySystemComponent::RaycastToFindPickableItem()
 			10
 		);*/
 		// if hit smth check if an item is pickable
-		if (bHasHitSmth)
-		{
-			auto HittedActor = HitResult.GetActor();
-			// check if actor is pickable
-			auto ActorPickableComponent = HittedActor->FindComponentByClass<UQP_PickableComponent>();
-			if (ActorPickableComponent)
-			{// if it is pickable show the pick up option to player
-				OnItemCanBePickedUp.ExecuteIfBound(true);
-				return HittedActor;
-			}
-			else
+			if (bHasHitSmth)
 			{
-				OnItemCanBePickedUp.ExecuteIfBound(false);
-				// item is not pickable
-				return nullptr;
+				auto HittedActor = HitResult.GetActor();
+				// check if actor is pickable
+				if (HittedActor)
+				{
+					auto ActorPickableComponent = HittedActor->FindComponentByClass<UQP_PickableComponent>();
+					if (ActorPickableComponent)
+					{// if it is pickable show the pick up option to player
+						OnItemCanBePickedUp.ExecuteIfBound(true);
+						return HittedActor;
+					}
+					else
+					{
+						OnItemCanBePickedUp.ExecuteIfBound(false);
+						// item is not pickable
+						return nullptr;
+					}
+				}
+				else 
+				{
+					return nullptr;
+				}
 			}
 		}
 		OnItemCanBePickedUp.ExecuteIfBound(false);

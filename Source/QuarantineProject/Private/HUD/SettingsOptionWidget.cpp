@@ -10,7 +10,6 @@
 USettingsOptionWidget::USettingsOptionWidget(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
-
 }
 
 void USettingsOptionWidget::NativeConstruct()
@@ -19,14 +18,25 @@ void USettingsOptionWidget::NativeConstruct()
 	// Bind combo box option changes function
 	if (OptionValues)
 	{
-		OptionValues->OnSelectionChanged.AddDynamic(this, 
-									&USettingsOptionWidget::SelectionChanged);
+		OptionValues->OnSelectionChanged.AddDynamic(this,
+			&USettingsOptionWidget::SelectionChanged);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Option values combo box does not exist. Please check BP_SettingsWidget -> Graph -> Details -> SettingsButton -> SettingsOption might be a widget contains 'OptionName' text area and 'OptionValues'combo box (BP_OptionWidget)."));
 	}
 }
 
 void USettingsOptionWidget::SetName(const FString Name)
 {
-	OptionName->SetText(FText::FromString(Name));
+	if (OptionName)
+	{
+		OptionName->SetText(FText::FromString(Name));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Option name does not exist. Please check BP_SettingsWidget->Graph->Details->SettingsButton->SettingsOption might be a widget contains 'OptionName' text area and 'OptionValues'combo box(BP_OptionWidget)."));
+	}
 }
 
 void USettingsOptionWidget::SetValues(const TMap<FString, FString> Values)
@@ -40,26 +50,26 @@ void USettingsOptionWidget::SetValues(const TMap<FString, FString> Values)
 	// set options name as a combobox option
 	for (auto option : Values)
 	{
-		OptionValues->AddOption(option.Key);
+		if (OptionValues)
+		{
+			OptionValues->AddOption(option.Key);
+		}
 	}
 }
 
 void USettingsOptionWidget::SetValue(const FString Value)
 {
-	OptionValues->SetSelectedOption(Value);	
-	// CONSOLE COMMAND VERSION
-	// Create and execute console command to set option
-	auto ConsoleCommandValue = ConsoleCommandsMap[Value];
-	FString GeneratedConsoleCommand = ConsoleCommandPrefix + " " + ConsoleCommandValue;
-	GetWorld()->GetFirstPlayerController()->ConsoleCommand(*GeneratedConsoleCommand);
-	//// Find appropriate key in config file to save
-	//auto CVar = IConsoleManager::Get().FindConsoleVariable(*ConsoleCommandPrefix);
-	//UE_LOG(LogTemp, Warning, TEXT("Before CVar, console command %s"), *ConsoleCommandPrefix)
-	//if (CVar && !ConsoleCommandValue.IsEmpty())
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("In CVar String, %s"), *Value)
-	//	CVar->Set(*ConsoleCommandValue, ECVF_SetByConsole);
-	//}
+	if (OptionValues)
+	{
+		OptionValues->SetSelectedOption(Value);
+		// Create and execute console command to set option
+		auto ConsoleCommandValue = ConsoleCommandsMap.Find(Value);
+		if (ConsoleCommandValue)
+		{
+			FString GeneratedConsoleCommand = ConsoleCommandPrefix + " " + *ConsoleCommandValue;
+			GetWorld()->GetFirstPlayerController()->ConsoleCommand(*GeneratedConsoleCommand);
+		}
+	}
 }
 
 void USettingsOptionWidget::SelectionChanged(FString SelectedItem, ESelectInfo::Type SelectionType)
