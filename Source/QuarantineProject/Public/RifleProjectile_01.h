@@ -45,5 +45,4 @@ public:
 	FORCEINLINE class UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
 	// explosive status
 	bool bIsExplosiveRound = true;
-
 };
